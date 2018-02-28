@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Function extends Expression
 {
@@ -15,12 +17,22 @@ public class Function extends Expression
 		this.operator = operator;
 		this.terms = new ArrayList<Expression>(terms);
 	}
+	public Function(Operator operator, Expression... terms)
+	{
+		this(operator, Arrays.asList(terms));
+	}
+	public Function(Operator operator, String... terms)
+	{
+		this(operator, Arrays.stream(terms).map(Literal::new).collect(Collectors.toList()));
+	}
 	
 	@Override
 	public String toString()
 	{
 		String ans = operator.toString();
-		return ans;
+		for (Expression e : terms)
+			ans += " "+e;
+		return "("+ans+")";
 	}
 
 	@Override
