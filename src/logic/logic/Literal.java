@@ -1,4 +1,5 @@
-import java.util.HashSet;
+package logic;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -14,9 +15,7 @@ public class Literal extends Expression
 	@Override
 	public Set<Literal> getVariables()
 	{
-		Set<Literal> temp = new HashSet<Literal>();
-		temp.add(this);
-		return temp;
+		return Collections.singleton(this);
 	}
 
 	@Override

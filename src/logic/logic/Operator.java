@@ -1,3 +1,4 @@
+package logic;
 public enum Operator
 {
 	NEG("¬", 1),

@@ -1,3 +1,4 @@
+package logic;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -19,13 +20,25 @@ public class Function extends Expression
 		this.operator = operator;
 		this.terms = new ArrayList<Expression>(terms);
 	}
+	
 	public Function(Operator operator, Expression... terms)
 	{
 		this(operator, Arrays.asList(terms));
 	}
+	
 	public Function(Operator operator, String... terms)
 	{
 		this(operator, Arrays.stream(terms).map(Literal::new).collect(Collectors.toList()));
+	}
+	
+	public List<Expression> getTerms()
+	{
+		return new ArrayList<Expression>(terms); // Copy new list to avoid representation exposure
+	}
+	
+	public Expression getTerm(int i)
+	{
+		return terms.get(i);
 	}
 	
 	@Override
@@ -50,5 +63,21 @@ public class Function extends Expression
 	public List<TruthAssignment> getTruthAssignments()
 	{
 		return null;
+	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		if (o instanceof Function)
+		{
+			Function f2 = (Function) o;
+			if (!operator.equals(f2.operator))
+				return false;
+			for (int i=0; i<terms.size(); ++i)
+				if (!terms.get(i).equals(f2.getTerm(i)))
+					return false;
+			return true;
+		}
+		return false;
 	}
 }
