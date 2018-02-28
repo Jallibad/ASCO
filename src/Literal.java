@@ -1,5 +1,6 @@
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Literal extends Expression
 {
@@ -11,9 +12,9 @@ public class Literal extends Expression
 	}
 	
 	@Override
-	public List<Literal> getVariables()
+	public Set<Literal> getVariables()
 	{
-		List<Literal> temp = new ArrayList<Literal>();
+		Set<Literal> temp = new HashSet<Literal>();
 		temp.add(this);
 		return temp;
 	}
@@ -28,5 +29,18 @@ public class Literal extends Expression
 	public String toString()
 	{
 		return VARIABLE_NAME;
+	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		if (o instanceof Literal)
+			return VARIABLE_NAME.equals(((Literal) o).VARIABLE_NAME);
+		return false;
+	}
+	@Override
+	public int hashCode()
+	{
+		return VARIABLE_NAME.hashCode();
 	}
 }

@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Function extends Expression
@@ -36,9 +38,9 @@ public class Function extends Expression
 	}
 
 	@Override
-	public List<Literal> getVariables()
+	public Set<Literal> getVariables()
 	{
-		List<Literal> ans = new ArrayList<Literal>();
+		Set<Literal> ans = new HashSet<Literal>();
 		for (Expression e : terms)
 			ans.addAll(e.getVariables());
 		return ans;
