@@ -52,6 +52,44 @@ public abstract class Expression
 		return new Function(op, terms);
 	}
 	
+	//This only covers basic shit
+	public Expression transformCNF(Expression e){
+		if(e instanceof Literal)//is a class that inherits from Literal
+		{
+			return e;
+		}
+		//Check if the expression is an instance of Function
+		else if(e instanceof Function)
+		{
+			//Cast the expression to a function so that we can access it's variables
+			Function curr = (Function)e; 
+			
+			if(curr.operator == Operator.NEG) 
+			{
+				
+				if(curr.getTerm(0) instanceof Literal)
+				{
+					return curr;
+				}
+				else if(curr.getTerm(0) instanceof Function)
+				{
+					Function innerCurr = (Function)curr.getTerm(0);
+					if(innerCurr.operator == Operator.NEG)
+					{
+						InferenceRule.DOUBLE_NEGATION.transform(innerCurr);
+						return innerCurr;
+					}
+				
+					else if(innerCurr.operator == Operator.OR)
+					{
+						
+					}
+				}
+			}
+		}
+		return e;
+	}
+	
 	/**
 	 * Creates a Set containing each variable that occurs in the expression
 	 * @return the specified Set
