@@ -1,6 +1,8 @@
 package logic;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -46,5 +48,19 @@ public class Literal extends Expression
 	public int hashCode()
 	{
 		return VARIABLE_NAME.hashCode();
+	}
+
+	@Override
+	public boolean matches(Expression e)
+	{
+		return true; // A Literal matches any Expression
+	}
+
+	@Override
+	public Map<Literal, Expression> fillMatches(Expression e)
+	{
+		Map<Literal, Expression> ans = new HashMap<Literal, Expression>();
+		ans.put(this, e);
+		return ans;
 	}
 }

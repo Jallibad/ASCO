@@ -1,6 +1,7 @@
 package logic;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -13,7 +14,10 @@ public abstract class Expression
 {
 	public static void main(String[] args)
 	{
-		
+		Expression e1 = create("(AND A B)");
+		Expression e2 = create("(AND (NEG A) Q)");
+		System.out.println(e1.matches(e2));
+		System.out.println(e1.fillMatches(e2));
 	}
 	
 	// TODO add error checking/handling
@@ -96,4 +100,19 @@ public abstract class Expression
 	 */
 	public abstract Set<Literal> getVariables();
 	public abstract List<TruthAssignment> getTruthAssignments();
+	
+	// TODO rewrite this JavaDoc to be more correct
+	/**
+	 * Checks if the Expressions have the same syntactic form, ignoring Literal names.
+	 * The argument specifies the minimum complexity
+	 * "A".matches("B"), and "(AND A B)".matches("(AND P Q)"), but !"(AND A B)".matches("(OR A B)")
+	 * @param pattern the Expression to match against
+	 * @return True if the Expressions match, false otherwise
+	 */
+	public abstract boolean matches(Expression pattern);
+	public boolean matches(String pattern) // TODO write JavaDoc for this I'm lazy
+	{
+		return matches(Expression.create(pattern));
+	}
+	public abstract Map<Literal,Expression> fillMatches(Expression e);
 }

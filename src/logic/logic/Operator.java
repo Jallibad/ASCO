@@ -1,5 +1,6 @@
 package logic;
 
+// TODO add truth table stuff to this
 /**
  * An Enum containing each of the valid operators in FOL.
  * @author Jallibad

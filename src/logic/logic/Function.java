@@ -1,8 +1,10 @@
 package logic;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -66,11 +68,23 @@ public class Function extends Expression
 		this(operator, Arrays.stream(terms).map(Literal::new).collect(Collectors.toList()));
 	}
 	
+	/**
+	 * Getter method for the the terms or arguments to this function.
+	 * Terms are in sorted order with getTerms().get(0) being the first argument.
+	 * @return The List of terms, a copy is made to avoid rep exposure
+	 */
 	public List<Expression> getTerms()
 	{
 		return new ArrayList<Expression>(terms); // Copy new list to avoid representation exposure
 	}
 	
+	/**
+	 * Gets the term[i] element of the terms List.
+	 * It's slightly more efficient to use this function if the
+	 * full list of terms isn't needed.
+	 * @param i the index of the term, 0 is the first
+	 * @return The i'th term of the terms List
+	 */
 	public Expression getTerm(int i)
 	{
 		return terms.get(i);
@@ -103,16 +117,42 @@ public class Function extends Expression
 	@Override
 	public boolean equals(Object o)
 	{
-		if (o instanceof Function)
-		{
-			Function f2 = (Function) o;
-			if (!operator.equals(f2.operator))
+		if (!(o instanceof Function))
+			return false;
+		Function other = (Function) o;
+		if (operator != other.operator)
+			return false;
+		for (int i=0; i<terms.size(); ++i)
+			if (!terms.get(i).equals(other.getTerm(i)))
 				return false;
-			for (int i=0; i<terms.size(); ++i)
-				if (!terms.get(i).equals(f2.getTerm(i)))
-					return false;
-			return true;
-		}
-		return false;
+		return true;
+	}
+
+	@Override
+	public boolean matches(Expression e)
+	{
+		if (!(e instanceof Function))
+			return false;
+		Function other = (Function) e;
+		if (operator != other.operator)
+			return false;
+		for (int i=0; i<terms.size(); ++i)
+			if (!terms.get(i).matches(other.getTerm(i)))
+				return false;
+		return true;
+	}
+
+	@Override
+	public Map<Literal, Expression> fillMatches(Expression e)
+	{
+		if (!(e instanceof Function))
+			return null;
+		Function other = (Function) e;
+		if (operator != other.operator)
+			return null;
+		Map<Literal, Expression> ans = new HashMap<Literal, Expression>();
+		for (int i=0; i<terms.size(); ++i)
+			ans.putAll(terms.get(i).fillMatches(other.getTerm(i)));
+		return ans;
 	}
 }

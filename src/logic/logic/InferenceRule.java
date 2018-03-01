@@ -35,7 +35,7 @@ public enum InferenceRule
 		}
 	}
 	
-	private void fillMapping(Map<Literal,Expression> m, Expression orig, Expression from) throws InferenceMismatchException
+	public void fillMapping(Map<Literal,Expression> m, Expression orig, Expression from) throws InferenceMismatchException
 	{
 		if (orig instanceof Literal)
 		{
