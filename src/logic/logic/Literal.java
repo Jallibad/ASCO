@@ -3,6 +3,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * This class represents a single variable such as "A" or "B".
+ * @author Jallibad
+ *
+ */
 public class Literal extends Expression
 {
 	public final String VARIABLE_NAME;

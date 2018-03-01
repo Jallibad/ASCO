@@ -6,8 +6,9 @@ import java.util.stream.Collectors;
 
 public enum InferenceRule
 {
-	// TODO change to using clearer Function construction syntax
-	DE_MORGANS("(NEG (OR P Q))", "(AND (NEG P) (NEG Q))");
+	DE_MORGANS_OR("(NEG (OR P Q))", "(AND (NEG P) (NEG Q))"),
+	DE_MORGANS_AND("(NEG (AND P Q))", "(OR (NEG P) (NEG Q))"),
+	DOUBLE_NEGATION("(NEG (NEG P))", "P");
 	
 	InferenceRule(String left, String right)
 	{
@@ -23,11 +24,18 @@ public enum InferenceRule
 	public Expression transform(Expression orig)
 	{
 		Map<Literal,Expression> mapping = new HashMap<Literal,Expression>();
-		fillMapping(mapping, left, orig);
-		return transform(mapping, right);
+		try
+		{
+			fillMapping(mapping, left, orig);
+			return transform(mapping, right);
+		}
+		catch (InferenceMismatchException e)
+		{
+			return null; // TODO this could be an awful idea
+		}
 	}
 	
-	private void fillMapping(Map<Literal,Expression> m, Expression orig, Expression from)
+	private void fillMapping(Map<Literal,Expression> m, Expression orig, Expression from) throws InferenceMismatchException
 	{
 		if (orig instanceof Literal)
 		{
@@ -35,7 +43,11 @@ public enum InferenceRule
 		}
 		else
 		{
-			// TODO check that operators are the same
+			if (((Function) orig).operator != ((Function) from).operator)
+			{
+				throw new InferenceMismatchException("TEST");
+				// TODO handle case where operators are not the same
+			}
 			List<Expression> origTerms = ((Function) orig).getTerms();
 			List<Expression> fromTerms = ((Function) from).getTerms();
 			for (int i=0; i<origTerms.size(); ++i)

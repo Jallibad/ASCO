@@ -3,18 +3,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * An abstract class that represents a FOL statement.
+ * Subclassed by Literal and Function 
+ * @author Jallibad
+ *
+ */
 public abstract class Expression
 {
 	public static void main(String[] args)
 	{
-		System.out.println(create("(AND (NEG A) B)"));
-		Expression test = new Function(Operator.NEG, new Function(Operator.OR, "A", "B"));
-		System.out.println(test);
-		Expression result = InferenceRule.DE_MORGANS.transform(test);
-		System.out.println(result);
+		
 	}
 	
 	// TODO add error checking/handling
+	/**
+	 * Takes a String representing FOL using prefix notation (ie. "(NEG (AND A B))").
+	 * Currently does not do any error checking or handling.
+	 * @param exp the String to convert to an Expression
+	 * @return An Expression object that is equivalent to the parameter
+	 */
 	public static Expression create(String exp)
 	{
 		if (exp.charAt(0) != '(') // Every Function is wrapped in ()
@@ -45,8 +53,8 @@ public abstract class Expression
 	}
 	
 	/**
-	 * Creates a set of 
-	 * @return
+	 * Creates a Set containing each variable that occurs in the expression
+	 * @return the specified Set
 	 */
 	public abstract Set<Literal> getVariables();
 	public abstract List<TruthAssignment> getTruthAssignments();
