@@ -14,6 +14,7 @@ public class InferenceRuleTests
 		Expression e1 = Expression.create("(NEG (OR A B))");
 		Expression e2 = Expression.create("(AND (NEG A) (NEG B))");
 		assertEquals(InferenceRule.DE_MORGANS_OR.transform(e1), e2);
-		InferenceRule.DE_MORGANS_OR.transform(e2); // TODO test invalid transforms
+		assertEquals(InferenceRule.DE_MORGANS_OR.transform(e2), e1);
+		// TODO test invalid transforms
 	}
 }

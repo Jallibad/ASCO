@@ -14,10 +14,8 @@ public abstract class Expression
 {
 	public static void main(String[] args)
 	{
-		Expression e1 = create("(AND A B)");
-		Expression e2 = create("(AND (NEG A) Q)");
-		System.out.println(e1.matches(e2));
-		System.out.println(e1.fillMatches(e2));
+		Expression e1 = create("(NEG (OR A (NEG C)))");
+		System.out.println(NormalForm.NEGATION.transform(e1));
 	}
 	
 	// TODO add error checking/handling

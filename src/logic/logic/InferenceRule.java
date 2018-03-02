@@ -1,10 +1,10 @@
 package logic;
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public enum InferenceRule
+public enum InferenceRule implements Transform
 {
 	DE_MORGANS_OR("(NEG (OR P Q))", "(AND (NEG P) (NEG Q))"),
 	DE_MORGANS_AND("(NEG (AND P Q))", "(OR (NEG P) (NEG Q))"),
@@ -23,36 +23,12 @@ public enum InferenceRule
 	 */
 	public Expression transform(Expression orig)
 	{
-		Map<Literal,Expression> mapping = new HashMap<Literal,Expression>();
-		try
-		{
-			fillMapping(mapping, left, orig);
-			return transform(mapping, right);
-		}
-		catch (InferenceMismatchException e)
-		{
-			return null; // TODO this could be an awful idea
-		}
-	}
-	
-	public void fillMapping(Map<Literal,Expression> m, Expression orig, Expression from) throws InferenceMismatchException
-	{
-		if (orig instanceof Literal)
-		{
-			m.put((Literal) orig, from);
-		}
+		if (left.matches(orig))
+			return transform(left.fillMatches(orig), right);
+		else if (right.matches(orig))
+			return transform(right.fillMatches(orig), left);
 		else
-		{
-			if (((Function) orig).operator != ((Function) from).operator)
-			{
-				throw new InferenceMismatchException("TEST");
-				// TODO handle case where operators are not the same
-			}
-			List<Expression> origTerms = ((Function) orig).getTerms();
-			List<Expression> fromTerms = ((Function) from).getTerms();
-			for (int i=0; i<origTerms.size(); ++i)
-				fillMapping(m, origTerms.get(i), fromTerms.get(i));
-		}
+			return null; // TODO this could be a terrible idea
 	}
 	
 	private Expression transform(Map<Literal,Expression> mapping, Expression e)
