@@ -18,6 +18,17 @@ public abstract class Expression
 		System.out.println(NormalForm.NEGATION.transform(e1));
 	}
 	
+	// TODO actually parse arbitrary expressions
+	/**
+	 * Parses text for 
+	 * @param exp
+	 * @return
+	 */
+	public static Expression parse(String exp) throws MalformedExpressionException
+	{
+		return null;
+	}
+	
 	// TODO add error checking/handling
 	/**
 	 * Takes a String representing FOL using prefix notation (ie. "(NEG (AND A B))").
