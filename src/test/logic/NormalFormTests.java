@@ -21,6 +21,24 @@ public class NormalFormTests
 	}
 	
 	@Test
+	public void testCNFtransform()
+	{
+		Expression e1 = Expression.create("(AND (NEG A) (OR B C))");
+		Expression e2 = Expression.create("(AND A (OR B (AND D E)))");
+		assertEquals(e1,NormalForm.CONJUNCTIVE.transform(e1));
+		assertEquals(Expression.create("(AND A (AND (OR B D) (OR B E)))"),NormalForm.CONJUNCTIVE.transform(e2));
+	}
+	
+	@Test
+	public void testDNFtransform()
+	{
+		Expression e1 = Expression.create("(OR (NEG A) (AND B C))");
+		Expression e2 = Expression.create("(OR A (AND B (OR D E)))");
+		assertEquals(e1,NormalForm.DISJUNCTIVE.transform(e1));
+		assertEquals(Expression.create("(OR A (OR (AND B D) (AND B E)))"),NormalForm.DISJUNCTIVE.transform(e2));
+	}
+	
+	@Test
 	public void testNNFtransform()
 	{
 		Expression e1 = Expression.create("(AND (OR A B) C)");

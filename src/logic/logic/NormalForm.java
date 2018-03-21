@@ -15,9 +15,33 @@ public enum NormalForm implements Transform
 		switch (this)
 		{
 			case CONJUNCTIVE:
-				break;
+				orig = NEGATION.transform(orig);
+				
+				if (orig instanceof Function)
+				{
+					Function f = (Function) orig;
+					List<Expression> normalFormTerms =
+						f.getTerms().stream().map(CONJUNCTIVE::transform).collect(Collectors.toList());
+					orig = new Function(f.operator, normalFormTerms);
+				}
+				if (Expression.create("(OR P (AND Q R))").matches(orig))
+					orig = transform(InferenceRule.OR_DISTRIBUTION.transform(orig));
+				
+				return orig;
 			case DISJUNCTIVE:
-				break;
+				orig = NEGATION.transform(orig);
+				
+				if (orig instanceof Function)
+				{
+					Function f = (Function) orig;
+					List<Expression> normalFormTerms =
+						f.getTerms().stream().map(DISJUNCTIVE::transform).collect(Collectors.toList());
+					orig = new Function(f.operator, normalFormTerms);
+				}
+				if (Expression.create("(AND P (OR Q R))").matches(orig))
+					orig = transform(InferenceRule.AND_DISTRIBUTION.transform(orig));
+				
+				return orig;
 			case NEGATION:
 				if (orig instanceof Function)
 				{
