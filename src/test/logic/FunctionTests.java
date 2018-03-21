@@ -41,4 +41,16 @@ public class FunctionTests
 		Function e3 = new Function(Operator.NEG, e2);
 		assertEquals(testVariables, e3.getVariables());
 	}
+	
+	@Test
+	public void testMatches()
+	{
+		// TODO write test cases here
+	}
+	
+	@Test
+	public void testFillMatches()
+	{
+		// TODO write test cases here
+	}
 }

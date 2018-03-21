@@ -63,4 +63,16 @@ public class Literal extends Expression
 		ans.put(this, e);
 		return ans;
 	}
+
+	@Override
+	public String prettyPrint()
+	{
+		return VARIABLE_NAME;
+	}
+
+	@Override
+	Operator getOperator()
+	{
+		return null;
+	}
 }

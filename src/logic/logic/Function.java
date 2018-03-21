@@ -155,4 +155,38 @@ public class Function extends Expression
 			ans.putAll(terms.get(i).fillMatches(other.getTerm(i)));
 		return ans;
 	}
+
+	@Override
+	public String prettyPrint()
+	{
+		if (operator == Operator.NEG)
+		{
+			if (terms.get(0) instanceof Function)
+				return operator.DISPLAY_TEXT+"("+terms.get(0).prettyPrint()+")";
+			else
+				return operator.DISPLAY_TEXT+terms.get(0).prettyPrint();
+		}
+		
+		String ans = "";
+		for (int i=0; i<terms.size()+1; ++i)
+		{
+			if (i == operator.SYMBOL_POSITION)
+			{
+				ans += " "+operator.DISPLAY_TEXT;
+				continue;
+			}
+			Expression currTerm = terms.get(i<operator.SYMBOL_POSITION ? i : i-1); // Account for inserting the operator
+			if (currTerm instanceof Literal || currTerm.getOperator() == Operator.NEG)
+				ans += " "+currTerm.prettyPrint();
+			else
+				ans += " ("+currTerm.prettyPrint()+")";
+		}
+		return ans.substring(1);
+	}
+
+	@Override
+	Operator getOperator()
+	{
+		return operator;
+	}
 }

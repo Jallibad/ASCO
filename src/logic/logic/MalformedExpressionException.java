@@ -7,4 +7,9 @@ public class MalformedExpressionException extends Exception
 	{
 		super(s);
 	}
+
+	public MalformedExpressionException()
+	{
+		
+	}
 }

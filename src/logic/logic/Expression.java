@@ -15,10 +15,9 @@ public abstract class Expression
 	public static void main(String[] args)
 	{
 		Expression e1 = create("(NEG (OR A (NEG C)))");
-		System.out.println(NormalForm.NEGATION.transform(e1));
+		System.out.println(e1.prettyPrint());
 	}
 	
-	// TODO actually parse arbitrary expressions
 	/**
 	 * Parses text for 
 	 * @param exp
@@ -26,7 +25,15 @@ public abstract class Expression
 	 */
 	public static Expression parse(String exp) throws MalformedExpressionException
 	{
-		return null;
+		// TODO parse pretty printed expressions and check for correctness
+		try
+		{
+			return create(exp);
+		}
+		catch (Exception e)
+		{
+			throw new MalformedExpressionException();
+		}
 	}
 	
 	// TODO add error checking/handling
@@ -124,4 +131,16 @@ public abstract class Expression
 		return matches(Expression.create(pattern));
 	}
 	public abstract Map<Literal,Expression> fillMatches(Expression e);
+	
+	/**
+	 * A version of the expression with proper infix notation and symbols
+	 * @return a formatted String
+	 */
+	public abstract String prettyPrint();
+	
+	/**
+	 * Helper function that returns null if expression is a Literal, the operator if it is a Function
+	 * @return the operator
+	 */
+	abstract Operator getOperator();
 }
