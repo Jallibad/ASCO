@@ -1,5 +1,6 @@
 package gui;
 
+import java.io.File;
 import java.util.Optional;
 
 import javafx.application.Application;
@@ -13,7 +14,9 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import logic.Expression;
 import logic.MalformedExpressionException;
 import logic.NormalForm;
 
@@ -33,22 +36,35 @@ public class LogicApplication extends Application
 		VBox root = new VBox();
 		Scene s = new Scene(root, 300, 300, Color.WHITESMOKE);
 		
-		setUpMenu(root);
+		setUpMenu(primaryStage, root);
 		
 		root.getChildren().add(e);
 		primaryStage.setScene(s);
 		primaryStage.show();
 	}
 	
-	private void setUpMenu(Pane root) // TODO I'm not sure if Pane is the best type here
+	private void setUpMenu(Stage primaryStage, Pane root) // TODO I'm not sure if Pane is the best type here
 	{
 		MenuBar menuBar = new MenuBar();
 		
 		Menu menuFile = new Menu("File");
 		MenuItem load = new MenuItem("Load");
+		load.setOnAction(event ->
+		{
+			FileChooser fileChooser = new FileChooser();
+			fileChooser.setTitle("Open Resource File");
+			File toOpen = fileChooser.showOpenDialog(primaryStage);
+			//toOpen.canRead(); // TODO load file
+		});
 		menuFile.getItems().addAll(load);
 		
 		Menu menuEdit = new Menu("Edit");
+		menuEdit.setOnShowing(event ->
+			menuEdit.getItems().forEach(item -> // It might be better to only disable certain options
+				item.setDisable(!e.validExpression())));
+		
+		MenuItem simplify = new MenuItem("Simplify");
+		
 		MenuItem normalForm = new MenuItem("Transform to Normal Form");
 		normalForm.setOnAction(event ->
 		{
@@ -62,6 +78,7 @@ public class LogicApplication extends Application
 				{
 					System.out.println(e.getExpression());
 					System.out.println(t.transform(e.getExpression()));
+					displayExpression(t.transform(e.getExpression()));
 				}
 				catch (MalformedExpressionException e)
 				{
@@ -72,9 +89,15 @@ public class LogicApplication extends Application
 				}
 			});
 		});
-		menuEdit.getItems().addAll(normalForm);
+		
+		menuEdit.getItems().addAll(simplify, normalForm);
 		
 		menuBar.getMenus().addAll(menuFile, menuEdit);
 		root.getChildren().add(menuBar);
+	}
+	
+	private void displayExpression(Expression e)
+	{
+		
 	}
 }

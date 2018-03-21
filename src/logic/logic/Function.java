@@ -189,4 +189,11 @@ public class Function extends Expression
 	{
 		return operator;
 	}
+
+	@Override
+	public int complexity()
+	{
+		// Sum of complexity of all terms + 1 for the operator
+		return terms.stream().collect(Collectors.summingInt(Expression::complexity))+1;
+	}
 }

@@ -75,4 +75,10 @@ public class Literal extends Expression
 	{
 		return null;
 	}
+
+	@Override
+	public int complexity()
+	{
+		return 1;
+	}
 }

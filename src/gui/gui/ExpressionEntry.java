@@ -32,6 +32,20 @@ public class ExpressionEntry extends VBox
 		getChildren().add(buttons);
 	}
 	
+	// TODO validate rather than try/catch exception
+	public boolean validExpression()
+	{
+		try
+		{
+			getExpression();
+			return true;
+		}
+		catch (MalformedExpressionException e)
+		{
+			return false;
+		}
+	}
+	
 	public Expression getExpression() throws MalformedExpressionException
 	{
 		return Expression.parse(textField.getText());

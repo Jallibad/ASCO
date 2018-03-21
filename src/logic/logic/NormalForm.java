@@ -5,8 +5,8 @@ import java.util.stream.Collectors;
 
 public enum NormalForm implements Transform
 {
-	CONJUNCTIVE, // TODO implement CNF
-	DISJUNCTIVE, // TODO implement DNF
+	CONJUNCTIVE,
+	DISJUNCTIVE,
 	NEGATION;
 
 	@Override
@@ -65,9 +65,9 @@ public enum NormalForm implements Transform
 	{
 		switch (this)
 		{
-			case CONJUNCTIVE:
+			case CONJUNCTIVE: // TODO check if in CNF
 				break;
-			case DISJUNCTIVE:
+			case DISJUNCTIVE: // TODO check if in DNF
 				break;
 			case NEGATION:
 				if (e instanceof Function)

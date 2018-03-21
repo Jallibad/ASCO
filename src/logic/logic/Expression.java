@@ -105,4 +105,6 @@ public abstract class Expression
 	 * @return the operator
 	 */
 	abstract Operator getOperator();
+	
+	public abstract int complexity();
 }
