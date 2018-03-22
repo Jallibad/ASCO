@@ -14,6 +14,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import logic.Expression;
@@ -23,6 +24,7 @@ import logic.NormalForm;
 public class LogicApplication extends Application
 {
 	ExpressionEntry e = new ExpressionEntry();
+	Stage primaryStage;
 	
 	public static void main(String[] args)
 	{
@@ -32,18 +34,19 @@ public class LogicApplication extends Application
 	@Override
 	public void start(Stage primaryStage) throws Exception
 	{
+		this.primaryStage = primaryStage;
 		primaryStage.setTitle("Logic++");
 		VBox root = new VBox();
 		Scene s = new Scene(root, 300, 300, Color.WHITESMOKE);
 		
-		setUpMenu(primaryStage, root);
+		setUpMenu(root);
 		
 		root.getChildren().add(e);
 		primaryStage.setScene(s);
 		primaryStage.show();
 	}
 	
-	private void setUpMenu(Stage primaryStage, Pane root) // TODO I'm not sure if Pane is the best type here
+	private void setUpMenu(Pane root) // TODO I'm not sure if Pane is the best type here
 	{
 		MenuBar menuBar = new MenuBar();
 		
@@ -78,7 +81,7 @@ public class LogicApplication extends Application
 				{
 					System.out.println(e.getExpression());
 					System.out.println(t.transform(e.getExpression()));
-					displayExpression(t.transform(e.getExpression()));
+					displayExpression(root, t.transform(e.getExpression()));
 				}
 				catch (MalformedExpressionException e)
 				{
@@ -96,8 +99,9 @@ public class LogicApplication extends Application
 		root.getChildren().add(menuBar);
 	}
 	
-	private void displayExpression(Expression e)
+	private void displayExpression(Pane root, Expression e)
 	{
-		
+		Text newExpression = new Text(e.prettyPrint());
+		root.getChildren().add(newExpression);
 	}
 }
