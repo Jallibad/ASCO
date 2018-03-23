@@ -25,8 +25,8 @@ public class ExpressionTests
 	{
 		try {
 			Expression e1 = Expression.parse("¬A ∨ B");
-			Expression t1 = Expression.create("(NEG (OR A B)");
-			System.out.println(String.format("{0} is not equal to {1}",e1, t1));
+			Expression t1 = Expression.create("(NEG (OR A B))");
+			System.out.println(String.format("%s is not equal to %s",e1, t1));
 			assertEquals(e1,t1);
 		}
 		catch (MalformedExpressionException e) {
