@@ -19,7 +19,12 @@ public abstract class Expression
 		System.out.println(NormalForm.CONJUNCTIVE.transform(e1));
 	}
 	
-	boolean isOperator(char c)
+	/**
+	 * check whether or not the specified character is a letter or digit
+	 * @param c the character to check
+	 * @return whether c is a character or digit (true) or not (false)
+	 */
+	public static boolean isOperator(char c)
 	{
 	    return (!Character.isLetter(c) && !Character.isDigit(c));
 	}
@@ -29,7 +34,7 @@ public abstract class Expression
 	 * @param C the character whose priority we wish to determine
 	 * @return the arithmetic priority of character C
 	 */
-	int getPriority(char C)
+	public static int getPriority(char C)
 	{
 	    if (C == '-' || C == '+')
 	        return 1;
@@ -40,7 +45,12 @@ public abstract class Expression
 	    return 0;
 	}
 	 
-	String infixToPostfix(String infix)
+	/**
+	 * convert an expression from infix to postfix form
+	 * @param infix the expression in infix form
+	 * @return the specified expression in postfix form
+	 */
+	public static String infixToPostfix(String infix)
 	{
 	    infix = '(' + infix + ')';
 	    int l = infix.length();
@@ -90,11 +100,23 @@ public abstract class Expression
 	    return output;
 	}
 	
-	String setChar(String s, int loc, char c) {
+	/**
+	 * return a new string from the specified string with the desired character replaced
+	 * @param s the original string
+	 * @param loc the location of the character to replace
+	 * @param c the character to write to string position loc
+	 * @return a new string equal to s with character number loc replaced with c
+	 */
+	public static String setChar(String s, int loc, char c) {
 		return s.substring(0,loc)+c+s.substring(loc+1);
 	}
 	 
-	String infixToPrefix(String infix)
+	/**
+	 * convert an expression from infix to prefix form
+	 * @param infix the expression in infix form to convert
+	 * @return the new expression in prefix form
+	 */
+	public static String infixToPrefix(String infix)
 	{
 	    /* Reverse String
 	     * Replace ( with ) and vice versa
@@ -133,14 +155,9 @@ public abstract class Expression
 	 */
 	public static Expression parse(String exp) throws MalformedExpressionException
 	{
-		//step 1: convert to prefix notation
-
-		
-		
-		// TODO parse pretty printed expressions and check for correctness
 		try
 		{
-			return create(exp);
+			return create(infixToPrefix(exp));
 		}
 		catch (Exception e)
 		{
