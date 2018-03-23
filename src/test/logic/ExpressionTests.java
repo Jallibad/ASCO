@@ -19,4 +19,19 @@ public class ExpressionTests
 		Expression t3 = Expression.create("(AND A (NEG (OR A B)))");
 		assertEquals(e3,t3);
 	}
+	
+	@Test
+	public void testParse() 
+	{
+		try {
+			Expression e1 = Expression.parse("¬A ∨ B");
+			Expression t1 = Expression.create("(NEG (OR A B)");
+			System.out.println(String.format("{0} is not equal to {1}",e1, t1));
+			assertEquals(e1,t1);
+		}
+		catch (MalformedExpressionException e) {
+			System.out.println("reee");
+			fail();
+		}
+	}
 }
