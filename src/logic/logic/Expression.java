@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 /**
  * An abstract class that represents a FOL statement.
@@ -18,13 +19,124 @@ public abstract class Expression
 		System.out.println(NormalForm.CONJUNCTIVE.transform(e1));
 	}
 	
+	boolean isOperator(char c)
+	{
+	    return (!Character.isLetter(c) && !Character.isDigit(c));
+	}
+	 
 	/**
-	 * Parses text for 
-	 * @param exp
-	 * @return
+	 * determine the arithmetic priority (order of evaluation) of the specified character
+	 * @param C the character whose priority we wish to determine
+	 * @return the arithmetic priority of character C
+	 */
+	int getPriority(char C)
+	{
+	    if (C == '-' || C == '+')
+	        return 1;
+	    else if (C == '*' || C == '/')
+	        return 2;
+	    else if (C == '^')
+	        return 3;
+	    return 0;
+	}
+	 
+	String infixToPostfix(String infix)
+	{
+	    infix = '(' + infix + ')';
+	    int l = infix.length();
+	    Stack<Character> char_stack = new Stack<Character>();
+	    String output = "";
+	 
+	    for (int i = 0; i < l; i++) {
+	 
+	        // If the scanned character is an 
+	        // operand, add it to output.
+	        if (Character.isLetter(infix.charAt(i)) || Character.isDigit(infix.charAt(i)))
+	            output += infix.charAt(i);
+	 
+	        // If the scanned character is an
+	        // ‘(‘, push it to the stack.
+	        else if (infix.charAt(i) == '(')
+	            char_stack.push('(');
+	 
+	        // If the scanned character is an
+	        // ‘)’, pop and output from the stack 
+	        // until an ‘(‘ is encountered.
+	        else if (infix.charAt(i) == ')') {
+	 
+	            while (char_stack.peek() != '(') {
+	                output += char_stack.pop();
+	            }
+	 
+	            // Remove '(' from the stack
+	            char_stack.pop(); 
+	        }
+	 
+	        // Operator found 
+	        else {
+	             
+	            if (isOperator(char_stack.peek())) {
+	                while (getPriority(infix.charAt(i))
+	                   <= getPriority(char_stack.peek())) {
+	                    output += char_stack.pop();
+	                    char_stack.pop();
+	                }
+	 
+	                // Push current Operator on stack
+	                char_stack.push(infix.charAt(i));
+	            }
+	        }
+	    }
+	    return output;
+	}
+	
+	String setChar(String s, int loc, char c) {
+		return s.substring(0,loc)+c+s.substring(loc+1);
+	}
+	 
+	String infixToPrefix(String infix)
+	{
+	    /* Reverse String
+	     * Replace ( with ) and vice versa
+	     * Get Postfix
+	     * Reverse Postfix  *  */
+	    int l = infix.length();
+	 
+	    // Reverse infix
+	    infix = new StringBuilder(infix).reverse().toString();
+	 
+	    // Replace ( with ) and vice versa
+	    for (int i = 0; i < l; i++) {
+	 
+	        if (infix.charAt(i) == '(') {
+	        	infix = setChar(infix,i,')');
+	            i++;
+	        }
+	        else if (infix.charAt(i) == ')') {
+	        	infix = setChar(infix,i,'(');
+	            i++;
+	        }
+	    }
+	 
+	    String prefix = infixToPostfix(infix);
+	 
+	    // Reverse postfix
+	    prefix = new StringBuilder(prefix).reverse().toString();
+	 
+	    return prefix;
+	}
+	
+	/**
+	 * Parses text for an expression
+	 * @param exp the String to convert to an Expression
+	 * @return an Expression object that is equivalent to the specified expression
 	 */
 	public static Expression parse(String exp) throws MalformedExpressionException
 	{
+		//step 1: convert to prefix notation
+
+		
+		
 		// TODO parse pretty printed expressions and check for correctness
 		try
 		{
@@ -38,10 +150,10 @@ public abstract class Expression
 	
 	// TODO add error checking/handling
 	/**
-	 * Takes a String representing FOL using prefix notation (ie. "(NEG (AND A B))").
-	 * Currently does not do any error checking or handling.
+	 * Takes a String representing FOL using prefix notation (ie. "(NEG (AND A B))")
+	 * Currently does not do any error checking or handling
 	 * @param exp the String to convert to an Expression
-	 * @return An Expression object that is equivalent to the parameter
+	 * @return An Expression object that is equivalent to the specified expression
 	 */
 	public static Expression create(String exp)
 	{
