@@ -19,7 +19,88 @@ public abstract class Expression
 		System.out.println(NormalForm.CONJUNCTIVE.transform(e1));
 	}
 	
-	public static String infixToPrefix(String str){
+	/**
+	 * check whether or not the specified character is a letter or digit
+	 * @param c the character to check
+	 * @return whether c is a character or digit (true) or not (false)
+	 */
+	private static boolean isOperator(char c)
+	{
+	    return (!Character.isLetter(c) && !Character.isDigit(c));
+	}
+	 
+	/**
+	 * determine the arithmetic priority (order of evaluation) of the specified character
+	 * @param C the character whose priority we wish to determine
+	 * @return the arithmetic priority of character C
+	 */
+	private static int getPriority(char C)
+	{
+	    if (C == '-' || C == '+')
+	        return 1;
+	    else if (C == '*' || C == '/')
+	        return 2;
+	    else if (C == '^')
+	        return 3;
+	    return 0;
+	}
+	 
+	/**
+	 * convert an expression from infix to postfix form
+	 * @param infix the expression in infix form
+	 * @return the specified expression in postfix form
+	 */
+	private static String infixToPostfix(String infix)
+	{
+	    infix = '(' + infix + ')';
+	    int l = infix.length();
+	    Stack<Character> char_stack = new Stack<Character>();
+	    String output = "";
+	 
+	    for (int i = 0; i < l; i++) {
+	 
+	        // If the scanned character is an 
+	        // operand, add it to output.
+	        if (Character.isLetter(infix.charAt(i)) || Character.isDigit(infix.charAt(i)))
+	            output += infix.charAt(i);
+	 
+	        // If the scanned character is an
+	        // �(�, push it to the stack.
+	        else if (infix.charAt(i) == '(')
+	            char_stack.push('(');
+	 
+	        // If the scanned character is an
+	        // �)�, pop and output from the stack 
+	        // until an �(� is encountered.
+	        else if (infix.charAt(i) == ')') {
+	 
+	            while (char_stack.peek() != '(') {
+	            	System.out.println("A");
+	                output += char_stack.pop();
+	            }
+	 
+	            // Remove '(' from the stack
+	            char_stack.pop(); 
+	        }
+	 
+	        // Operator found 
+	        else {
+	             
+	            if (isOperator(char_stack.peek())) {
+//	                //no concern of operator priority in FOL, so no need for this loop
+//	            	while (getPriority(infix.charAt(i)) <= getPriority(char_stack.peek())) {
+	                	System.out.println("B");
+	                	output += char_stack.pop();
+//	                }
+	 
+	                // Push current Operator on stack
+	                char_stack.push(infix.charAt(i));
+	            }
+	        }
+	    }
+	    return output;
+	}
+	/*public static String infixToPrefix(String str){
         Stack stack = new Stack();
         String prefix = "";
         for(int i=str.length()-1;i>=0;i--){
@@ -39,7 +120,51 @@ public abstract class Expression
         }
         return prefix;
  
-    }
+    }*/
+	
+	/**
+	 * return a new string from the specified string with the desired character replaced
+@@ -121,43 +62,6 @@ public abstract class Expression
+	private static String setCharString(String s, int loc, String s2) {
+		return s.substring(0, loc) + s2 + s.substring(loc+1);
+	}
+	 
+	/**
+	 * convert an expression from infix to prefix form
+	 * @param infix the expression in infix form to convert
+	 * @return the new expression in prefix form
+	 */
+	private static String infixToPrefix(String infix)
+	{
+	    /* Reverse String
+	     * Replace ( with ) and vice versa
+	     * Get Postfix
+	     * Reverse Postfix  *  */
+	    int l = infix.length();
+	 
+	    // Reverse infix
+	    infix = new StringBuilder(infix).reverse().toString();
+	 
+	    // Replace ( with ) and vice versa
+	    for (int i = 0; i < l; i++) {
+	 
+	        if (infix.charAt(i) == '(') {
+	        	infix = setChar(infix,i,')');
+	            i++;
+	        }
+	        else if (infix.charAt(i) == ')') {
+	        	infix = setChar(infix,i,'(');
+	            i++;
+	        }
+	    }
+	 
+	    String prefix = infixToPostfix(infix);
+	 
+	    // Reverse postfix
+	    prefix = new StringBuilder(prefix).reverse().toString();
+	 
+	    return prefix;
+	}
 	
 	/**
 	 * return a new string from the specified string with the desired character replaced
@@ -100,6 +225,9 @@ public abstract class Expression
 	{
 		try
 		{
+			System.out.println("sanitized: " + sanitizeInput(exp));
+			System.out.println("sanitized infix: " + infixToPrefix(sanitizeInput(exp)));
+			System.out.println("sanitized infix english: " + operatorsToEnglish(infixToPrefix(sanitizeInput(exp))));
 			return create(operatorsToEnglish(infixToPrefix(sanitizeInput(exp))));
 		}
 		catch (Exception e)

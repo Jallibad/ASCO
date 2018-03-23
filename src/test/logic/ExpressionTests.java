@@ -30,7 +30,6 @@ public class ExpressionTests
 			assertEquals(e1,t1);
 		}
 		catch (MalformedExpressionException e) {
-			System.out.println("reee");
 			fail();
 		}
 	}
