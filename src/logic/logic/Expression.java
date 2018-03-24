@@ -24,7 +24,7 @@ public abstract class Expression
 	 * @param c the character to check
 	 * @return whether c is a character or digit (true) or not (false)
 	 */
-	public static boolean isOperator(char c)
+	private static boolean isOperator(char c)
 	{
 	    return (!Character.isLetter(c) && !Character.isDigit(c));
 	}
@@ -34,7 +34,7 @@ public abstract class Expression
 	 * @param C the character whose priority we wish to determine
 	 * @return the arithmetic priority of character C
 	 */
-	public static int getPriority(char C)
+	private static int getPriority(char C)
 	{
 	    if (C == '-' || C == '+')
 	        return 1;
@@ -50,7 +50,7 @@ public abstract class Expression
 	 * @param infix the expression in infix form
 	 * @return the specified expression in postfix form
 	 */
-	public static String infixToPostfix(String infix)
+	private static String infixToPostfix(String infix)
 	{
 	    infix = '(' + infix + ')';
 	    int l = infix.length();
@@ -107,8 +107,19 @@ public abstract class Expression
 	 * @param c the character to write to string position loc
 	 * @return a new string equal to s with character number loc replaced with c
 	 */
-	public static String setChar(String s, int loc, char c) {
+	private static String setChar(String s, int loc, char c) {
 		return s.substring(0,loc)+c+s.substring(loc+1);
+	}
+	
+	/**
+	 * return a new string from the specified string with the desired character replaced with the specified string
+	 * @param s the original string
+	 * @param loc the location of the character to replace
+	 * @param c the string to write to string position loc
+	 * @return a new string equal to s with character number loc replaced with string s
+	 */
+	private static String setCharString(String s, int loc, String s2) {
+		return s.substring(0, loc) + s2 + s.substring(loc+1);
 	}
 	 
 	/**
@@ -116,7 +127,7 @@ public abstract class Expression
 	 * @param infix the expression in infix form to convert
 	 * @return the new expression in prefix form
 	 */
-	public static String infixToPrefix(String infix)
+	private static String infixToPrefix(String infix)
 	{
 	    /* Reverse String
 	     * Replace ( with ) and vice versa
@@ -149,6 +160,34 @@ public abstract class Expression
 	}
 	
 	/**
+	 * convert all operator characters to the operator name
+	 * @param exp the expression in which to convert all operators
+	 * @return the specified expression string with all operator characters replaced with the operator name
+	 */
+	private static String operatorsToEnglish(String exp) {
+		for (int i = 0; i < exp.length(); ++i) {
+			for (Operator opr : Operator.values()) {
+				if (String.valueOf(exp.charAt(i)).equals(opr.DISPLAY_TEXT)) {
+					exp = setCharString(exp,i,opr.name());
+					i += opr.name().length()-1;
+					continue;
+				}
+			}
+		}
+		return exp;
+	}
+	
+	/**
+	 * sanitize the input expression in order to prepare it for parsing
+	 * @param exp the string to sanitize
+	 * @return the specified string sanitized for expression parsing
+	 */
+	private static String sanitizeInput(String exp) {
+		//add parenthesis around the expression, if not already present
+		return exp.charAt(0) == '(' ? exp : "("+exp+")";
+	}
+	
+	/**
 	 * Parses text for an expression
 	 * @param exp the String to convert to an Expression
 	 * @return an Expression object that is equivalent to the specified expression
@@ -157,7 +196,7 @@ public abstract class Expression
 	{
 		try
 		{
-			return create(infixToPrefix(exp));
+			return create(sanitizeInput(operatorsToEnglish(infixToPrefix(exp))));
 		}
 		catch (Exception e)
 		{
