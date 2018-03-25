@@ -7,6 +7,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -14,10 +15,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import logic.Expression;
 import logic.MalformedExpressionException;
 import logic.NormalForm;
 
@@ -79,9 +78,16 @@ public class LogicApplication extends Application
 			{
 				try
 				{
-					System.out.println(e.getExpression());
-					System.out.println(t.transform(e.getExpression()));
-					displayExpression(root, t.transform(e.getExpression()));
+					Button b = new Button("Show steps?");
+					ExpressionDisplay n = new ExpressionDisplay(t.transform(e.getExpression()), b);
+					b.setOnAction(event2 ->
+					{
+						// TODO
+						System.out.println("Showing steps");
+						System.out.println("First removing show steps button");
+						root.getChildren().remove(n);
+					});
+					root.getChildren().add(n);
 				}
 				catch (MalformedExpressionException e)
 				{
@@ -93,15 +99,11 @@ public class LogicApplication extends Application
 			});
 		});
 		
-		menuEdit.getItems().addAll(simplify, normalForm);
+		MenuItem proveEquivalence = new MenuItem("Prove Equivalence");
+		
+		menuEdit.getItems().addAll(simplify, normalForm, proveEquivalence);
 		
 		menuBar.getMenus().addAll(menuFile, menuEdit);
 		root.getChildren().add(menuBar);
-	}
-	
-	private void displayExpression(Pane root, Expression e)
-	{
-		Text newExpression = new Text(e.prettyPrint());
-		root.getChildren().add(newExpression);
 	}
 }

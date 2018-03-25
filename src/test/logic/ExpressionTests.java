@@ -21,17 +21,17 @@ public class ExpressionTests
 	}
 	
 	@Test
-	public void testParse() 
+	public void testParse()
 	{
-		try {
-			//Expression e1 = Expression.parse("(A - B/C) * (A/K-L)");
-			Expression e1 = Expression.parse("¬A ∨ B");
-			Expression t1 = Expression.create("(NEG (OR A B))");
-			System.out.println(String.format("%s is not equal to %s",e1, t1));
-			assertEquals(e1,t1);
+		try
+		{
+			assertEquals(Expression.create("(AND A B)"), Expression.parse("A∧B"));
+			assertEquals(Expression.create("(NEG A)"), Expression.parse("¬A"));
+			assertEquals(Expression.create("(AND B (NEG A))"), Expression.parse("B∧ ¬A"));
 		}
-		catch (MalformedExpressionException e) {
-			fail();
+		catch (MalformedExpressionException e)
+		{
+			fail("Expression::parse threw an exception when it shouldn't have");
 		}
 	}
 }

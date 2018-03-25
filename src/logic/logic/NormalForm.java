@@ -89,4 +89,11 @@ public enum NormalForm implements Transform
 		}
 		return false; // TODO implement
 	}
+
+	@Override
+	public List<TransformStep> transformWithSteps(Expression orig)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
