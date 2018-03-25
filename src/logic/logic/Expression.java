@@ -123,9 +123,10 @@ public abstract class Expression
 		//add parentheses around all negations
 		for (int i = 0; i < exp.length(); ++i) {
 			if (exp.charAt(i) == '¬') {
-				++i;
 				exp = addChar(exp,i,'(');
-				++i;
+				i+=2;
+				exp = addChar(exp,i,' ');
+				i+=1;
 				while (!(exp.charAt(i) == ' ' || exp.charAt(i) == ')')) {
 					++i;
 				}
@@ -257,9 +258,6 @@ public abstract class Expression
 	{
 		try
 		{
-			System.out.println("sanitized: " + sanitizeInput(exp));
-			System.out.println("sanitized infix: " + infixToPrefix2(sanitizeInput(exp)));
-			System.out.println("sanitized infix english: " + operatorsToEnglish(infixToPrefix2(sanitizeInput(exp))));
 			return create(operatorsToEnglish(infixToPrefix2(sanitizeInput(exp))));
 		}
 		catch (Exception e)
