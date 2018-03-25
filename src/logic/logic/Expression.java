@@ -218,12 +218,21 @@ public abstract class Expression
 	}
 	
 	/**
+	 * determine whether or not the specified character is an operator
+	 * @param c the character to check
+	 * @return whether c is an operator (true) or not (false)
+	 */
+	private static boolean charIsOperator(char c) {
+		return c == '∧' || c == '∨';
+	}
+	
+	/**
 	 * sanitize the input expression in order to prepare it for parsing
 	 * @param exp the string to sanitize
 	 * @return the specified string sanitized for expression parsing
 	 */
 	private static String sanitizeInput(String exp) {
-		//add parenthesis around the expression, if not already present
+		//add parentheses around the expression, if not already present
 		if (exp.charAt(0) != '(') {
 			exp = "("+exp+")";
 		}
@@ -239,6 +248,51 @@ public abstract class Expression
 				exp = addChar(exp,i,')');
 			}
 		}
+		
+		//parenthesize all operators
+		for (int i = 0; i < exp.length(); ++i) {
+			if (charIsOperator(exp.charAt(i))) {
+				//move back until we find the first operator or same-level open paren
+				int r = i;
+				int bracketCount = 0;
+				while (--r >= 0) {
+					if (exp.charAt(r) == ')') {
+						++bracketCount;
+					}
+					else if (exp.charAt(r) == '(') {
+						if (--bracketCount == 0) {
+							exp = addChar(exp, r, '(');
+							break;
+						}
+					}
+					else if (Character.isAlphabetic(exp.charAt(r))) {
+						exp = addChar(exp,r, '(');
+						break;
+					}
+				}
+				i+=1; //move forward one space to make room for the new open parenthesis
+				//move forward until we find the second operator or same-level closed paren
+				r = i;
+				bracketCount = 0;
+				while (++r < exp.length()) {
+					if (exp.charAt(r) == '(') {
+						++bracketCount;
+					}
+					else if (exp.charAt(r) == ')') {
+						if (--bracketCount == 0) {
+							exp = addChar(exp, ++r, ')');
+							break;
+						}
+					}
+					else if (Character.isAlphabetic(exp.charAt(r))) {
+						exp = addChar(exp,r, ')');
+						break;
+					}
+				}
+				i+=1; //move forward one space to make room for the new closed parenthesis
+			}
+		}
+		
 		return exp;
 	}
 	
