@@ -189,6 +189,16 @@ public abstract class Expression
 	}
 	
 	/**
+	 * return a new string from the specified string with the desired character removed
+	 * @param s the original string
+	 * @param loc the location of the character to remove
+	 * @return a new string equal to s with character number loc removed
+	 */
+	private static String removeChar(String s, int loc) {
+		return s.substring(0,loc) + s.substring(loc+1);
+	}
+	
+	/**
 	 * return a new string from the specified string with the desired character replaced with the specified string
 	 * @param s the original string
 	 * @param loc the location of the character to replace
@@ -233,9 +243,9 @@ public abstract class Expression
 	 */
 	private static String sanitizeInput(String exp) {
 		//add parentheses around the expression, if not already present
-		if (exp.charAt(0) != '(') {
+		/*if (exp.charAt(0) != '(') {
 			exp = "("+exp+")";
-		}
+		}*/
 		//add parentheses around all negations
 		for (int i = 0; i < exp.length(); ++i) {
 			if (exp.charAt(i) == '¬') {
@@ -285,7 +295,7 @@ public abstract class Expression
 						}
 					}
 					else if (Character.isAlphabetic(exp.charAt(r))) {
-						exp = addChar(exp,r, ')');
+						exp = addChar(exp,++r, ')');
 						break;
 					}
 				}
@@ -293,6 +303,48 @@ public abstract class Expression
 			}
 		}
 		
+		return exp;
+	}
+	
+	/**
+	 * convert the input expression from prefix into infix
+	 * @param exp the expression to convert
+	 * @return the specified expression in infix form
+	 */
+	private static String infixToPrefix2(String exp) {
+		//search for operators
+		for (int i = 0; i < exp.length(); ++i) {
+			//System.out.println(i);
+			if (charIsOperator(exp.charAt(i))) {
+				//found an operator; move it back to produce infix notation
+				int bracketCount = 0;
+				int r = i;
+				while (--r >= 0) {
+					if (exp.charAt(r) == ')') {
+						++bracketCount;
+					}
+					else if (exp.charAt(r) == '(') {
+						if (--bracketCount < 0) {
+							//move operator to just ahead of same-level opening paren
+							exp = addChar(exp,++r, exp.charAt(i));
+							//remove operator from old location
+							exp = removeChar(exp, ++i);
+							//add a space before the second operator, if not already present
+							if (exp.charAt(i) != ' ') {
+								exp = addChar(exp,i,' ');
+							}
+							//decrement here so we don't skip over the next character
+							i-=1;
+							//add a space before the first operator, if not already present
+							if (exp.charAt(++r) != ' ') {
+								exp = addChar(exp,r,' ');
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
 		return exp;
 	}
 	
@@ -306,9 +358,9 @@ public abstract class Expression
 		try
 		{
 			System.out.println("sanitized: " + sanitizeInput(exp));
-			System.out.println("sanitized infix: " + infixToPrefix(sanitizeInput(exp)));
-			System.out.println("sanitized infix english: " + operatorsToEnglish(infixToPrefix(sanitizeInput(exp))));
-			return create(operatorsToEnglish(infixToPrefix(sanitizeInput(exp))));
+			System.out.println("sanitized infix: " + infixToPrefix2(sanitizeInput(exp)));
+			System.out.println("sanitized infix english: " + operatorsToEnglish(infixToPrefix2(sanitizeInput(exp))));
+			return create(operatorsToEnglish(infixToPrefix2(sanitizeInput(exp))));
 		}
 		catch (Exception e)
 		{
