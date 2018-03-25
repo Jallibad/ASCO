@@ -95,10 +95,31 @@ public abstract class Expression
 	 * @return the specified string sanitized for expression parsing
 	 */
 	private static String sanitizeInput(String exp) {
-		//add parentheses around the expression, if not already present
-		/*if (exp.charAt(0) != '(') {
+		//add parentheses around the expression if not already present
+		boolean isWrapped = true;
+		if (exp.charAt(0) != '(') {
+			isWrapped = false;
+		}
+		else {
+			int bracketNum = 1;
+			for (int i = 1; i < exp.length(); ++i) {
+				if (exp.charAt(i) == '(') {
+					++bracketNum;
+				}
+				else if (exp.charAt(i) == ')') {
+					if (--bracketNum == 0) {
+						if (i != exp.length()-1) {
+							isWrapped = false;	
+						}
+						break;
+					}
+				}
+			}
+		}
+		if (!isWrapped) {
 			exp = "("+exp+")";
-		}*/
+		}
+		
 		//add parentheses around all negations
 		for (int i = 0; i < exp.length(); ++i) {
 			if (exp.charAt(i) == '¬') {
@@ -154,6 +175,32 @@ public abstract class Expression
 				}
 				i+=1; //move forward one space to make room for the new closed parenthesis
 			}
+		}		
+		
+		//remove parentheses from expression if double-wrapped
+		boolean doubleWrapped = true;
+		if (!(exp.charAt(0) == '(' && exp.charAt(1) == '(')) {
+			doubleWrapped = false;
+		}
+		else {
+			int bracketNum = 2;
+			for (int i = 2; i < exp.length(); ++i) {
+				if (exp.charAt(i) == '(') {
+					++bracketNum;
+				}
+				else if (exp.charAt(i) == ')') {
+					if (--bracketNum == 1) {
+						if (i != exp.length()-2) {
+							doubleWrapped = false;	
+						}
+						break;
+					}
+				}
+			}
+		}
+		if (doubleWrapped) {
+			exp = removeChar(exp,0);
+			exp = removeChar(exp,exp.length()-1);
 		}
 		
 		return exp;
