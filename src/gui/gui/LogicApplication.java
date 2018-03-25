@@ -79,11 +79,14 @@ public class LogicApplication extends Application
 				try
 				{
 					Button b = new Button("Show steps?");
+					ExpressionDisplay n = new ExpressionDisplay(t.transform(e.getExpression()), b);
 					b.setOnAction(event2 ->
 					{
 						// TODO
+						System.out.println("Showing steps");
+						System.out.println("First removing show steps button");
+						root.getChildren().remove(n);
 					});
-					ExpressionDisplay n = new ExpressionDisplay(t.transform(e.getExpression()), b);
 					root.getChildren().add(n);
 				}
 				catch (MalformedExpressionException e)

@@ -1,16 +1,20 @@
 package logic;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public enum InferenceRule implements Transform
-{
+{	
 	DE_MORGANS_OR("(NEG (OR P Q))", "(AND (NEG P) (NEG Q))"),
 	DE_MORGANS_AND("(NEG (AND P Q))", "(OR (NEG P) (NEG Q))"),
 	OR_DISTRIBUTION("(OR P (AND Q R))", "(AND (OR P Q) (OR P R))"),
 	AND_DISTRIBUTION("(AND P (OR Q R))", "(OR (AND P Q) (AND P R))"),
 	DOUBLE_NEGATION("(NEG (NEG P))", "P");
+
+	final Expression left;
+	final Expression right;
 	
 	InferenceRule(String left, String right)
 	{
@@ -58,6 +62,11 @@ public enum InferenceRule implements Transform
 		}
 	}
 	
-	final Expression left;
-	final Expression right;
+	@Override
+	public List<TransformStep> transformWithSteps(Expression orig)
+	{
+		Expression ans = transform(orig);
+		TransformStep step = new TransformStep(this, orig, ans);
+		return Collections.singletonList(step);
+	}
 }

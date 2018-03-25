@@ -194,14 +194,7 @@ public abstract class Expression
 	 */
 	public static Expression parse(String exp) throws MalformedExpressionException
 	{
-		try
-		{
-			return create(sanitizeInput(operatorsToEnglish(infixToPrefix(exp))));
-		}
-		catch (Exception e)
-		{
-			throw new MalformedExpressionException();
-		}
+		return create(sanitizeInput(operatorsToEnglish(infixToPrefix(exp))));
 	}
 	
 	// TODO add error checking/handling
