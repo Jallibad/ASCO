@@ -24,6 +24,7 @@ public class ExpressionTests
 	public void testParse() 
 	{
 		try {
+			//Expression e1 = Expression.parse("(A - B/C) * (A/K-L)");
 			Expression e1 = Expression.parse("¬A ∨ B");
 			Expression t1 = Expression.create("(NEG (OR A B))");
 			System.out.println(String.format("%s is not equal to %s",e1, t1));

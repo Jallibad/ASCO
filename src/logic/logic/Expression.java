@@ -144,7 +144,7 @@ public abstract class Expression
 	 
 	    // Reverse infix
 	    infix = new StringBuilder(infix).reverse().toString();
-	 
+	    
 	    // Replace ( with ) and vice versa
 	    for (int i = 0; i < l; i++) {
 	 
@@ -175,6 +175,17 @@ public abstract class Expression
 	 */
 	private static String setChar(String s, int loc, char c) {
 		return s.substring(0,loc)+c+s.substring(loc+1);
+	}
+	
+	/**
+	 * return a new string from the specified string with the desired character added
+	 * @param s the original string
+	 * @param loc the location of the character before which to add
+	 * @param c the character to write to string position loc
+	 * @return a new string equal to s with character number loc preceded by c
+	 */
+	private static String addChar(String s, int loc, char c) {
+		return s.substring(0, loc) + c + s.substring(loc);
 	}
 	
 	/**
@@ -213,7 +224,22 @@ public abstract class Expression
 	 */
 	private static String sanitizeInput(String exp) {
 		//add parenthesis around the expression, if not already present
-		return exp.charAt(0) == '(' ? exp : "("+exp+")";
+		if (exp.charAt(0) != '(') {
+			exp = "("+exp+")";
+		}
+		//add parentheses around all negations
+		for (int i = 0; i < exp.length(); ++i) {
+			if (exp.charAt(i) == '¬') {
+				++i;
+				exp = addChar(exp,i,'(');
+				++i;
+				while (!(exp.charAt(i) == ' ' || exp.charAt(i) == ')')) {
+					++i;
+				}
+				exp = addChar(exp,i,')');
+			}
+		}
+		return exp;
 	}
 	
 	/**
