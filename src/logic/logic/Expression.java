@@ -112,6 +112,7 @@ public abstract class Expression
 			exp = "("+exp+")";
 		}
 		
+//		System.out.println("before paren neg: " + exp);
 		//add parentheses around all negations
 		for (int i = 0; i < exp.length(); ++i) {
 			if (exp.charAt(i) == '¬') {
@@ -125,10 +126,22 @@ public abstract class Expression
 				exp = addChar(exp,i,')');
 			}
 		}
+//		System.out.println("after paren neg: " + exp);
 		
-		//parenthesize all operators
+		//parenthesize all position 1 operators
 		for (int i = 0; i < exp.length(); ++i) {
 			if (charIsOperator(exp.charAt(i))) {
+				//ignore non-position 1 operators
+				boolean isPos1 = true;
+				for (Operator o : Operator.values())
+					if (o.DISPLAY_TEXT.charAt(0) == exp.charAt(i))
+						if (o.SYMBOL_POSITION != 1) {
+							isPos1 = false;
+							break;
+						}
+				if (!isPos1) {
+					continue;
+				}
 				//move back until we find the first operator or same-level open paren
 				int r = i;
 				int bracketCount = 0;
@@ -170,6 +183,7 @@ public abstract class Expression
 			}
 		}		
 		
+		//System.out.println("before wrap: " + exp);
 		//remove parentheses from expression if double-wrapped
 		boolean doubleWrapped = true;
 		if (!(exp.charAt(0) == '(' && exp.charAt(1) == '(')) {
@@ -195,6 +209,8 @@ public abstract class Expression
 			exp = removeChar(exp,0);
 			exp = removeChar(exp,exp.length()-1);
 		}
+		
+		//System.out.println("after wrap: " + exp);
 		
 		return exp;
 	}
@@ -251,9 +267,9 @@ public abstract class Expression
 		try
 		{
 			String ans = infixToPrefix2(sanitizeInput(exp));
-			System.out.println("\""+ans+"\"");
+			//System.out.println("\""+ans+"\"");
 			String ans2 = operatorsToEnglish(ans);
-			System.out.println("\""+ans2+"\"");
+			//System.out.println("\""+ans2+"\"");
 			return create(ans2);
 		}
 		catch (Exception e)
