@@ -11,5 +11,6 @@ public class StepsDisplay extends VBox
 	{
 		this.steps = steps;
 		//getChildren().addAll(steps.stream().map(StepDisplay::new).collect(Collectors.toList()));
+		
 	}
 }

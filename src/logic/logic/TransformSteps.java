@@ -32,16 +32,18 @@ public class TransformSteps
 	
 	public void combine(TransformSteps s, int index)
 	{
-		// TODO combine steps
-		System.out.println("Combining steps");
+		if (s.steps.size() == 0)
+			return;
 		// Remove the possibly null last element to make room for the new original
-		intermediaries.remove(intermediaries.size()-1);
-		List<Expression> newIntermediaries = s.intermediaries;
 		List<Expression> newTerms = ((Function) result()).getTerms();
+		Operator o = result().getOperator();
+		intermediaries.remove(intermediaries.size()-1);
+		fullIntermediaries.remove(fullIntermediaries.size()-1);
+		List<Expression> newIntermediaries = s.intermediaries;
 		for (int i=0; i<newIntermediaries.size(); ++i)
 		{
 			newTerms.set(index, s.fullIntermediaries.get(i));
-			fullIntermediaries.add(new Function(result().getOperator(), newTerms));
+			fullIntermediaries.add(new Function(o, newTerms));
 			if (newIntermediaries.get(i) == null)
 				newIntermediaries.set(i, s.fullIntermediaries.get(i));
 		}
@@ -66,7 +68,7 @@ public class TransformSteps
 		String ans = "-----\n";
 		for (int i=0; i<steps.size(); ++i)
 		{
-			ans += intermediaries.get(i)+"\n";
+			ans += fullIntermediaries.get(i)+"\n";
 			ans += steps.get(i)+"\n";
 		}
 		// TODO implement

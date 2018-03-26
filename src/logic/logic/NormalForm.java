@@ -105,6 +105,7 @@ public enum NormalForm implements Transform
 			for (int i=0; i<getTerms.size(); ++i)
 			{
 				TransformSteps partialSteps = transformHelperWithSteps(getTerms.get(i), inferenceRules);
+				//System.out.println(partialSteps);
 				normalFormTerms.add(partialSteps.result());
 				steps.combine(partialSteps, i);
 			}
