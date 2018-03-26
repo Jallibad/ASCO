@@ -1,6 +1,5 @@
 package logic;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -68,10 +67,10 @@ public enum InferenceRule implements Transform
 	}
 	
 	@Override
-	public List<TransformStep> transformWithSteps(Expression orig)
+	public TransformSteps transformWithSteps(Expression orig)
 	{
-		Expression ans = transform(orig);
-		TransformStep step = new TransformStep(this, orig, ans);
-		return Collections.singletonList(step);
+		TransformSteps ans = new TransformSteps(orig);
+		ans.addStep(this);
+		return ans;
 	}
 }

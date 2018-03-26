@@ -1,5 +1,6 @@
 package logic;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,23 +20,14 @@ public enum NormalForm implements Transform
 			case DISJUNCTIVE:
 				return transformHelper(NEGATION.transform(orig), InferenceRule.AND_DISTRIBUTION);
 			case NEGATION:
-				return transformHelper(orig, InferenceRule.DE_MORGANS_OR, InferenceRule.DE_MORGANS_AND, InferenceRule.DOUBLE_NEGATION);
-//				if (orig instanceof Function)
-//				{
-//					Function f = (Function) orig;
-//					List<Expression> normalFormTerms =
-//						f.getTerms().stream().map(NEGATION::transform).collect(Collectors.toList());
-//					orig = new Function(f.operator, normalFormTerms);
-//				}
-//				if (Expression.create("(NEG (OR A B))").matches(orig))
-//					orig = transform(InferenceRule.DE_MORGANS_OR.transform(orig));
-//				else if (Expression.create("(NEG (AND A B))").matches(orig))
-//					orig = transform(InferenceRule.DE_MORGANS_AND.transform(orig));
-//				else if (Expression.create("(NEG (NEG A))").matches(orig))
-//					orig = InferenceRule.DOUBLE_NEGATION.transform(orig);
-//				return orig;
+				return transformHelper(orig,
+					InferenceRule.DE_MORGANS_OR,
+					InferenceRule.DE_MORGANS_AND,
+					InferenceRule.DOUBLE_NEGATION
+				);
+			default:
+				throw new Error("A normal form transform has been applied without an implementation");
 		}
-		return null;
 	}
 
 	public boolean inForm(Expression e)
@@ -68,10 +60,24 @@ public enum NormalForm implements Transform
 	}
 
 	@Override
-	public List<TransformStep> transformWithSteps(Expression orig)
+	public TransformSteps transformWithSteps(Expression orig)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		switch (this)
+		{
+			// TODO for CNF and DNF show NNF transform steps as well
+			case CONJUNCTIVE:
+				return transformHelperWithSteps(NEGATION.transform(orig), InferenceRule.OR_DISTRIBUTION);
+			case DISJUNCTIVE:
+				return transformHelperWithSteps(NEGATION.transform(orig), InferenceRule.AND_DISTRIBUTION);
+			case NEGATION:
+				return transformHelperWithSteps(orig,
+					InferenceRule.DE_MORGANS_OR,
+					InferenceRule.DE_MORGANS_AND,
+					InferenceRule.DOUBLE_NEGATION
+				);
+			default:
+				throw new Error("A normal form transform has been applied without an implementation");
+		}
 	}
 	
 	private Expression transformHelper(Expression orig, InferenceRule... inferenceRules)
@@ -88,17 +94,24 @@ public enum NormalForm implements Transform
 		return orig;
 	}
 	
-	private Expression transformHelperWithSteps(Expression orig, InferenceRule... inferenceRules)
+	private TransformSteps transformHelperWithSteps(Expression orig, InferenceRule... inferenceRules)
 	{
+		TransformSteps steps = new TransformSteps();
 		if (orig instanceof Function)
 		{
 			Function f = (Function) orig;
-			List<Expression> normalFormTerms =
-				f.getTerms().stream().map(t -> transformHelperWithSteps(t, inferenceRules)).collect(Collectors.toList());
+			List<Expression> getTerms = f.getTerms();
+			List<Expression> normalFormTerms = new ArrayList<Expression>();
+			for (int i=0; i<getTerms.size(); ++i)
+			{
+				TransformSteps partialSteps = transformHelperWithSteps(getTerms.get(i), inferenceRules);
+				normalFormTerms.add(partialSteps.result());
+				steps.combine(partialSteps, i);
+			}
 			orig = new Function(f.operator, normalFormTerms);
 		}
 		for (InferenceRule i : inferenceRules)
 			orig = i.leftToRightTransform(orig);
-		return orig;
+		return steps;
 	}
 }
