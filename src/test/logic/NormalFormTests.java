@@ -25,10 +25,10 @@ public class NormalFormTests
 	{
 		Expression e1 = Expression.create("(AND (NEG A) (OR B C))");
 		Expression e2 = Expression.create("(AND A (OR B (AND D E)))");
-		Expression e3 = Expression.create("(OR (AND A B) (AND C D))");
+		//Expression e3 = Expression.create("(OR (AND A B) (AND C D))");
 		assertEquals(e1,NormalForm.CONJUNCTIVE.transform(e1));
 		assertEquals(Expression.create("(AND A (AND (OR B D) (OR B E)))"), NormalForm.CONJUNCTIVE.transform(e2));
-		assertEquals(Expression.create(""), NormalForm.CONJUNCTIVE.transform(e3));
+		//assertEquals(Expression.create(""), NormalForm.CONJUNCTIVE.transform(e3));
 	}
 	
 	@Test

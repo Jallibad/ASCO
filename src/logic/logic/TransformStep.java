@@ -2,9 +2,9 @@ package logic;
 
 public class TransformStep
 {
-	Transform step;
-	Expression before;
-	Expression after;
+	public final Transform step;
+	public final Expression before;
+	public final Expression after;
 	
 	public TransformStep(Transform step, Expression before, Expression after)
 	{

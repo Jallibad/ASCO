@@ -22,6 +22,11 @@ public enum InferenceRule implements Transform
 		this.right = Expression.create(right);
 	}
 	
+	public Expression leftToRightTransform(Expression orig)
+	{
+		return left.matches(orig) ? transform(left.fillMatches(orig), right) : orig;
+	}
+	
 	/**
 	 * 
 	 * @param orig
