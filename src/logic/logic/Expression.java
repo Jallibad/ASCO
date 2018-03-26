@@ -3,7 +3,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 /**
  * An abstract class that represents a FOL statement.
@@ -17,17 +16,6 @@ public abstract class Expression
 	{
 		Expression e1 = create("(AND A (OR B (AND D E)))");
 		System.out.println(NormalForm.CONJUNCTIVE.transform(e1));
-	}
-	
-	/**
-	 * return a new string from the specified string with the desired character replaced
-	 * @param s the original string
-	 * @param loc the location of the character to replace
-	 * @param c the character to write to string position loc
-	 * @return a new string equal to s with character number loc replaced with c
-	 */
-	private static String setChar(String s, int loc, char c) {
-		return s.substring(0,loc)+c+s.substring(loc+1);
 	}
 	
 	/**
@@ -85,8 +73,12 @@ public abstract class Expression
 	 * @param c the character to check
 	 * @return whether c is an operator (true) or not (false)
 	 */
-	private static boolean charIsOperator(char c) {
-		return c == '∧' || c == '∨';
+	private static boolean charIsOperator(char c)
+	{
+		for (Operator o : Operator.values())
+			if (o.DISPLAY_TEXT.charAt(0) == c) // TODO maybe match multiple characters to an operator?
+				return true;
+		return false;
 	}
 	
 	/**
@@ -258,7 +250,11 @@ public abstract class Expression
 	{
 		try
 		{
-			return create(operatorsToEnglish(infixToPrefix2(sanitizeInput(exp))));
+			String ans = infixToPrefix2(sanitizeInput(exp));
+			System.out.println("\""+ans+"\"");
+			String ans2 = operatorsToEnglish(ans);
+			System.out.println("\""+ans2+"\"");
+			return create(ans2);
 		}
 		catch (Exception e)
 		{

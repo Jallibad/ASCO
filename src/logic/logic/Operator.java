@@ -29,7 +29,7 @@ public enum Operator
 	}
 	/**
 	 * A Unicode representation of the symbol or text to be displayed when pretty-printing
-	 * the operator
+	 * the operator.  Currently only single characters are supported for parsing.
 	 */
 	public final String DISPLAY_TEXT;
 	public final int NUM_ARGUMENTS;
