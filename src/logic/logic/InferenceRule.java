@@ -26,6 +26,12 @@ public enum InferenceRule implements Transform
 		return left.matches(orig) ? transform(left.fillMatches(orig), right) : orig;
 	}
 	
+	public void leftTransform(TransformSteps steps)
+	{
+		if (left.matches(steps.result()))
+			steps.addStep(this);
+	}
+	
 	/**
 	 * 
 	 * @param orig

@@ -14,8 +14,10 @@ public abstract class Expression
 {
 	public static void main(String[] args)
 	{
-		Expression e1 = create("(AND A (OR B (AND D E)))");
-		System.out.println(NormalForm.CONJUNCTIVE.transform(e1));
+		Expression e = create("(NEG (NEG (NEG A)))");
+		TransformSteps t = NormalForm.NEGATION.transformWithSteps(e);
+		System.out.println(t);
+		System.out.println(NormalForm.NEGATION.transform(e));
 	}
 	
 	/**

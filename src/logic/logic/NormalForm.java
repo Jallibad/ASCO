@@ -96,7 +96,7 @@ public enum NormalForm implements Transform
 	
 	private TransformSteps transformHelperWithSteps(Expression orig, InferenceRule... inferenceRules)
 	{
-		TransformSteps steps = new TransformSteps();
+		TransformSteps steps = new TransformSteps(orig);
 		if (orig instanceof Function)
 		{
 			Function f = (Function) orig;
@@ -108,10 +108,10 @@ public enum NormalForm implements Transform
 				normalFormTerms.add(partialSteps.result());
 				steps.combine(partialSteps, i);
 			}
-			orig = new Function(f.operator, normalFormTerms);
+			//orig = new Function(f.operator, normalFormTerms);
 		}
 		for (InferenceRule i : inferenceRules)
-			orig = i.leftToRightTransform(orig);
+			i.leftTransform(steps);
 		return steps;
 	}
 }

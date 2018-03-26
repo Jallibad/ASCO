@@ -1,18 +1,15 @@
 package gui;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import javafx.scene.layout.VBox;
-import logic.TransformStep;
+import logic.TransformSteps;
 
 public class StepsDisplay extends VBox
 {
-	List<TransformStep> steps;
+	TransformSteps steps;
 	
-	StepsDisplay(List<TransformStep> steps)
+	StepsDisplay(TransformSteps steps)
 	{
 		this.steps = steps;
-		getChildren().addAll(steps.stream().map(StepDisplay::new).collect(Collectors.toList()));
+		//getChildren().addAll(steps.stream().map(StepDisplay::new).collect(Collectors.toList()));
 	}
 }

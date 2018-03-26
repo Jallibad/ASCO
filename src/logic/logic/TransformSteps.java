@@ -14,15 +14,11 @@ public class TransformSteps
 	private List<Expression> intermediaries = new ArrayList<Expression>();
 	private List<Expression> fullIntermediaries = new ArrayList<Expression>();
 	
-	public TransformSteps()
-	{
-		
-	}
-	
 	public TransformSteps(Expression orig)
 	{
-		intermediaries.add(orig);
+		intermediaries.add(null);
 		fullIntermediaries.add(orig);
+		checkRep();
 	}
 	
 	public void addStep(Transform step)
@@ -31,11 +27,27 @@ public class TransformSteps
 		// Transform the current last result and then add it to the list
 		fullIntermediaries.add(step.transform(result()));
 		intermediaries.add(null);
+		checkRep();
 	}
 	
 	public void combine(TransformSteps s, int index)
 	{
 		// TODO combine steps
+		System.out.println("Combining steps");
+		// Remove the possibly null last element to make room for the new original
+		intermediaries.remove(intermediaries.size()-1);
+		List<Expression> newIntermediaries = s.intermediaries;
+		List<Expression> newTerms = ((Function) result()).getTerms();
+		for (int i=0; i<newIntermediaries.size(); ++i)
+		{
+			newTerms.set(index, s.fullIntermediaries.get(i));
+			fullIntermediaries.add(new Function(result().getOperator(), newTerms));
+			if (newIntermediaries.get(i) == null)
+				newIntermediaries.set(i, s.fullIntermediaries.get(i));
+		}
+		intermediaries.addAll(newIntermediaries);
+		steps.addAll(s.steps);
+		checkRep();
 	}
 	
 	/**
@@ -45,5 +57,27 @@ public class TransformSteps
 	public Expression result()
 	{
 		return fullIntermediaries.get(fullIntermediaries.size()-1);
+	}
+	
+	@Override
+	public String toString()
+	{
+//		String ans = "TransformSteps::toString not implemented yet";
+		String ans = "-----\n";
+		for (int i=0; i<steps.size(); ++i)
+		{
+			ans += intermediaries.get(i)+"\n";
+			ans += steps.get(i)+"\n";
+		}
+		// TODO implement
+		return ans+result()+"\n-----";
+	}
+	
+	private void checkRep()
+	{
+		if (intermediaries.size() != fullIntermediaries.size())
+			throw new Error();
+		if (intermediaries.size() != steps.size()+1)
+			throw new Error();
 	}
 }
