@@ -14,7 +14,8 @@ public abstract class Expression
 {
 	public static void main(String[] args)
 	{
-		Expression e = create("(NEG (NEG (NEG A)))");
+		Expression e = create("(NEG (NEG A))");
+		System.out.println(e);
 		TransformSteps t = NormalForm.NEGATION.transformWithSteps(e);
 		System.out.println(t);
 		System.out.println(NormalForm.NEGATION.transform(e));

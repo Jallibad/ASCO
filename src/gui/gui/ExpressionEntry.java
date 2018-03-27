@@ -48,6 +48,6 @@ public class ExpressionEntry extends VBox
 	
 	public Expression getExpression() throws MalformedExpressionException
 	{
-		return Expression.create(textField.getText()); // TODO change to Expression::parse
+		return Expression.parse(textField.getText());
 	}
 }

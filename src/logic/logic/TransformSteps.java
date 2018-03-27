@@ -10,9 +10,9 @@ import java.util.List;
  */
 public class TransformSteps
 {
-	private List<Transform> steps = new ArrayList<Transform>();
-	private List<Expression> intermediaries = new ArrayList<Expression>();
-	private List<Expression> fullIntermediaries = new ArrayList<Expression>();
+	public List<Transform> steps = new ArrayList<Transform>();
+	public List<Expression> intermediaries = new ArrayList<Expression>();
+	public List<Expression> fullIntermediaries = new ArrayList<Expression>();
 	
 	public TransformSteps(Expression orig)
 	{
@@ -81,5 +81,10 @@ public class TransformSteps
 			throw new Error();
 		if (intermediaries.size() != steps.size()+1)
 			throw new Error();
+	}
+	
+	public TransformStep getStep(int i)
+	{
+		return new TransformStep(intermediaries.get(i), steps.get(i), intermediaries.get(i+1));
 	}
 }
