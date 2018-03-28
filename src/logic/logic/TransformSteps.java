@@ -1,6 +1,8 @@
 package logic;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -8,11 +10,17 @@ import java.util.List;
  * @author Jallibad
  *
  */
-public class TransformSteps
+public class TransformSteps implements Serializable
 {
+	private static final long serialVersionUID = -5016027615991197605L;
 	public List<Transform> steps = new ArrayList<Transform>();
 	public List<Expression> intermediaries = new ArrayList<Expression>();
 	public List<Expression> fullIntermediaries = new ArrayList<Expression>();
+	
+	private TransformSteps()
+	{
+		
+	}
 	
 	public TransformSteps(Expression orig)
 	{
@@ -64,14 +72,12 @@ public class TransformSteps
 	@Override
 	public String toString()
 	{
-//		String ans = "TransformSteps::toString not implemented yet";
 		String ans = "-----\n";
 		for (int i=0; i<steps.size(); ++i)
 		{
 			ans += fullIntermediaries.get(i)+"\n";
 			ans += steps.get(i)+"\n";
 		}
-		// TODO implement
 		return ans+result()+"\n-----";
 	}
 	
@@ -86,5 +92,14 @@ public class TransformSteps
 	public TransformStep getStep(int i)
 	{
 		return new TransformStep(intermediaries.get(i), steps.get(i), intermediaries.get(i+1));
+	}
+	
+	public TransformSteps reverse()
+	{
+		TransformSteps ans = new TransformSteps();
+		Collections.reverse(ans.fullIntermediaries);
+		Collections.reverse(ans.intermediaries);
+		Collections.reverse(ans.steps);
+		return ans;
 	}
 }

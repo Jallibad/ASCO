@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
  */
 public class Function extends Expression
 {
+	private static final long serialVersionUID = 7003195412543405388L;
 	public final Operator operator;
 	/**
 	 * An ordered List of the arguments to the Function, with term[0] being the first argument.

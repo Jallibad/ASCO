@@ -1,7 +1,10 @@
 package logic;
 
-public class TransformStep
+import java.io.Serializable;
+
+public class TransformStep implements Serializable
 {
+	private static final long serialVersionUID = -1364619449009668270L;
 	public final Expression before;
 	public final Transform step;
 	public final Expression after;
@@ -16,6 +19,6 @@ public class TransformStep
 	@Override
 	public String toString()
 	{
-		return "";
+		return ""; // TODO Implement
 	}
 }
