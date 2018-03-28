@@ -60,13 +60,48 @@ public enum NormalForm implements Transform
 		}
 		return null;
 	}
+	// o shit
+	public static boolean checkAllOr(Expression e)
+	{
+		if(e instanceof Function)
+		{
+			Function f = (Function) e;
+			return
+			(
+					f.operator == Operator.OR && (f.getTerm(0) instanceof Literal && f.getTerm(1) instanceof Literal)
+			) ||
+			(
+					f.operator == Operator.OR &&(checkAllOr(f.getTerm(0)) && checkAllOr(f.getTerm(1)))					
+			);
+		}
+		return true;
+	}
 
 	public boolean inForm(Expression e)
 	{
 		switch (this)
 		{
 			case CONJUNCTIVE: // TODO check if in CNF
-				break;
+			
+				
+				if (e instanceof Function)
+				{
+					Function f = (Function) e;
+					return
+					(
+						f.operator == Operator.AND && checkAllOr(f)
+					) ||
+					(
+						(
+							f.operator == Operator.AND ||
+							f.operator == Operator.OR
+						) &&
+							f.getTerms().stream().allMatch(CONJUNCTIVE::inForm)
+					);
+					
+				}
+				return true;
+				
 			case DISJUNCTIVE: // TODO check if in DNF
 				break;
 			case NEGATION:
