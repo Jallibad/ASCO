@@ -19,4 +19,20 @@ public class ExpressionTests
 		Expression t3 = Expression.create("(AND A (NEG (OR A B)))");
 		assertEquals(e3,t3);
 	}
+	
+	@Test
+	public void testParse()
+	{
+		try
+		{
+			assertEquals(Expression.create("(AND A B)"), Expression.parse("A∧B"));
+			assertEquals(Expression.create("(NEG A)"), Expression.parse("¬A"));
+			assertEquals(Expression.create("(AND B (NEG A))"), Expression.parse("B∧ ¬A"));
+			assertEquals(Expression.create("(AND B (NEG A))"), Expression.parse("(B∧ ¬A)"));
+		}
+		catch (MalformedExpressionException e)
+		{
+			fail("Expression::parse threw an exception when it shouldn't have");
+		}
+	}
 }

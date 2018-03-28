@@ -1,12 +1,12 @@
 package gui;
 
-import java.io.File;
 import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -14,8 +14,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import logic.Expression;
 import logic.MalformedExpressionException;
@@ -23,7 +21,7 @@ import logic.NormalForm;
 
 public class LogicApplication extends Application
 {
-	ExpressionEntry e = new ExpressionEntry();
+	ExpressionEntry expressionEntry = new ExpressionEntry();
 	Stage primaryStage;
 	
 	public static void main(String[] args)
@@ -41,7 +39,7 @@ public class LogicApplication extends Application
 		
 		setUpMenu(root);
 		
-		root.getChildren().add(e);
+		root.getChildren().add(expressionEntry);
 		primaryStage.setScene(s);
 		primaryStage.show();
 	}
@@ -54,17 +52,17 @@ public class LogicApplication extends Application
 		MenuItem load = new MenuItem("Load");
 		load.setOnAction(event ->
 		{
-			FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle("Open Resource File");
-			File toOpen = fileChooser.showOpenDialog(primaryStage);
-			//toOpen.canRead(); // TODO load file
+//			FileChooser fileChooser = new FileChooser();
+//			fileChooser.setTitle("Open Resource File");
+//			File toOpen = fileChooser.showOpenDialog(primaryStage);
+//			toOpen.canRead(); // TODO load file
 		});
 		menuFile.getItems().addAll(load);
 		
 		Menu menuEdit = new Menu("Edit");
 		menuEdit.setOnShowing(event ->
 			menuEdit.getItems().forEach(item -> // It might be better to only disable certain options
-				item.setDisable(!e.validExpression())));
+				item.setDisable(!expressionEntry.validExpression())));
 		
 		MenuItem simplify = new MenuItem("Simplify");
 		
@@ -77,31 +75,39 @@ public class LogicApplication extends Application
 			Optional<NormalForm> result = dialog.showAndWait();
 			result.ifPresent(t ->
 			{
+				Expression e;
 				try
 				{
-					System.out.println(e.getExpression());
-					System.out.println(t.transform(e.getExpression()));
-					displayExpression(root, t.transform(e.getExpression()));
+					e = expressionEntry.getExpression();
 				}
-				catch (MalformedExpressionException e)
+				catch (MalformedExpressionException exception)
 				{
 					Alert error = new Alert(AlertType.ERROR);
 					error.setTitle("Error");
 					error.setContentText("The expression is malformed"); // TODO give helpful information here
 					error.showAndWait();
+					return;
 				}
+				Button b = new Button("Show steps?");
+				ExpressionDisplay n = new ExpressionDisplay(t.transform(e), b);
+				b.setOnAction(event2 ->
+				{
+					// TODO
+					System.out.println("Showing steps");
+					System.out.println("First removing show steps button");
+					root.getChildren().remove(n);
+					StepsDisplay s = new StepsDisplay(t.transformWithSteps(e));
+					root.getChildren().add(s);
+				});
+				root.getChildren().add(n);
 			});
 		});
 		
-		menuEdit.getItems().addAll(simplify, normalForm);
+		MenuItem proveEquivalence = new MenuItem("Prove Equivalence");
+		
+		menuEdit.getItems().addAll(simplify, normalForm, proveEquivalence);
 		
 		menuBar.getMenus().addAll(menuFile, menuEdit);
 		root.getChildren().add(menuBar);
-	}
-	
-	private void displayExpression(Pane root, Expression e)
-	{
-		Text newExpression = new Text(e.prettyPrint());
-		root.getChildren().add(newExpression);
 	}
 }

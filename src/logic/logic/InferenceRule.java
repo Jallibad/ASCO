@@ -5,17 +5,31 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public enum InferenceRule implements Transform
-{
+{	
 	DE_MORGANS_OR("(NEG (OR P Q))", "(AND (NEG P) (NEG Q))"),
 	DE_MORGANS_AND("(NEG (AND P Q))", "(OR (NEG P) (NEG Q))"),
 	OR_DISTRIBUTION("(OR P (AND Q R))", "(AND (OR P Q) (OR P R))"),
 	AND_DISTRIBUTION("(AND P (OR Q R))", "(OR (AND P Q) (AND P R))"),
 	DOUBLE_NEGATION("(NEG (NEG P))", "P");
+
+	final Expression left;
+	final Expression right;
 	
 	InferenceRule(String left, String right)
 	{
 		this.left = Expression.create(left);
 		this.right = Expression.create(right);
+	}
+	
+	public Expression leftToRightTransform(Expression orig)
+	{
+		return left.matches(orig) ? transform(left.fillMatches(orig), right) : orig;
+	}
+	
+	public void leftTransform(TransformSteps steps)
+	{
+		if (left.matches(steps.result()))
+			steps.addStep(this);
 	}
 	
 	/**
@@ -58,6 +72,11 @@ public enum InferenceRule implements Transform
 		}
 	}
 	
-	final Expression left;
-	final Expression right;
+	@Override
+	public TransformSteps transformWithSteps(Expression orig)
+	{
+		TransformSteps ans = new TransformSteps(orig);
+		ans.addStep(this);
+		return ans;
+	}
 }
