@@ -3,6 +3,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -85,10 +86,17 @@ public class Literal extends Expression
 	}
 
 	@Override
-	public boolean equivalent(Expression other)
+	public boolean simplyEquivalent(Expression other)
 	{
-		if (other instanceof Literal)
-			return ((Literal) other).VARIABLE_NAME.equals(VARIABLE_NAME);
-		return false;
+		return(other instanceof Literal) && ((Literal) other).VARIABLE_NAME.equals(VARIABLE_NAME);
+	}
+
+	@Override
+	public Optional<TransformSteps> proveEquivalence(Expression other)
+	{
+		if (simplyEquivalent(other))
+			return Optional.of(new TransformSteps(this));
+		else
+			return Optional.empty();
 	}
 }

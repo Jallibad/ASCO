@@ -1,13 +1,9 @@
 package logic;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -22,20 +18,16 @@ public abstract class Expression implements Serializable
 
 	public static void main(String[] args)
 	{
+		Expression e1 = create("(AND A (OR B (AND D E)))");
+		Expression e2 = create("(AND A (AND (OR B D) (OR B E)))");
+		System.out.println(e1.proveEquivalence(e2));
 		try
 		{
-			FileOutputStream fileOut = new FileOutputStream("test.ser");
-			ObjectOutputStream out = new ObjectOutputStream(fileOut);
-			out.writeObject(create("(NEG (NEG A))"));
-			out.close();
-			
-			FileInputStream fileIn = new FileInputStream("test.ser");
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			System.out.println((Expression) in.readObject());
-			in.close();
+			System.out.println(parse("A"));
 		}
-		catch (IOException | ClassNotFoundException e)
+		catch (MalformedExpressionException e)
 		{
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -362,16 +354,18 @@ public abstract class Expression implements Serializable
 	public abstract int complexity();
 	
 	/**
-	 * Tests structural equality, whether the two Expression have the exact same form.
+	 * Tests full equality, whether the two Expression have the exact same form.
 	 * In other words, (AND A B) != (AND B A)
 	 */
 	@Override
 	public abstract boolean equals(Object other);
 	
 	/**
-	 * Checks whether two Expressions are logically equivalent, including commutativity and associativity
+	 * Checks whether two Expressions are simply logically equivalent, including commutativity and associativity
 	 * @param other
 	 * @return
 	 */
-	public abstract boolean equivalent(Expression other);
+	public abstract boolean simplyEquivalent(Expression other);
+	
+	public abstract Optional<TransformSteps> proveEquivalence(Expression other);
 }

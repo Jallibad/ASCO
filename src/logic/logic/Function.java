@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -199,7 +200,7 @@ public class Function extends Expression
 	}
 
 	@Override
-	public boolean equivalent(Expression o)
+	public boolean simplyEquivalent(Expression o)
 	{
 		if (o.getOperator() != operator)
 			return false;
@@ -208,8 +209,8 @@ public class Function extends Expression
 		if
 		(
 			operator.TRAITS.contains(OperatorTrait.COMMUTATIVE)
-			&& terms.get(1).equivalent(other.terms.get(2))
-			&& terms.get(2).equivalent(other.terms.get(1))
+			&& terms.get(0).simplyEquivalent(other.terms.get(1))
+			&& terms.get(1).simplyEquivalent(other.terms.get(0))
 		)
 			return true;
 		
@@ -218,5 +219,18 @@ public class Function extends Expression
 			// TODO implement
 		}
 		return equals(other);
+	}
+
+	@Override
+	public Optional<TransformSteps> proveEquivalence(Expression other)
+	{
+		TransformSteps ans = NormalForm.CONJUNCTIVE.transformWithSteps(this);
+		System.out.println(ans);
+		TransformSteps secondHalf = NormalForm.CONJUNCTIVE.transformWithSteps(other);
+		System.out.println(secondHalf);
+		if (ans.result().simplyEquivalent(secondHalf.result()))
+			return Optional.of(ans.combine(secondHalf.reverse()));
+		else
+			return Optional.empty();
 	}
 }

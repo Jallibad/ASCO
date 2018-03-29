@@ -6,13 +6,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.List;
 import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
 import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -24,17 +27,18 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import logic.Expression;
 import logic.MalformedExpressionException;
 import logic.NormalForm;
+import logic.TransformSteps;
 
 public class LogicApplication extends Application
 {
 	ExpressionEntry expressionEntry = new ExpressionEntry();
 	Stage primaryStage;
-	Scene s;
 	
 	public static void main(String[] args)
 	{
@@ -47,24 +51,13 @@ public class LogicApplication extends Application
 		this.primaryStage = primaryStage;
 		primaryStage.setTitle("Logic++");
 		VBox root = new VBox();
-		s = new Scene(root, 300, 300, Color.WHITESMOKE);
+		Scene s = new Scene(root, 300, 300, Color.WHITESMOKE);
 		
 		setUpMenu(root);
 		
 		root.getChildren().add(expressionEntry);
 		primaryStage.setScene(s);
 		primaryStage.show();
-	}
-	
-	private void exportScreen() {
-		 WritableImage writableImage = s.snapshot(null);
-         File file = new File("screenCap.png");
-         try {
-             ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", file);
-             System.out.println("Captured: " + file.getAbsolutePath());
-         } catch (IOException ex) {
-             System.out.println("Error: unable to write screen capture to output file.");
-         }
 	}
 	
 	private void setUpMenu(Pane root) // TODO I'm not sure if Pane is the best type here
@@ -86,17 +79,15 @@ public class LogicApplication extends Application
 				error.setContentText("The current expression is invalid and cannot be saved");
 				error.showAndWait();
 			}
-		});		
+		});
 		
 		MenuItem export = new MenuItem("Export");
-		export.setOnAction(event -> {
-			exportScreen();
-		});
+		export.setOnAction(event -> exportScreen(root));
 		
 		MenuItem load = new MenuItem("Load");
 		load.setOnAction(event ->
 			loadFile().ifPresent(e -> expressionEntry.setExpression((Expression) e)));
-		menuFile.getItems().addAll(save, load, export);
+		menuFile.getItems().addAll(save, export, load);
 		
 		Menu menuEdit = new Menu("Edit");
 		menuEdit.setOnShowing(event ->
@@ -143,11 +134,89 @@ public class LogicApplication extends Application
 		});
 		
 		MenuItem proveEquivalence = new MenuItem("Prove Equivalence");
+		proveEquivalence.setOnAction(event ->
+		{
+			ExpressionEntry e2 = new ExpressionEntry();
+			Button b = new Button("Ready to prove equivalence");
+			b.setOnAction(event2 ->
+			{
+				root.getChildren().removeAll(e2, b);
+				try
+				{
+					Optional<TransformSteps> steps = expressionEntry.getExpression().proveEquivalence(e2.getExpression());
+					if (steps.isPresent())
+						root.getChildren().addAll(new Text("The expressions are equivalent"), new StepsDisplay(steps.get()));
+					else
+						root.getChildren().add(new Text("The expressions are not equivalent"));
+				}
+				catch (MalformedExpressionException error)
+				{
+					// TODO Auto-generated catch block
+					error.printStackTrace();
+				}
+			});
+			root.getChildren().addAll(e2, b);
+		});
 		
-		menuEdit.getItems().addAll(simplify, normalForm, proveEquivalence);
+		MenuItem checkWork = new MenuItem("Check Work");
+		checkWork.setOnAction(event ->
+		{
+			FileChooser fileChooser = new FileChooser();
+			FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("SER files (*.ser)", "*.ser");
+			fileChooser.getExtensionFilters().add(extFilter);
+			fileChooser.setTitle("Select files to check");
+			List<File> files = fileChooser.showOpenMultipleDialog(primaryStage);
+			if (files == null)
+				return;
+			for (File f : files)
+			{
+				// TODO say which expression is which
+				Node toAdd;
+				try
+				{
+					FileInputStream fileIn = new FileInputStream(f);
+					Expression other = (Expression) new ObjectInputStream(fileIn).readObject();
+					fileIn.close();
+					
+					Optional<TransformSteps> steps = expressionEntry.getExpression().proveEquivalence(other);
+					if (steps.isPresent())
+						toAdd = new StepsDisplay(steps.get());
+					else
+						toAdd = new Text("The expressions are not equivalent");
+				}
+				catch (IOException | ClassNotFoundException | MalformedExpressionException e)
+				{
+					toAdd = new Text(String.format("The file \"%s\" could not be read", f.toString()));
+				}
+				root.getChildren().add(toAdd);
+			}
+		});
+		
+		menuEdit.getItems().addAll(simplify, normalForm, proveEquivalence, checkWork);
 		
 		menuBar.getMenus().addAll(menuFile, menuEdit);
 		root.getChildren().add(menuBar);
+	}
+	
+	private void exportScreen(Node toExport)
+	{
+		WritableImage writableImage = toExport.snapshot(new SnapshotParameters(), null);
+		try
+		{
+			FileChooser fileChooser = new FileChooser();
+			FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.png");
+			fileChooser.getExtensionFilters().add(extFilter);
+			fileChooser.setTitle("Export Steps");
+			File file = fileChooser.showSaveDialog(primaryStage);
+			if (file == null)
+				return;
+			ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", file);
+			System.out.println("Captured: " + file.getAbsolutePath());
+		}
+		catch (IOException e)
+		{
+			System.out.println("Error: unable to write screen capture to output file.");
+		}
 	}
 	
 	private void save(Object toSave)
@@ -158,11 +227,10 @@ public class LogicApplication extends Application
 			FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("SER files (*.ser)", "*.ser");
 			fileChooser.getExtensionFilters().add(extFilter);
 			fileChooser.setTitle("Save Resource File");
-			// TODO set extension filters
-			File toOpen = fileChooser.showSaveDialog(primaryStage);
-			if (toOpen == null)
+			File file = fileChooser.showSaveDialog(primaryStage);
+			if (file == null)
 				return;
-			FileOutputStream fileOut = new FileOutputStream(toOpen);
+			FileOutputStream fileOut = new FileOutputStream(file);
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
 			out.writeObject(toSave);
 			out.close();
@@ -195,7 +263,7 @@ public class LogicApplication extends Application
 		{
 			Alert error = new Alert(AlertType.ERROR);
 			error.setTitle("Error");
-			error.setContentText("The chosen file could not be read");
+			error.setContentText(e.getMessage());
 			error.showAndWait();
 			return Optional.empty();
 		}

@@ -44,6 +44,7 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 		if (s.steps.size() == 0)
 			return;
 		// Remove the possibly null last element to make room for the new original
+		// TODO this sounds wrong...
 		List<Expression> newTerms = ((Function) result()).getTerms();
 		Operator o = result().getOperator();
 		intermediaries.remove(intermediaries.size()-1);
@@ -124,5 +125,21 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 		}
 		ans.add(new StepOrExpression(result()));
 		return ans.iterator();
+	}
+
+	public TransformSteps combine(TransformSteps other)
+	{
+		// TODO Auto-generated method stub
+		TransformSteps ans = new TransformSteps();
+		ans.fullIntermediaries.addAll(fullIntermediaries);
+		ans.fullIntermediaries.remove(fullIntermediaries.size()-1);
+		ans.fullIntermediaries.addAll(other.fullIntermediaries);
+		ans.intermediaries.addAll(intermediaries);
+		ans.intermediaries.remove(intermediaries.size()-1);
+		ans.intermediaries.addAll(other.intermediaries);
+		ans.steps.addAll(steps);
+		ans.steps.addAll(other.steps);
+		checkRep();
+		return ans;
 	}
 }
