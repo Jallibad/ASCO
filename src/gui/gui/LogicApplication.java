@@ -8,7 +8,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Optional;
 
+import javax.imageio.ImageIO;
+
 import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -17,6 +20,7 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -30,6 +34,7 @@ public class LogicApplication extends Application
 {
 	ExpressionEntry expressionEntry = new ExpressionEntry();
 	Stage primaryStage;
+	Scene s;
 	
 	public static void main(String[] args)
 	{
@@ -42,13 +47,24 @@ public class LogicApplication extends Application
 		this.primaryStage = primaryStage;
 		primaryStage.setTitle("Logic++");
 		VBox root = new VBox();
-		Scene s = new Scene(root, 300, 300, Color.WHITESMOKE);
+		s = new Scene(root, 300, 300, Color.WHITESMOKE);
 		
 		setUpMenu(root);
 		
 		root.getChildren().add(expressionEntry);
 		primaryStage.setScene(s);
 		primaryStage.show();
+	}
+	
+	private void exportScreen() {
+		 WritableImage writableImage = s.snapshot(null);
+         File file = new File("screenCap.png");
+         try {
+             ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", file);
+             System.out.println("Captured: " + file.getAbsolutePath());
+         } catch (IOException ex) {
+             System.out.println("Error: unable to write screen capture to output file.");
+         }
 	}
 	
 	private void setUpMenu(Pane root) // TODO I'm not sure if Pane is the best type here
@@ -70,11 +86,17 @@ public class LogicApplication extends Application
 				error.setContentText("The current expression is invalid and cannot be saved");
 				error.showAndWait();
 			}
+		});		
+		
+		MenuItem export = new MenuItem("Export");
+		export.setOnAction(event -> {
+			exportScreen();
 		});
+		
 		MenuItem load = new MenuItem("Load");
 		load.setOnAction(event ->
 			loadFile().ifPresent(e -> expressionEntry.setExpression((Expression) e)));
-		menuFile.getItems().addAll(save, load);
+		menuFile.getItems().addAll(save, load, export);
 		
 		Menu menuEdit = new Menu("Edit");
 		menuEdit.setOnShowing(event ->
