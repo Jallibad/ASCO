@@ -88,7 +88,7 @@ public class Literal extends Expression
 	@Override
 	public boolean simplyEquivalent(Expression other)
 	{
-		return(other instanceof Literal) && ((Literal) other).VARIABLE_NAME.equals(VARIABLE_NAME);
+		return (other instanceof Literal) && ((Literal) other).VARIABLE_NAME.equals(VARIABLE_NAME);
 	}
 
 	@Override

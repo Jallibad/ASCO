@@ -52,13 +52,16 @@ public class ExpressionTests
 	
 	@Test
 	public void testEquivalence()
-	{
+	{	
 		// Test commutativity
 		assertTrue(Expression.create("(AND A B)").proveEquivalence(Expression.create("(AND B A)")).isPresent());
 		assertFalse(Expression.create("(AND A A)").proveEquivalence(Expression.create("(AND B A)")).isPresent());
 		assertFalse(Expression.create("(AND B B)").proveEquivalence(Expression.create("(AND B A)")).isPresent());
 		
 		assertFalse(Expression.create("(AND A B)").proveEquivalence(new Literal("A")).isPresent());
+		
+		assertTrue(new Literal("A").proveEquivalence(new Literal("A")).isPresent());
+		assertFalse(new Literal("A").proveEquivalence(new Literal("B")).isPresent());
 	}
 	
 	@Test
@@ -74,6 +77,7 @@ public class ExpressionTests
 	@Test
 	public void testMatches()
 	{
-		//assertTrue(Expression.create("").matches(""))
+		assertTrue(Expression.create("(AND A B)").matches("(AND A B)"));
+		assertFalse(Expression.create("(AND (OR A B) B)").matches("(AND (AND A B) B)"));
 	}
 }
