@@ -86,7 +86,8 @@ public abstract class Expression implements Serializable
 	 * @return the sanitized expression
 	 */
 	private static String postSanitize(String exp) {
-		 boolean found = true;
+		//remove wrapped literals 
+		boolean found = true;
 		 while (found) {
 			 found = false;
 			 for (int i = 0; i < exp.length(); ++i) {
@@ -96,6 +97,13 @@ public abstract class Expression implements Serializable
 					 exp = removeChar(exp,i);
 					 --i;
 				 }
+			 }
+		 }
+		 
+		 //remove extra spaces
+		 for (int i = 0; i < exp.length()-1; ++i) {
+			 if (exp.charAt(i) == ' ' && exp.charAt(i+1) == ' ') {
+				 exp = removeChar(exp, i);
 			 }
 		 }
 		 return exp;
@@ -297,10 +305,10 @@ public abstract class Expression implements Serializable
 			//System.out.println("\""+ans+"\"");
 			String ans2 = operatorsToEnglish(ans);
 			//System.out.println("\""+ans2+"\"");
-			System.out.println("englsh prefix sanitized: " + ans);
+			System.out.println("englsh prefix sanitized: " + ans2);
 			String ans3 = postSanitize(ans2);
 			System.out.println("post sanitization: " + ans3);
-			return create(ans2);
+			return create(ans3);
 		}
 		catch (Exception e)
 		{
