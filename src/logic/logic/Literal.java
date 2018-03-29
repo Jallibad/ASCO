@@ -12,6 +12,7 @@ import java.util.Set;
  */
 public class Literal extends Expression
 {
+	private static final long serialVersionUID = 7226891007841491566L;
 	public final String VARIABLE_NAME;
 	
 	public Literal(String variableName)
