@@ -37,9 +37,11 @@ public class NormalFormTests
 		Expression e1 = Expression.create("(AND A B)");
 		Expression e2 = Expression.create("(AND (OR A B) (OR B C))");
 		Expression e3 = Expression.create("(OR C (AND A B))");
+		Expression e4 = Expression.create("(NEG (OR B C))");
 		assertTrue(NormalForm.CONJUNCTIVE.inForm(e1));
 		assertTrue(NormalForm.CONJUNCTIVE.inForm(e2));
 		assertFalse(NormalForm.CONJUNCTIVE.inForm(e3));
+		assertFalse(NormalForm.CONJUNCTIVE.inForm(e4));
 	}
 	
 	@Test
@@ -49,6 +51,19 @@ public class NormalFormTests
 		Expression e2 = Expression.create("(OR A (AND B (OR D E)))");
 		assertEquals(e1,NormalForm.DISJUNCTIVE.transform(e1));
 		assertEquals(Expression.create("(OR A (OR (AND B D) (AND B E)))"),NormalForm.DISJUNCTIVE.transform(e2));
+	}
+	
+	@Test 
+	public void testDNFinform()
+	{
+		Expression e1 = Expression.create("(OR C (AND A B))");
+		Expression e2 = Expression.create("(AND A B)");
+		Expression e3 = Expression.create("(NEG (OR A B))");
+		Expression e4 = Expression.create("(OR C (OR A B))");
+		assertTrue(NormalForm.DISJUNCTIVE.inForm(e1));
+		assertTrue(NormalForm.DISJUNCTIVE.inForm(e2));
+		assertFalse(NormalForm.DISJUNCTIVE.inForm(e3));
+		assertFalse(NormalForm.DISJUNCTIVE.inForm(e4));
 	}
 	
 	@Test

@@ -33,6 +33,7 @@ public enum NormalForm implements Transform
 	// o shit
 		public static boolean checkAllOr(Expression e)
 		{
+			
 			if(e instanceof Function)
 			{
 				Function f = (Function) e;
@@ -42,6 +43,22 @@ public enum NormalForm implements Transform
 				) ||
 				(
 						f.operator == Operator.OR &&(checkAllOr(f.getTerm(0)) && checkAllOr(f.getTerm(1)))					
+				);
+			}
+			return true;
+		}
+		
+		public static boolean checkAllAnd(Expression e)
+		{
+			if(e instanceof Function)
+			{
+				Function f = (Function) e;
+				return
+				(
+						f.operator == Operator.AND && (f.getTerm(0) instanceof Literal && f.getTerm(1) instanceof Literal)
+				) ||
+				(
+						f.operator == Operator.AND &&(checkAllAnd(f.getTerm(0)) && checkAllAnd(f.getTerm(1)))					
 				);
 			}
 			return true;
@@ -59,21 +76,39 @@ public enum NormalForm implements Transform
 						Function f = (Function) e;
 						return
 						(
-							f.operator == Operator.AND && checkAllOr(f)
+							checkAllOr(f)
 						) ||
 						(
 							(
-								f.operator == Operator.AND ||
-								f.operator == Operator.OR
+								f.operator == Operator.AND
 							) &&
-								f.getTerms().stream().allMatch(CONJUNCTIVE::inForm)
+								f.getTerms().stream().allMatch(CONJUNCTIVE::inForm) 
 						);
 						
 					}
+				
 					return true;
 					
 				case DISJUNCTIVE: // TODO check if in DNF
-					break;
+					
+					if (e instanceof Function)
+					{
+						Function f = (Function) e;
+						return
+						(
+							checkAllAnd(f)
+						) ||
+						(
+							(
+								f.operator == Operator.OR
+							) &&
+								f.getTerms().stream().allMatch(DISJUNCTIVE::inForm) 
+						);
+						
+					}
+			
+					return true;
+					
 				case NEGATION:
 					if (e instanceof Function)
 					{
