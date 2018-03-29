@@ -188,28 +188,30 @@ public abstract class Expression implements Serializable
 		}		
 		
 		//System.out.println("before wrap: " + exp);
-		//remove parentheses from expression if double-wrapped
+		//remove parentheses from expression while double-wrapped
 		boolean doubleWrapped = true;
-		if (!(exp.charAt(0) == '(' && exp.charAt(1) == '('))
-			doubleWrapped = false;
-		else
-		{
-			int bracketNum = 2;
-			for (int i = 2; i < exp.length(); ++i)
+		while (doubleWrapped) {
+			if (!(exp.charAt(0) == '(' && exp.charAt(1) == '('))
+				doubleWrapped = false;
+			else
 			{
-				if (exp.charAt(i) == '(')
-					++bracketNum;
-				else if (exp.charAt(i) == ')' && --bracketNum == 1)
+				int bracketNum = 2;
+				for (int i = 2; i < exp.length(); ++i)
 				{
-					doubleWrapped &= i == exp.length()-2;
-					break;
+					if (exp.charAt(i) == '(')
+						++bracketNum;
+					else if (exp.charAt(i) == ')' && --bracketNum == 1)
+					{
+						doubleWrapped &= i == exp.length()-2;
+						break;
+					}
 				}
 			}
-		}
-		if (doubleWrapped)
-		{
-			exp = removeChar(exp,0);
-			exp = removeChar(exp,exp.length()-1);
+			if (doubleWrapped)
+			{
+				exp = removeChar(exp,0);
+				exp = removeChar(exp,exp.length()-1);
+			}	
 		}
 		
 		//System.out.println("after wrap: " + exp);
@@ -268,10 +270,13 @@ public abstract class Expression implements Serializable
 	{
 		try
 		{
+			//System.out.println("sanitized: " + sanitizeInput(exp));
 			String ans = infixToPrefix2(sanitizeInput(exp));
+			//System.out.println("sanitized prefix: " + ans);
 			//System.out.println("\""+ans+"\"");
 			String ans2 = operatorsToEnglish(ans);
 			//System.out.println("\""+ans2+"\"");
+			System.out.println("englsh prefix sanitized: " + ans);
 			return create(ans2);
 		}
 		catch (Exception e)
