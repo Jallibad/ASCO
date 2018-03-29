@@ -32,6 +32,17 @@ public class NormalFormTests
 	}
 	
 	@Test
+	public void testCNFinform()
+	{
+		Expression e1 = Expression.create("(AND A B)");
+		Expression e2 = Expression.create("(AND (OR A B) (OR B C))");
+		Expression e3 = Expression.create("(OR C (AND A B))");
+		assertTrue(NormalForm.CONJUNCTIVE.inForm(e1));
+		assertTrue(NormalForm.CONJUNCTIVE.inForm(e2));
+		assertFalse(NormalForm.CONJUNCTIVE.inForm(e3));
+	}
+	
+	@Test
 	public void testDNFtransform()
 	{
 		Expression e1 = Expression.create("(OR (NEG A) (AND B C))");
