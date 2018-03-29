@@ -360,4 +360,18 @@ public abstract class Expression implements Serializable
 	abstract Operator getOperator();
 	
 	public abstract int complexity();
+	
+	/**
+	 * Tests structural equality, whether the two Expression have the exact same form.
+	 * In other words, (AND A B) != (AND B A)
+	 */
+	@Override
+	public abstract boolean equals(Object other);
+	
+	/**
+	 * Checks whether two Expressions are logically equivalent, including commutativity and associativity
+	 * @param other
+	 * @return
+	 */
+	public abstract boolean equivalent(Expression other);
 }

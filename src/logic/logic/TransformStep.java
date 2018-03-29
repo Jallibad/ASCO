@@ -2,6 +2,11 @@ package logic;
 
 import java.io.Serializable;
 
+/**
+ * An immutable container class representing a single transform, along with the expressions before and after
+ * @author Jallibad
+ *
+ */
 public class TransformStep implements Serializable
 {
 	private static final long serialVersionUID = -1364619449009668270L;

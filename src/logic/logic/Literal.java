@@ -45,6 +45,7 @@ public class Literal extends Expression
 			return VARIABLE_NAME.equals(((Literal) o).VARIABLE_NAME);
 		return false;
 	}
+	
 	@Override
 	public int hashCode()
 	{
@@ -81,5 +82,13 @@ public class Literal extends Expression
 	public int complexity()
 	{
 		return 1;
+	}
+
+	@Override
+	public boolean equivalent(Expression other)
+	{
+		if (other instanceof Literal)
+			return ((Literal) other).VARIABLE_NAME.equals(VARIABLE_NAME);
+		return false;
 	}
 }

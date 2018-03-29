@@ -162,7 +162,7 @@ public enum NormalForm implements Transform
 			orig = new Function(f.operator, normalFormTerms);
 		}
 		for (InferenceRule i : inferenceRules)
-			orig = i.leftToRightTransform(orig);
+			orig = i.transformLeft(orig);
 		return orig;
 	}
 	
@@ -177,14 +177,12 @@ public enum NormalForm implements Transform
 			for (int i=0; i<getTerms.size(); ++i)
 			{
 				TransformSteps partialSteps = transformHelperWithSteps(getTerms.get(i), inferenceRules);
-				//System.out.println(partialSteps);
 				normalFormTerms.add(partialSteps.result());
 				steps.combine(partialSteps, i);
 			}
-			//orig = new Function(f.operator, normalFormTerms);
 		}
 		for (InferenceRule i : inferenceRules)
-			i.leftTransform(steps);
+			i.transformLeftWithSteps(steps);
 		return steps;
 	}
 }

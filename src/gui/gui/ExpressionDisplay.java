@@ -45,4 +45,14 @@ public class ExpressionDisplay extends BorderPane
 		this(exp);
 		setRight(rightHalf);
 	}
+	
+	public void setExpression(Expression exp)
+	{
+		this.exp = exp;
+	}
+	
+	public Expression getExpression()
+	{
+		return exp;
+	}
 }

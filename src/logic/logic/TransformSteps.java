@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A class representing a collection of steps and intermediary expressions
+ * A mutable class representing a collection of steps and intermediary expressions
  * @author Jallibad
  *
  */
@@ -82,12 +82,14 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 		return ans+result()+"\n-----";
 	}
 	
+	/**
+	 * Checks the representation invariant.  Should not do anything in the working
+	 * production version of the application.
+	 */
 	private void checkRep()
 	{
-		if (intermediaries.size() != fullIntermediaries.size())
-			throw new Error();
-		if (intermediaries.size() != steps.size()+1)
-			throw new Error();
+		assert(intermediaries.size() != fullIntermediaries.size());
+		assert(intermediaries.size() != steps.size()+1);
 	}
 	
 	public TransformStep getStep(int i)
@@ -111,6 +113,7 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 		return ans;
 	}
 	
+	@Override
 	public Iterator<StepOrExpression> iterator()
 	{
 		List<StepOrExpression> ans = new ArrayList<StepOrExpression>();

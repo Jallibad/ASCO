@@ -14,10 +14,16 @@ import java.util.Set;
 public enum Operator
 {
 	/**
-	 * Represents the unary not/negation
+	 * Represents the unary not/negation "¬"
 	 */
 	NEG("¬", 1, 0),
+	/**
+	 * Represents the logical and "∧"
+	 */
 	AND("∧", 2, 1, OperatorTrait.COMMUTATIVE, OperatorTrait.ASSOCIATIVE),
+	/**
+	 * Represents the logical or "∨"
+	 */
 	OR("∨", 2, 1, OperatorTrait.COMMUTATIVE, OperatorTrait.ASSOCIATIVE);
 	
 	Operator(String displayText, int numArguments, int symbolPosition, OperatorTrait... traits)

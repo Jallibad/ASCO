@@ -197,4 +197,26 @@ public class Function extends Expression
 		// Sum of complexity of all terms + 1 for the operator
 		return terms.stream().collect(Collectors.summingInt(Expression::complexity))+1;
 	}
+
+	@Override
+	public boolean equivalent(Expression o)
+	{
+		if (o.getOperator() != operator)
+			return false;
+		Function other = (Function) o;
+		
+		if
+		(
+			operator.TRAITS.contains(OperatorTrait.COMMUTATIVE)
+			&& terms.get(1).equivalent(other.terms.get(2))
+			&& terms.get(2).equivalent(other.terms.get(1))
+		)
+			return true;
+		
+		if (operator.TRAITS.contains(OperatorTrait.ASSOCIATIVE))
+		{
+			
+		}
+		return equals(other);
+	}
 }
