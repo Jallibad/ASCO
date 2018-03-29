@@ -81,6 +81,27 @@ public abstract class Expression implements Serializable
 	}
 	
 	/**
+	 * sanitize the results of infix->prefix parse, removing wrapped literally
+	 * @param exp the expression to sanitize
+	 * @return the sanitized expression
+	 */
+	private static String postSanitize(String exp) {
+		 boolean found = true;
+		 while (found) {
+			 found = false;
+			 for (int i = 0; i < exp.length(); ++i) {
+				 if (Character.isAlphabetic(exp.charAt(i)) && i > 0 && exp.charAt(i-1) == '(' && i < exp.length() - 1 && exp.charAt(i+1) == ')') {
+					 found = true;
+					 exp = removeChar(exp,i-1);
+					 exp = removeChar(exp,i);
+					 --i;
+				 }
+			 }
+		 }
+		 return exp;
+	}
+	
+	/**
 	 * sanitize the input expression in order to prepare it for parsing
 	 * @param exp the string to sanitize
 	 * @return the specified string sanitized for expression parsing
@@ -277,6 +298,8 @@ public abstract class Expression implements Serializable
 			String ans2 = operatorsToEnglish(ans);
 			//System.out.println("\""+ans2+"\"");
 			System.out.println("englsh prefix sanitized: " + ans);
+			String ans3 = postSanitize(ans2);
+			System.out.println("post sanitization: " + ans3);
 			return create(ans2);
 		}
 		catch (Exception e)

@@ -25,7 +25,7 @@ public class ExpressionTests
 	{
 		try
 		{
-			assertEquals(new Literal("A"), Expression.parse("A"));
+			assertEquals(new Literal("A"), Expression.parse("(((A)))"));
 			assertEquals(Expression.create("(AND A B)"), Expression.parse("A∧B"));
 			assertEquals(Expression.create("(NEG A)"), Expression.parse("¬A"));
 			assertEquals(Expression.create("(AND B (NEG A))"), Expression.parse("B∧ ¬A"));
