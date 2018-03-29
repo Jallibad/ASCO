@@ -6,19 +6,28 @@ import java.util.stream.Collectors;
 
 public enum InferenceRule implements Transform
 {	
-	DE_MORGANS_OR("(NEG (OR P Q))", "(AND (NEG P) (NEG Q))"),
-	DE_MORGANS_AND("(NEG (AND P Q))", "(OR (NEG P) (NEG Q))"),
+	DE_MORGANS_OR("(NEG (OR P Q))", "(AND (NEG P) (NEG Q))", "DeMorgan's Or"),
+	DE_MORGANS_AND("(NEG (AND P Q))", "(OR (NEG P) (NEG Q))", "DeMorgan's And"),
 	OR_DISTRIBUTION("(OR P (AND Q R))", "(AND (OR P Q) (OR P R))"),
 	AND_DISTRIBUTION("(AND P (OR Q R))", "(OR (AND P Q) (AND P R))"),
 	DOUBLE_NEGATION("(NEG (NEG P))", "P");
 
 	final Expression left;
 	final Expression right;
+	private final String name;
+
+	InferenceRule(String left, String right, String name)
+	{
+		this.left = Expression.create(left);
+		this.right = Expression.create(right);
+		this.name = name;
+	}
 	
 	InferenceRule(String left, String right)
 	{
 		this.left = Expression.create(left);
 		this.right = Expression.create(right);
+		name = null;
 	}
 	
 	public Expression leftToRightTransform(Expression orig)
@@ -78,5 +87,13 @@ public enum InferenceRule implements Transform
 		TransformSteps ans = new TransformSteps(orig);
 		ans.addStep(this);
 		return ans;
+	}
+	
+	@Override
+	public String toString()
+	{
+		if (name != null)
+			return name;
+		return name().replaceAll("_", " ").toLowerCase();
 	}
 }

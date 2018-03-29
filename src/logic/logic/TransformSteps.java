@@ -3,6 +3,7 @@ package logic;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -10,12 +11,12 @@ import java.util.List;
  * @author Jallibad
  *
  */
-public class TransformSteps implements Serializable
+public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 {
 	private static final long serialVersionUID = -5016027615991197605L;
-	public List<Transform> steps = new ArrayList<Transform>();
-	public List<Expression> intermediaries = new ArrayList<Expression>();
-	public List<Expression> fullIntermediaries = new ArrayList<Expression>();
+	private List<Transform> steps = new ArrayList<Transform>();
+	private List<Expression> intermediaries = new ArrayList<Expression>();
+	private List<Expression> fullIntermediaries = new ArrayList<Expression>();
 	
 	private TransformSteps()
 	{
@@ -91,7 +92,14 @@ public class TransformSteps implements Serializable
 	
 	public TransformStep getStep(int i)
 	{
-		return new TransformStep(intermediaries.get(i), steps.get(i), intermediaries.get(i+1));
+		return new TransformStep(get(i), steps.get(i), get(i+1));
+	}
+	
+	public Expression get(int i)
+	{
+		if (intermediaries.get(i) == null)
+			return fullIntermediaries.get(i);
+		return intermediaries.get(i);
 	}
 	
 	public TransformSteps reverse()
@@ -101,5 +109,17 @@ public class TransformSteps implements Serializable
 		Collections.reverse(ans.intermediaries);
 		Collections.reverse(ans.steps);
 		return ans;
+	}
+	
+	public Iterator<StepOrExpression> iterator()
+	{
+		List<StepOrExpression> ans = new ArrayList<StepOrExpression>();
+		for (int i=0; i<steps.size(); ++i)
+		{
+			ans.add(new StepOrExpression(fullIntermediaries.get(i)));
+			ans.add(new StepOrExpression(getStep(i)));
+		}
+		ans.add(new StepOrExpression(result()));
+		return ans.iterator();
 	}
 }

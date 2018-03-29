@@ -50,4 +50,9 @@ public class ExpressionEntry extends VBox
 	{
 		return Expression.parse(textField.getText());
 	}
+	
+	public void setExpression(Expression e)
+	{
+		textField.setText(e.prettyPrint());
+	}
 }

@@ -26,12 +26,12 @@ public abstract class Expression implements Serializable
 		{
 			FileOutputStream fileOut = new FileOutputStream("test.ser");
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
-			out.writeObject(NormalForm.NEGATION.transformWithSteps(create("(NEG (OR A (NEG (NEG (NEG C)))))")));
+			out.writeObject(create("(NEG (NEG A))"));
 			out.close();
 			
 			FileInputStream fileIn = new FileInputStream("test.ser");
 			ObjectInputStream in = new ObjectInputStream(fileIn);
-			System.out.println((TransformSteps) in.readObject());
+			System.out.println((Expression) in.readObject());
 			in.close();
 		}
 		catch (IOException | ClassNotFoundException e)

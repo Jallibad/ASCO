@@ -1,5 +1,11 @@
 package gui;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Optional;
 
 import javafx.application.Application;
@@ -14,6 +20,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import logic.Expression;
 import logic.MalformedExpressionException;
@@ -49,15 +56,25 @@ public class LogicApplication extends Application
 		MenuBar menuBar = new MenuBar();
 		
 		Menu menuFile = new Menu("File");
+		MenuItem save = new MenuItem("Save");
+		save.setOnAction(event ->
+		{
+			try
+			{
+				save(expressionEntry.getExpression());
+			}
+			catch (MalformedExpressionException e)
+			{
+				Alert error = new Alert(AlertType.ERROR);
+				error.setTitle("Error");
+				error.setContentText("The current expression is invalid and cannot be saved");
+				error.showAndWait();
+			}
+		});
 		MenuItem load = new MenuItem("Load");
 		load.setOnAction(event ->
-		{
-//			FileChooser fileChooser = new FileChooser();
-//			fileChooser.setTitle("Open Resource File");
-//			File toOpen = fileChooser.showOpenDialog(primaryStage);
-//			toOpen.canRead(); // TODO load file
-		});
-		menuFile.getItems().addAll(load);
+			loadFile().ifPresent(e -> expressionEntry.setExpression((Expression) e)));
+		menuFile.getItems().addAll(save, load);
 		
 		Menu menuEdit = new Menu("Edit");
 		menuEdit.setOnShowing(event ->
@@ -109,5 +126,56 @@ public class LogicApplication extends Application
 		
 		menuBar.getMenus().addAll(menuFile, menuEdit);
 		root.getChildren().add(menuBar);
+	}
+	
+	private void save(Object toSave)
+	{
+		try
+		{
+			FileChooser fileChooser = new FileChooser();
+			FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("SER files (*.ser)", "*.ser");
+			fileChooser.getExtensionFilters().add(extFilter);
+			fileChooser.setTitle("Save Resource File");
+			// TODO set extension filters
+			File toOpen = fileChooser.showSaveDialog(primaryStage);
+			if (toOpen == null)
+				return;
+			FileOutputStream fileOut = new FileOutputStream(toOpen);
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			out.writeObject(toSave);
+			out.close();
+		}
+		catch (IOException e)
+		{
+			Alert error = new Alert(AlertType.ERROR);
+			error.setTitle("Error");
+			error.setContentText("Could not save");
+			error.showAndWait();
+		}
+	}
+	
+	private Optional<Object> loadFile()
+	{
+		try
+		{
+			FileChooser fileChooser = new FileChooser();
+			fileChooser.setTitle("Open Resource File");
+			// TODO set extension filters
+			File toOpen = fileChooser.showOpenDialog(primaryStage);
+			if (toOpen == null)
+				return Optional.empty();
+			FileInputStream fileIn = new FileInputStream(toOpen);
+			Optional<Object> ans = Optional.of(new ObjectInputStream(fileIn).readObject());
+			fileIn.close();
+			return ans;
+		}
+		catch (IOException | ClassNotFoundException e)
+		{
+			Alert error = new Alert(AlertType.ERROR);
+			error.setTitle("Error");
+			error.setContentText("The chosen file could not be read");
+			error.showAndWait();
+			return Optional.empty();
+		}
 	}
 }
