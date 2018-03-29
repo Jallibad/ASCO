@@ -58,11 +58,11 @@ public class NormalFormTests
 	{
 		Expression e1 = Expression.create("(OR C (AND A B))");
 		Expression e2 = Expression.create("(AND A B)");
-		Expression e3 = Expression.create("(NEG (OR A B))");
-		Expression e4 = Expression.create("(OR C (OR A B))");
+		Expression e3 = Expression.create("(OR C (OR A B))");
+		Expression e4 = Expression.create("(NEG (OR A B))");
 		assertTrue(NormalForm.DISJUNCTIVE.inForm(e1));
 		assertTrue(NormalForm.DISJUNCTIVE.inForm(e2));
-		assertFalse(NormalForm.DISJUNCTIVE.inForm(e3));
+		assertTrue(NormalForm.DISJUNCTIVE.inForm(e3));
 		assertFalse(NormalForm.DISJUNCTIVE.inForm(e4));
 	}
 	

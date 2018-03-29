@@ -12,7 +12,8 @@ public interface BiDirectionalTransform extends Transform
 	default public TransformSteps transformLeftWithSteps(Expression orig)
 	{
 		TransformSteps ans = new TransformSteps(orig);
-		ans.addStep(this); // TODO this might not be technically correct
+		if (left().matches(orig))
+			ans.addStep(this);
 		return ans;
 	}
 	
@@ -30,7 +31,8 @@ public interface BiDirectionalTransform extends Transform
 	default public TransformSteps transformRightWithSteps(Expression orig)
 	{
 		TransformSteps ans = new TransformSteps(orig);
-		ans.addStep(this); // TODO this might not be technically correct
+		if (right().matches(orig))
+			ans.addStep(this);
 		return ans;
 	}
 	

@@ -2,8 +2,8 @@ package logic;
 
 public enum InferenceRule implements BiDirectionalTransform
 {	
-	DE_MORGANS_OR("(NEG (OR P Q))", "(AND (NEG P) (NEG Q))", "DeMorgan's Or"),
-	DE_MORGANS_AND("(NEG (AND P Q))", "(OR (NEG P) (NEG Q))", "DeMorgan's And"),
+	DE_MORGANS_OR("(NEG (OR P Q))", "(AND (NEG P) (NEG Q))", "DeMorgan's or"),
+	DE_MORGANS_AND("(NEG (AND P Q))", "(OR (NEG P) (NEG Q))", "DeMorgan's and"),
 	OR_DISTRIBUTION("(OR P (AND Q R))", "(AND (OR P Q) (OR P R))"),
 	AND_DISTRIBUTION("(AND P (OR Q R))", "(OR (AND P Q) (AND P R))"),
 	DOUBLE_NEGATION("(NEG (NEG P))", "P");

@@ -29,106 +29,84 @@ public enum NormalForm implements Transform
 				throw new Error("A normal form transform has been applied without an implementation");
 		}
 	}
-
-	// o shit
-		public static boolean checkAllOr(Expression e)
+	
+	private static boolean checkAll(Operator op, Expression e)
+	{
+		if (e instanceof Function)
 		{
-			
-			if(e instanceof Function)
-			{
-				Function f = (Function) e;
-				return
-				(
-						f.operator == Operator.OR && (f.getTerm(0) instanceof Literal && f.getTerm(1) instanceof Literal)
-				) ||
-				(
-						f.operator == Operator.OR &&(checkAllOr(f.getTerm(0)) && checkAllOr(f.getTerm(1)))					
-				);
-			}
-			return true;
+			Function f = (Function) e;
+			return
+				(f.operator == Operator.NEG && f.getTerm(0) instanceof Literal)
+				|| (f.operator == op && f.getTerms().stream().allMatch(t -> checkAll(op,t)));
 		}
+		else return true;
+	}
+
+	public boolean inForm(Expression e)
+	{
+		switch (this)
+		{
+			case CONJUNCTIVE: // TODO check if in CNF
+			
+				
+				if (e instanceof Function)
+				{
+					Function f = (Function) e;
+					return
+					(
+						checkAll(Operator.OR, f)
+					) ||
+					(
+						(
+							f.operator == Operator.AND
+						) &&
+							f.getTerms().stream().allMatch(CONJUNCTIVE::inForm) 
+					);
+					
+				}
+			
+				return true;
+				
+			case DISJUNCTIVE: // TODO check if in DNF
+				
+				if (e instanceof Function)
+				{
+					Function f = (Function) e;
+					return
+					(
+						checkAll(Operator.AND, f)
+					) ||
+					(
+						(
+							f.operator == Operator.OR
+						) &&
+							f.getTerms().stream().allMatch(DISJUNCTIVE::inForm) 
+					);
+					
+				}
 		
-		public static boolean checkAllAnd(Expression e)
-		{
-			if(e instanceof Function)
-			{
-				Function f = (Function) e;
-				return
-				(
-						f.operator == Operator.AND && (f.getTerm(0) instanceof Literal && f.getTerm(1) instanceof Literal)
-				) ||
-				(
-						f.operator == Operator.AND &&(checkAllAnd(f.getTerm(0)) && checkAllAnd(f.getTerm(1)))					
-				);
-			}
-			return true;
-		}
-
-		public boolean inForm(Expression e)
-		{
-			switch (this)
-			{
-				case CONJUNCTIVE: // TODO check if in CNF
+				return true;
 				
-					
-					if (e instanceof Function)
-					{
-						Function f = (Function) e;
-						return
+			case NEGATION:
+				if (e instanceof Function)
+				{
+					Function f = (Function) e;
+					return // TODO this is the abyss staring back
+					(
+						f.operator == Operator.NEG && (f.getTerm(0) instanceof Literal)
+					) ||
+					(
 						(
-							checkAllOr(f)
-						) ||
-						(
-							(
-								f.operator == Operator.AND
-							) &&
-								f.getTerms().stream().allMatch(CONJUNCTIVE::inForm) 
-						);
-						
-					}
-				
-					return true;
-					
-				case DISJUNCTIVE: // TODO check if in DNF
-					
-					if (e instanceof Function)
-					{
-						Function f = (Function) e;
-						return
-						(
-							checkAllAnd(f)
-						) ||
-						(
-							(
-								f.operator == Operator.OR
-							) &&
-								f.getTerms().stream().allMatch(DISJUNCTIVE::inForm) 
-						);
-						
-					}
-			
-					return true;
-					
-				case NEGATION:
-					if (e instanceof Function)
-					{
-						Function f = (Function) e;
-						return // TODO this is the abyss staring back
-						(
-							f.operator == Operator.NEG && (f.getTerm(0) instanceof Literal)
-						) ||
-						(
-							(
-								f.operator == Operator.AND ||
-								f.operator == Operator.OR
-							) &&
-							f.getTerms().stream().allMatch(NEGATION::inForm)
-						); 
-					}
-					return true;
-			}
-			return false; // TODO implement
+							f.operator == Operator.AND ||
+							f.operator == Operator.OR
+						) &&
+						f.getTerms().stream().allMatch(NEGATION::inForm)
+					); 
+				}
+				return true;
 		}
+		return false; // TODO implement
+	}
 	
 
 	@Override
@@ -154,6 +132,8 @@ public enum NormalForm implements Transform
 	
 	private Expression transformHelper(Expression orig, InferenceRule... inferenceRules)
 	{
+		for (InferenceRule i : inferenceRules)
+			orig = i.transformLeft(orig);
 		if (orig instanceof Function)
 		{
 			Function f = (Function) orig;
@@ -161,17 +141,17 @@ public enum NormalForm implements Transform
 				f.getTerms().stream().map(t -> transformHelper(t, inferenceRules)).collect(Collectors.toList());
 			orig = new Function(f.operator, normalFormTerms);
 		}
-		for (InferenceRule i : inferenceRules)
-			orig = i.transformLeft(orig);
 		return orig;
 	}
 	
 	private TransformSteps transformHelperWithSteps(Expression orig, InferenceRule... inferenceRules)
 	{
 		TransformSteps steps = new TransformSteps(orig);
-		if (orig instanceof Function)
+		for (InferenceRule i : inferenceRules)
+			i.transformLeftWithSteps(steps);
+		if (steps.result() instanceof Function)
 		{
-			Function f = (Function) orig;
+			Function f = (Function) steps.result();
 			List<Expression> getTerms = f.getTerms();
 			List<Expression> normalFormTerms = new ArrayList<Expression>();
 			for (int i=0; i<getTerms.size(); ++i)
@@ -181,8 +161,6 @@ public enum NormalForm implements Transform
 				steps.combine(partialSteps, i);
 			}
 		}
-		for (InferenceRule i : inferenceRules)
-			i.transformLeftWithSteps(steps);
 		return steps;
 	}
 }

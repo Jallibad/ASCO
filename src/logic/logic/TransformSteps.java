@@ -88,8 +88,8 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 	 */
 	private void checkRep()
 	{
-		assert(intermediaries.size() != fullIntermediaries.size());
-		assert(intermediaries.size() != steps.size()+1);
+		assert(intermediaries.size() == fullIntermediaries.size());
+		assert(intermediaries.size() == steps.size()+1);
 	}
 	
 	public TransformStep getStep(int i)

@@ -215,7 +215,7 @@ public class Function extends Expression
 		
 		if (operator.TRAITS.contains(OperatorTrait.ASSOCIATIVE))
 		{
-			
+			// TODO implement
 		}
 		return equals(other);
 	}
