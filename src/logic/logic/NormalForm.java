@@ -30,34 +30,71 @@ public enum NormalForm implements Transform
 		}
 	}
 
-	public boolean inForm(Expression e)
-	{
-		switch (this)
+	// o shit
+		public static boolean checkAllOr(Expression e)
 		{
-			case CONJUNCTIVE: // TODO check if in CNF
-				break;
-			case DISJUNCTIVE: // TODO check if in DNF
-				break;
-			case NEGATION:
-				if (e instanceof Function)
-				{
-					Function f = (Function) e;
-					return // TODO this is the abyss staring back
-					(
-						f.operator == Operator.NEG && (f.getTerm(0) instanceof Literal)
-					) ||
-					(
-						(
-							f.operator == Operator.AND ||
-							f.operator == Operator.OR
-						) &&
-						f.getTerms().stream().allMatch(NEGATION::inForm)
-					); 
-				}
-				return true;
+			if(e instanceof Function)
+			{
+				Function f = (Function) e;
+				return
+				(
+						f.operator == Operator.OR && (f.getTerm(0) instanceof Literal && f.getTerm(1) instanceof Literal)
+				) ||
+				(
+						f.operator == Operator.OR &&(checkAllOr(f.getTerm(0)) && checkAllOr(f.getTerm(1)))					
+				);
+			}
+			return true;
 		}
-		return false; // TODO implement
-	}
+
+		public boolean inForm(Expression e)
+		{
+			switch (this)
+			{
+				case CONJUNCTIVE: // TODO check if in CNF
+				
+					
+					if (e instanceof Function)
+					{
+						Function f = (Function) e;
+						return
+						(
+							f.operator == Operator.AND && checkAllOr(f)
+						) ||
+						(
+							(
+								f.operator == Operator.AND ||
+								f.operator == Operator.OR
+							) &&
+								f.getTerms().stream().allMatch(CONJUNCTIVE::inForm)
+						);
+						
+					}
+					return true;
+					
+				case DISJUNCTIVE: // TODO check if in DNF
+					break;
+				case NEGATION:
+					if (e instanceof Function)
+					{
+						Function f = (Function) e;
+						return // TODO this is the abyss staring back
+						(
+							f.operator == Operator.NEG && (f.getTerm(0) instanceof Literal)
+						) ||
+						(
+							(
+								f.operator == Operator.AND ||
+								f.operator == Operator.OR
+							) &&
+							f.getTerms().stream().allMatch(NEGATION::inForm)
+						); 
+					}
+					return true;
+			}
+			return false; // TODO implement
+		}
+	
 
 	@Override
 	public TransformSteps transformWithSteps(Expression orig)
