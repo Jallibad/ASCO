@@ -1,6 +1,12 @@
 package logic;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -36,5 +42,38 @@ public class ExpressionTests
 		{
 			fail("Expression::parse threw an exception when it shouldn't have");
 		}
+	}
+	
+	@Test(expected = Error.class)
+	public void testConstructor()
+	{
+		new Function(Operator.AND, new Literal("A"));
+	}
+	
+	@Test
+	public void testEquivalence()
+	{
+		// Test commutativity
+		assertTrue(Expression.create("(AND A B)").proveEquivalence(Expression.create("(AND B A)")).isPresent());
+		assertFalse(Expression.create("(AND A A)").proveEquivalence(Expression.create("(AND B A)")).isPresent());
+		assertFalse(Expression.create("(AND B B)").proveEquivalence(Expression.create("(AND B A)")).isPresent());
+		
+		assertFalse(Expression.create("(AND A B)").proveEquivalence(new Literal("A")).isPresent());
+	}
+	
+	@Test
+	public void testGetVariables()
+	{
+		Set<Literal> variables = new HashSet<Literal>();
+		variables.add(new Literal("A"));
+		assertEquals(variables, Expression.create("A").getVariables());
+		variables.add(new Literal("B"));
+		assertEquals(variables, Expression.create("(AND A B)").getVariables());
+	}
+	
+	@Test
+	public void testMatches()
+	{
+		//assertTrue(Expression.create("").matches(""))
 	}
 }

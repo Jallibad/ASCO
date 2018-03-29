@@ -225,9 +225,9 @@ public class Function extends Expression
 	public Optional<TransformSteps> proveEquivalence(Expression other)
 	{
 		TransformSteps ans = NormalForm.CONJUNCTIVE.transformWithSteps(this);
-		System.out.println(ans);
+		//System.out.println(ans);
 		TransformSteps secondHalf = NormalForm.CONJUNCTIVE.transformWithSteps(other);
-		System.out.println(secondHalf);
+		//System.out.println(secondHalf);
 		if (ans.result().simplyEquivalent(secondHalf.result()))
 			return Optional.of(ans.combine(secondHalf.reverse()));
 		else

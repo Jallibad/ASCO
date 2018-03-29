@@ -18,16 +18,13 @@ public abstract class Expression implements Serializable
 
 	public static void main(String[] args)
 	{
-		Expression e1 = create("(AND A (OR B (AND D E)))");
-		Expression e2 = create("(AND A (AND (OR B D) (OR B E)))");
-		System.out.println(e1.proveEquivalence(e2));
 		try
 		{
-			System.out.println(parse("A"));
+			Expression e1 = parse("AND  A   B");
+			System.out.println(e1);
 		}
 		catch (MalformedExpressionException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -81,32 +78,32 @@ public abstract class Expression implements Serializable
 	}
 	
 	/**
-	 * sanitize the results of infix->prefix parse, removing wrapped literally
+	 * sanitize the results of infix->prefix parse, removing wrapped literals
 	 * @param exp the expression to sanitize
 	 * @return the sanitized expression
 	 */
-	private static String postSanitize(String exp) {
-		//remove wrapped literals 
+	private static String postSanitize(String exp)
+	{
+		//remove wrapped literals
 		boolean found = true;
-		 while (found) {
-			 found = false;
-			 for (int i = 0; i < exp.length(); ++i) {
-				 if (Character.isAlphabetic(exp.charAt(i)) && i > 0 && exp.charAt(i-1) == '(' && i < exp.length() - 1 && exp.charAt(i+1) == ')') {
-					 found = true;
-					 exp = removeChar(exp,i-1);
-					 exp = removeChar(exp,i);
-					 --i;
-				 }
-			 }
-		 }
+		while (found)
+		{
+			found = false;
+			for (int i = 0; i < exp.length(); ++i)
+			{
+				// TODO this only works with single character Literals
+				if (Character.isAlphabetic(exp.charAt(i)) && i > 0 && exp.charAt(i-1) == '(' && i < exp.length() - 1 && exp.charAt(i+1) == ')')
+				{
+					found = true;
+					exp = removeChar(exp,i-1);
+					exp = removeChar(exp,i);
+					--i;
+				}
+			}
+		}
 		 
 		 //remove extra spaces
-		 for (int i = 0; i < exp.length()-1; ++i) {
-			 if (exp.charAt(i) == ' ' && exp.charAt(i+1) == ' ') {
-				 exp = removeChar(exp, i);
-			 }
-		 }
-		 return exp;
+		return exp.trim().replaceAll(" +", " ");
 	}
 	
 	/**
@@ -219,7 +216,8 @@ public abstract class Expression implements Serializable
 		//System.out.println("before wrap: " + exp);
 		//remove parentheses from expression while double-wrapped
 		boolean doubleWrapped = true;
-		while (doubleWrapped) {
+		while (doubleWrapped)
+		{
 			if (!(exp.charAt(0) == '(' && exp.charAt(1) == '('))
 				doubleWrapped = false;
 			else
@@ -242,8 +240,6 @@ public abstract class Expression implements Serializable
 				exp = removeChar(exp,exp.length()-1);
 			}	
 		}
-		
-		//System.out.println("after wrap: " + exp);
 		
 		return exp;
 	}
@@ -305,7 +301,7 @@ public abstract class Expression implements Serializable
 			//System.out.println("\""+ans+"\"");
 			String ans2 = operatorsToEnglish(ans);
 			//System.out.println("\""+ans2+"\"");
-			System.out.println("englsh prefix sanitized: " + ans2);
+			System.out.println("english prefix sanitized: " + ans2);
 			String ans3 = postSanitize(ans2);
 			System.out.println("post sanitization: " + ans3);
 			return create(ans3);
