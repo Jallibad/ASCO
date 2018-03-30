@@ -107,6 +107,20 @@ public abstract class Expression implements Serializable
 	}
 	
 	/**
+	 * determine the operator position of the specified character, or -1 if the character is not an operator
+	 * @param c the character to check for operator position
+	 * @return the operator position of the specified character, or -1 if the character is not an operator
+	 */
+	private static int operatorPosition(char c) {
+		for (Operator o : Operator.values())
+			if (o.DISPLAY_TEXT.charAt(0) == c)
+			{
+				return o.SYMBOL_POSITION;
+			}
+		return -1;
+	}
+	
+	/**
 	 * sanitize the input expression in order to prepare it for parsing
 	 * @param exp the string to sanitize
 	 * @return the specified string sanitized for expression parsing
@@ -138,34 +152,37 @@ public abstract class Expression implements Serializable
 		//add parentheses around all negations
 		for (int i = 0; i < exp.length(); ++i)
 		{
-			if (exp.charAt(i) == '¬')
+			if (exp.charAt(i) == '¬' && (i == 0 || exp.charAt(i-1) != '('))
 			{
 				exp = addChar(exp,i,'(');
 				i+=2;
 				exp = addChar(exp,i,' ');
 				i+=1;
-				while (exp.charAt(i) != ' ' && exp.charAt(i) != ')')
-					++i;
-				exp = addChar(exp,i,')');
+				int r = i;
+				while (exp.charAt(r) != ' ' && exp.charAt(r) != ')')
+					++r;
+				exp = addChar(exp,r,')');
 			}
 		}
 //		System.out.println("after paren neg: " + exp);
 		
+//		//parenthesize position 0 operators whose operand is an expression
+//		for (int i = 0; i < exp.length(); ++i) {
+//			if (charIsOperator(exp.charAt(i)) && operatorPosition(exp.charAt(i)) == 0) {
+//				//move forward until we find the first operator
+//				for (int r = i; r < exp.length(); ++r) {
+//					if (exp.charAt(r) == ' ') {
+//						continue;
+//					}
+//				}
+//			}
+//		}
+		
 		//parenthesize all position 1 operators
 		for (int i = 0; i < exp.length(); ++i)
 		{
-			if (charIsOperator(exp.charAt(i)))
+			if (charIsOperator(exp.charAt(i)) && operatorPosition(exp.charAt(i)) == 1)
 			{
-				//ignore non-position 1 operators
-				boolean isPos1 = true;
-				for (Operator o : Operator.values())
-					if (o.DISPLAY_TEXT.charAt(0) == exp.charAt(i))
-					{
-						isPos1 &= o.SYMBOL_POSITION == 1;
-						break;
-					}
-				if (!isPos1)
-					continue;
 				//move back until we find the first operator or same-level open paren
 				int r = i;
 				int bracketCount = 0;
@@ -295,7 +312,7 @@ public abstract class Expression implements Serializable
 	{
 		try
 		{
-			//System.out.println("sanitized: " + sanitizeInput(exp));
+			System.out.println("sanitized: " + sanitizeInput(exp));
 			String ans = infixToPrefix2(sanitizeInput(exp));
 			//System.out.println("sanitized prefix: " + ans);
 			//System.out.println("\""+ans+"\"");
