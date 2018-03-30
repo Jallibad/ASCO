@@ -37,6 +37,7 @@ public class ExpressionTests
 			assertEquals(Expression.create("(AND B (NEG A))"), Expression.parse("B∧ ¬A"));
 			assertEquals(Expression.create("(AND B (NEG A))"), Expression.parse("(B∧ ¬A)"));
 			assertEquals(Expression.create("(NEG (OR A (NEG (NEG (NEG C)))))"), Expression.parse("¬(A ∨ ¬(¬(¬C)))"));
+			assertEquals(Expression.create("(NEG (NEG A))"), Expression.parse("¬¬A"));
 		}
 		catch (MalformedExpressionException e)
 		{
