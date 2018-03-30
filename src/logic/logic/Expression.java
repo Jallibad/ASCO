@@ -112,31 +112,34 @@ public abstract class Expression implements Serializable
 	 * @return the specified expression wrapped in at most one set of parentheses
 	 */
 	private static String removeDoubleWrapParens(String exp) {
-		//remove parentheses from expression while double-wrapped
 		boolean doubleWrapped = true;
 		while (doubleWrapped)
 		{
-			if (!(exp.charAt(0) == '(' && exp.charAt(1) == '('))
-				doubleWrapped = false;
-			else
-			{
-				int bracketNum = 2;
-				for (int i = 2; i < exp.length(); ++i)
-				{
-					if (exp.charAt(i) == '(')
-						++bracketNum;
-					else if (exp.charAt(i) == ')' && --bracketNum == 1)
-					{
-						doubleWrapped &= i == exp.length()-2;
+			doubleWrapped = false;
+			boolean amWrapping = false;
+			int wrapStartPos = -1;
+			int bracketNum = -1;
+			for (int i = 0; i < exp.length()-1; ++i) {
+				if (!amWrapping) {
+					if (exp.charAt(i) == '(' && exp.charAt(i+1) == '(') {
+						amWrapping = true;
+						wrapStartPos = i;
+						bracketNum = 0;
+					}
+					continue;
+				}
+				if (exp.charAt(i) == '(') {
+					++bracketNum;
+				}
+				else if (exp.charAt(i) == ')') {
+					if (exp.charAt(i+1) == ')' && --bracketNum == 0) {
+						doubleWrapped = true;
+						exp = removeChar(exp,i);
+						exp = removeChar(exp,wrapStartPos);
 						break;
 					}
 				}
 			}
-			if (doubleWrapped)
-			{
-				exp = removeChar(exp,0);
-				exp = removeChar(exp,exp.length()-1);
-			}	
 		}
 		return exp;
 	}
