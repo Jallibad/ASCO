@@ -107,6 +107,41 @@ public abstract class Expression implements Serializable
 	}
 	
 	/**
+	 * remove sets of parentheses until the specified expression is no longer double-wrapped
+	 * @param exp the expression from which to remove sets of parentheses
+	 * @return the specified expression wrapped in at most one set of parentheses
+	 */
+	private static String removeDoubleWrapParens(String exp) {
+		//remove parentheses from expression while double-wrapped
+		boolean doubleWrapped = true;
+		while (doubleWrapped)
+		{
+			if (!(exp.charAt(0) == '(' && exp.charAt(1) == '('))
+				doubleWrapped = false;
+			else
+			{
+				int bracketNum = 2;
+				for (int i = 2; i < exp.length(); ++i)
+				{
+					if (exp.charAt(i) == '(')
+						++bracketNum;
+					else if (exp.charAt(i) == ')' && --bracketNum == 1)
+					{
+						doubleWrapped &= i == exp.length()-2;
+						break;
+					}
+				}
+			}
+			if (doubleWrapped)
+			{
+				exp = removeChar(exp,0);
+				exp = removeChar(exp,exp.length()-1);
+			}	
+		}
+		return exp;
+	}
+	
+	/**
 	 * determine the operator position of the specified character, or -1 if the character is not an operator
 	 * @param c the character to check for operator position
 	 * @return the operator position of the specified character, or -1 if the character is not an operator
@@ -158,25 +193,31 @@ public abstract class Expression implements Serializable
 				i+=2;
 				exp = addChar(exp,i,' ');
 				i+=1;
+				//move forward until we find the second operator or same-level closed paren
 				int r = i;
-				while (exp.charAt(r) != ' ' && exp.charAt(r) != ')')
-					++r;
-				exp = addChar(exp,r,')');
+				int bracketCount = 0;
+				while (++r < exp.length())
+				{
+					if (exp.charAt(r) == '(')
+						++bracketCount;
+					else if (exp.charAt(r) == ')')
+					{
+						if (--bracketCount == -1)
+						{
+							exp = addChar(exp, ++r, ')');
+							break;
+						}
+					}
+					else if (Character.isAlphabetic(exp.charAt(r)))
+					{
+						exp = addChar(exp,++r, ')');
+						break;
+					}
+				}
+				i+=1; //move forward one space to make room for the new closed parenthesis
 			}
 		}
 //		System.out.println("after paren neg: " + exp);
-		
-//		//parenthesize position 0 operators whose operand is an expression
-//		for (int i = 0; i < exp.length(); ++i) {
-//			if (charIsOperator(exp.charAt(i)) && operatorPosition(exp.charAt(i)) == 0) {
-//				//move forward until we find the first operator
-//				for (int r = i; r < exp.length(); ++r) {
-//					if (exp.charAt(r) == ' ') {
-//						continue;
-//					}
-//				}
-//			}
-//		}
 		
 		//parenthesize all position 1 operators
 		for (int i = 0; i < exp.length(); ++i)
@@ -231,32 +272,7 @@ public abstract class Expression implements Serializable
 		}		
 		
 		//System.out.println("before wrap: " + exp);
-		//remove parentheses from expression while double-wrapped
-		boolean doubleWrapped = true;
-		while (doubleWrapped)
-		{
-			if (!(exp.charAt(0) == '(' && exp.charAt(1) == '('))
-				doubleWrapped = false;
-			else
-			{
-				int bracketNum = 2;
-				for (int i = 2; i < exp.length(); ++i)
-				{
-					if (exp.charAt(i) == '(')
-						++bracketNum;
-					else if (exp.charAt(i) == ')' && --bracketNum == 1)
-					{
-						doubleWrapped &= i == exp.length()-2;
-						break;
-					}
-				}
-			}
-			if (doubleWrapped)
-			{
-				exp = removeChar(exp,0);
-				exp = removeChar(exp,exp.length()-1);
-			}	
-		}
+		exp = removeDoubleWrapParens(exp);
 		
 		return exp;
 	}
