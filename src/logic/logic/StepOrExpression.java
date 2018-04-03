@@ -13,11 +13,20 @@ public class StepOrExpression
 	private final Optional<TransformStep> step;
 	private final Optional<Expression> exp;
 	
+	/**
+	 * Creates a new object that contains the given TransformStep
+	 * @param step the TransformStep to contain
+	 */
 	StepOrExpression(TransformStep step)
 	{
 		this.step = Optional.of(step);
 		this.exp = Optional.empty();
 	}
+	
+	/**
+	 * Creates a new object that contains the given Expression
+	 * @param exp the Expression to contain
+	 */
 	StepOrExpression(Expression exp)
 	{
 		this.step = Optional.empty();
@@ -29,17 +38,17 @@ public class StepOrExpression
 	 * and one that accepts an Expression.  Both functions should return the same thing, and
 	 * the StepOrExpression will choose which to apply based on its content, returning the result of
 	 * the correct one. 
-	 * @param left the function to apply to a TransformStep
-	 * @param right the function to apply to an Expression
+	 * @param stepMap the function to apply to a TransformStep
+	 * @param expressionMap the function to apply to an Expression
 	 * @return the result of applying the correct function to the contained object
 	 */
-	public <T> T mapOver(java.util.function.Function<TransformStep, T> left, java.util.function.Function<Expression, T> right)
+	public <T> T mapOver(java.util.function.Function<TransformStep, T> stepMap, java.util.function.Function<Expression, T> expressionMap)
 	{
 		T ans;
 		if (step.isPresent())
-			ans = left.apply(step.get());
+			ans = stepMap.apply(step.get());
 		else
-			ans = right.apply(exp.get());
+			ans = expressionMap.apply(exp.get());
 		return ans;
 	}
 	

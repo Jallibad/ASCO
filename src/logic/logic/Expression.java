@@ -111,7 +111,8 @@ public abstract class Expression implements Serializable
 	 * @param exp the expression from which to remove sets of parentheses
 	 * @return the specified expression wrapped in at most one set of parentheses
 	 */
-	private static String removeDoubleWrapParens(String exp) {
+	private static String removeDoubleWrapParens(String exp)
+	{
 		boolean doubleWrapped = true;
 		while (doubleWrapped)
 		{
@@ -119,20 +120,24 @@ public abstract class Expression implements Serializable
 			boolean amWrapping = false;
 			int wrapStartPos = -1;
 			int bracketNum = -1;
-			for (int i = 0; i < exp.length()-1; ++i) {
-				if (!amWrapping) {
-					if (exp.charAt(i) == '(' && exp.charAt(i+1) == '(') {
+			for (int i = 0; i < exp.length()-1; ++i)
+			{
+				if (!amWrapping)
+				{
+					if (exp.charAt(i) == '(' && exp.charAt(i+1) == '(')
+					{
 						amWrapping = true;
 						wrapStartPos = i;
 						bracketNum = 0;
 					}
 					continue;
 				}
-				if (exp.charAt(i) == '(') {
+				if (exp.charAt(i) == '(')
 					++bracketNum;
-				}
-				else if (exp.charAt(i) == ')') {
-					if (exp.charAt(i+1) == ')' && --bracketNum == 0) {
+				else if (exp.charAt(i) == ')')
+				{
+					if (exp.charAt(i+1) == ')' && --bracketNum == 0)
+					{
 						doubleWrapped = true;
 						exp = removeChar(exp,i);
 						exp = removeChar(exp,wrapStartPos);
@@ -149,12 +154,11 @@ public abstract class Expression implements Serializable
 	 * @param c the character to check for operator position
 	 * @return the operator position of the specified character, or -1 if the character is not an operator
 	 */
-	private static int operatorPosition(char c) {
+	private static int operatorPosition(char c)
+	{
 		for (Operator o : Operator.values())
 			if (o.DISPLAY_TEXT.charAt(0) == c)
-			{
 				return o.SYMBOL_POSITION;
-			}
 		return -1;
 	}
 	
