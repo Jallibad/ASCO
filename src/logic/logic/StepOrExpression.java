@@ -60,4 +60,22 @@ public class StepOrExpression
 		else
 			return "Expression: "+exp.get();
 	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		if (!(o instanceof StepOrExpression))
+			return false;
+		StepOrExpression other = (StepOrExpression) o;
+		return other.exp.equals(exp) && other.step.equals(step);
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		if (step.isPresent())
+			return step.hashCode();
+		else
+			return exp.hashCode();
+	}
 }

@@ -81,4 +81,12 @@ public class ExpressionTests
 		assertTrue(Expression.create("(AND A B)").matches("(AND A B)"));
 		assertFalse(Expression.create("(AND (OR A B) B)").matches("(AND (AND A B) B)"));
 	}
+	
+	@Test
+	public void testPrettyPrint()
+	{
+		assertEquals("¬A", Expression.create("(NEG A)").prettyPrint());
+		assertEquals("¬(A ∧ B)", Expression.create("(NEG (AND A B))").prettyPrint());
+		assertEquals("¬(A ∧ (B ∨ C))", Expression.create("(NEG (AND A (OR B C)))").prettyPrint());
+	}
 }

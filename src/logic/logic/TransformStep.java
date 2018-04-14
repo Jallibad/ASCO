@@ -1,6 +1,7 @@
 package logic;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * An immutable container class representing a single transform, along with the expressions before and after
@@ -25,5 +26,20 @@ public class TransformStep implements Serializable
 	public String toString()
 	{
 		return before+" --- "+step+" --- "+after; // TODO Implement
+	}
+	
+	@Override
+	public boolean equals(Object other)
+	{
+		if (!(other instanceof TransformStep))
+			return false;
+		TransformStep o = (TransformStep) other;
+		return before.equals(o.before) && step.equals(o.step) && after.equals(o.after); 
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(before, step, after);
 	}
 }

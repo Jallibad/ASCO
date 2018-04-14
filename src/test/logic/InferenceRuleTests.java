@@ -17,4 +17,11 @@ public class InferenceRuleTests
 		assertEquals(InferenceRule.DE_MORGANS_OR.transform(e2), e1);
 		// TODO test invalid transforms
 	}
+	
+	@Test
+	public void testToString()
+	{
+		assertEquals("double negation", InferenceRule.DOUBLE_NEGATION.toString());
+		assertEquals("DeMorgan's or", InferenceRule.DE_MORGANS_OR.toString());
+	}
 }

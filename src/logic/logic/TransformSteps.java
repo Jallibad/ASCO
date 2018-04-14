@@ -129,7 +129,6 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 
 	public TransformSteps combine(TransformSteps other)
 	{
-		// TODO Auto-generated method stub
 		TransformSteps ans = new TransformSteps();
 		ans.fullIntermediaries.addAll(fullIntermediaries);
 		ans.fullIntermediaries.remove(fullIntermediaries.size()-1);
