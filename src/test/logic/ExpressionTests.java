@@ -81,4 +81,12 @@ public class ExpressionTests
 		assertTrue(Expression.create("(AND A B)").matches("(AND A B)"));
 		assertFalse(Expression.create("(AND (OR A B) B)").matches("(AND (AND A B) B)"));
 	}
+	
+	@Test
+	public void testGetTruthTable()
+	{
+		assertTrue(new TruthAssignment(Expression.create("(AND A B)")).getTable().equals("A|B|*\nT|T|T\nT|F|F\nF|T|F\nF|F|F"));
+		assertTrue(new TruthAssignment(Expression.create("(OR A B)")).getTable().equals("A|B|*\nT|T|T\nT|F|T\nF|T|T\nF|F|F"));
+		assertTrue(new TruthAssignment(Expression.create("(NEG A)")).getTable().equals("A|*\nT|F\nF|T"));
+	}
 }
