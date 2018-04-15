@@ -3,7 +3,6 @@ package logic;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,7 +12,7 @@ import org.junit.Test;
 public class ExpressionTests
 {
 	@Test
-	public void testCreate()
+	public void testCreate() throws MalformedExpressionException
 	{
 		Expression e1 = new Function(Operator.NEG, new Function(Operator.OR, "A", "B"));
 		Expression t1 = Expression.create("(NEG (OR A B))");
@@ -27,26 +26,19 @@ public class ExpressionTests
 	}
 	
 	@Test
-	public void testParse()
+	public void testParse() throws MalformedExpressionException
 	{
-		try
-		{
-			assertEquals(new Literal("A"), Expression.parse("(((A)))"));
-			assertEquals(Expression.create("(AND A B)"), Expression.parse("A∧B"));
-			assertEquals(Expression.create("(NEG A)"), Expression.parse("¬A"));
-			assertEquals(Expression.create("(AND B (NEG A))"), Expression.parse("B∧ ¬A"));
-			assertEquals(Expression.create("(AND B (NEG A))"), Expression.parse("(B∧ ¬A)"));
-			assertEquals(Expression.create("(NEG (NEG A))"), Expression.parse("¬¬A"));
-			assertEquals(Expression.create("(NEG (OR A (NEG (NEG (NEG C)))))"), Expression.parse("¬(A ∨ ¬(¬(¬C)))"));
-		}
-		catch (MalformedExpressionException e)
-		{
-			fail("Expression::parse threw an exception when it shouldn't have");
-		}
+		assertEquals(new Literal("A"), Expression.parse("(((A)))"));
+		assertEquals(Expression.create("(AND A B)"), Expression.parse("A∧B"));
+		assertEquals(Expression.create("(NEG A)"), Expression.parse("¬A"));
+		assertEquals(Expression.create("(AND B (NEG A))"), Expression.parse("B∧ ¬A"));
+		assertEquals(Expression.create("(AND B (NEG A))"), Expression.parse("(B∧ ¬A)"));
+		assertEquals(Expression.create("(NEG (NEG A))"), Expression.parse("¬¬A"));
+		assertEquals(Expression.create("(NEG (OR A (NEG (NEG (NEG C)))))"), Expression.parse("¬(A ∨ ¬(¬(¬C)))"));
 	}
 	
-	@Test(expected = Error.class)
-	public void testConstructor()
+	@Test(expected = MalformedExpressionException.class)
+	public void testConstructor() throws MalformedExpressionException
 	{
 		new Function(Operator.AND, new Literal("A"));
 	}

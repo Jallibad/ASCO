@@ -1,9 +1,7 @@
 package logic;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * An interface representing arbitrary transformations that can be applied to
@@ -40,11 +38,7 @@ public interface Transform extends Serializable
 			}
 		}
 		else if (e instanceof Function)
-		{
-			Function curr = (Function) e;
-			List<Expression> terms = curr.getTerms().stream().map(x -> transform(mapping,x)).collect(Collectors.toList());
-			return new Function(curr.operator, terms);
-		}
+			return ((Function) e).mapTerms(x -> transform(mapping, x));
 		else
 		{
 			// TODO throw error and shit

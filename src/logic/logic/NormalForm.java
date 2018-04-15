@@ -170,7 +170,7 @@ public enum NormalForm implements Transform
 			Function f = (Function) orig;
 			List<Expression> normalFormTerms =
 				f.getTerms().stream().map(t -> transformHelper(t, inferenceRules)).collect(Collectors.toList());
-			orig = new Function(f.operator, normalFormTerms);
+			orig = Function.constructUnsafe(f.operator, normalFormTerms);
 		}
 		return orig;
 	}

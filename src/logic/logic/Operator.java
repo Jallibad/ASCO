@@ -39,6 +39,9 @@ public enum Operator
 	 */
 	public final String DISPLAY_TEXT;
 	public final int NUM_ARGUMENTS;
+	/**
+	 * The ordinal position of the operator in the pretty-printed version.  In other '∧' in "A∧B" has a position of 1.
+	 */
 	public final int SYMBOL_POSITION;
 	public final Set<OperatorTrait> TRAITS;
 }

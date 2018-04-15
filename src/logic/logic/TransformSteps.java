@@ -63,7 +63,7 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 		for (int i=0; i<newIntermediaries.size(); ++i)
 		{
 			newTerms.set(index, s.fullIntermediaries.get(i));
-			fullIntermediaries.add(new Function(o, newTerms));
+			fullIntermediaries.add(Function.constructUnsafe(o, newTerms));
 			if (newIntermediaries.get(i) == null)
 				newIntermediaries.set(i, s.fullIntermediaries.get(i));
 		}

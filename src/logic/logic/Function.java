@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 public class Function extends Expression
 {
 	private static final long serialVersionUID = 7003195412543405388L;
+	@SuppressWarnings("unused")
+	private static final Logger LOGGER = Logger.getLogger(Expression.class.getName());
 	public final Operator operator;
 	/**
 	 * An ordered List of the arguments to the Function, with term[0] being the first argument.
@@ -33,12 +36,13 @@ public class Function extends Expression
 	 * terms matches up with the expected number of arguments.
 	 * @param operator the operator for the new Function
 	 * @param terms a List of the terms, a copy is made to avoid rep exposure
+	 * @throws MalformedExpressionException 
 	 */
-	public Function(Operator operator, List<Expression> terms)
+	public Function(Operator operator, List<Expression> terms) throws MalformedExpressionException
 	{
 		if (terms.size() != operator.NUM_ARGUMENTS)
 		{
-			throw new Error(String.format
+			throw new MalformedExpressionException(String.format
 			(
 				"Operator \"%s\" expects %d arguments, %d were provided",
 				operator,
@@ -49,13 +53,33 @@ public class Function extends Expression
 		this.operator = operator;
 		this.terms = new ArrayList<>(terms);
 	}
+	
+	/**
+	 * The basic constructor for the Function class.  Checks that the number
+	 * terms matches up with the expected number of arguments.
+	 * @param operator the operator for the new Function
+	 * @param terms a List of the terms, a copy is made to avoid rep exposure
+	 */
+	public static Expression constructUnsafe(Operator operator, List<Expression> terms)
+	{
+		try
+		{
+			return new Function(operator, terms);
+		}
+		catch (MalformedExpressionException e)
+		{
+			System.out.println(e);
+			throw new Error(e.getMessage());
+		}
+	}
 
 	/**
 	 * A wrapper constructor to make constructing Functions inline somewhat simpler.
 	 * @param operator the Operator to be used in the Function
 	 * @param terms an Expression[] consisting of the terms in order.  Uses variadic arguments.
+	 * @throws MalformedExpressionException 
 	 */
-	public Function(Operator operator, Expression... terms)
+	public Function(Operator operator, Expression... terms) throws MalformedExpressionException
 	{
 		this(operator, Arrays.asList(terms));
 	}
@@ -65,8 +89,9 @@ public class Function extends Expression
 	 * Each String in the second argument is parsed using Expression::create.
 	 * @param operator the Operator to be used in the Function
 	 * @param terms a String[] consisting of the terms in order.  Uses variadic arguments.
+	 * @throws MalformedExpressionException 
 	 */
-	public Function(Operator operator, String... terms)
+	public Function(Operator operator, String... terms) throws MalformedExpressionException
 	{
 		this(operator, Arrays.stream(terms).map(Literal::new).collect(Collectors.toList()));
 	}
@@ -239,5 +264,10 @@ public class Function extends Expression
 			return Optional.of(ans.combine(secondHalf.reverse()));
 		else
 			return Optional.empty();
+	}
+	
+	public Function mapTerms(java.util.function.Function<Expression, Expression> f)
+	{
+		return (Function) constructUnsafe(operator, terms.stream().map(f).collect(Collectors.toList()));
 	}
 }

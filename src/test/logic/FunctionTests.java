@@ -11,7 +11,7 @@ import org.junit.Test;
 public class FunctionTests
 {
 	@Test
-	public void testEquality()
+	public void testEquality() throws MalformedExpressionException
 	{
 		Function e = new Function(Operator.AND, "A", "B");
 		assertEquals(e, new Function(Operator.AND, "A", "B"));
@@ -22,14 +22,14 @@ public class FunctionTests
 	}
 	
 	@Test
-	public void testToString()
+	public void testToString() throws MalformedExpressionException
 	{
 		Function e = new Function(Operator.AND, "A", "B");
 		assertEquals("(AND A B)", e.toString());
 	}
 	
 	@Test
-	public void testGetVariables()
+	public void testGetVariables() throws MalformedExpressionException
 	{
 		Function e1 = new Function(Operator.NEG, "A");
 		Set<Literal> testVariables = new HashSet<Literal>();

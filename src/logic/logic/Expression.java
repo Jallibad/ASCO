@@ -78,12 +78,11 @@ public abstract class Expression implements Serializable
 	 * determine whether or not the specified character is an operator
 	 * @param c the character to check
 	 * @return whether c is an operator (true) or not (false)
-	 * @throws NotAnOperatorException if the character is not an operator
 	 */
 	private static boolean charIsOperator(char c)
 	{
 		for (Operator o : Operator.values())
-			if (o.DISPLAY_TEXT.charAt(0) == c) // TODO maybe match multiple characters to an operator?
+			if (o.DISPLAY_TEXT.charAt(0) == c)
 				return true;
 		return false;
 	}
@@ -115,8 +114,37 @@ public abstract class Expression implements Serializable
 	 */
 	private static String removeDoubleWrapParens(String exp)
 	{
-		// Regexes are kind of write only, but this should work
-		return exp.replaceAll("\\((\\(.+\\))\\)","$1");
+		boolean doubleWrapped = true;
+		while (doubleWrapped)
+		{
+			doubleWrapped = false;
+			boolean amWrapping = false;
+			int wrapStartPos = -1;
+			int bracketNum = -1;
+			for (int i = 0; i < exp.length()-1; ++i)
+			{
+				if (!amWrapping)
+				{
+					if (exp.charAt(i) == '(' && exp.charAt(i+1) == '(')
+					{
+						amWrapping = true;
+						wrapStartPos = i;
+						bracketNum = 0;
+					}
+					continue;
+				}
+				if (exp.charAt(i) == '(')
+					++bracketNum;
+				else if (exp.charAt(i) == ')' && exp.charAt(i+1) == ')' && --bracketNum == 0)
+				{
+					doubleWrapped = true;
+					exp = removeChar(exp,i);
+					exp = removeChar(exp,wrapStartPos);
+					break;
+				}
+			}
+		}
+		return exp;
 	}
 	
 	/**
@@ -132,31 +160,26 @@ public abstract class Expression implements Serializable
 		throw new NotAnOperatorException(String.valueOf(c)); // TODO add error message
 	}
 	
+	private static int numMatchedParentheses(String exp) throws UnmatchedParenthesesException
+	{
+		int numParentheses = exp.replaceAll("([^\\(\\)]*)", "").length();
+		if (numParentheses % 2 == 1)
+			throw new UnmatchedParenthesesException();
+		return numParentheses/2;
+	}
+	
 	/**
 	 * sanitize the input expression in order to prepare it for parsing
 	 * @param exp the string to sanitize
 	 * @return the specified string sanitized for expression parsing
 	 * @throws NotAnOperatorException 
+	 * @throws UnmatchedParenthesesException 
 	 */
-	private static String sanitizeInput(String exp) throws NotAnOperatorException
+	private static String sanitizeInput(String exp) throws NotAnOperatorException, UnmatchedParenthesesException
 	{
 		//add parentheses around the expression if not already present
-		boolean isWrapped = true;
+		numMatchedParentheses(exp);
 		if (exp.charAt(0) != '(')
-			isWrapped = false;
-		else
-		{
-			int bracketNum = 1;
-			for (int i = 1; i < exp.length(); ++i)
-				if (exp.charAt(i) == '(')
-					++bracketNum;
-				else if (exp.charAt(i) == ')' && --bracketNum == 0)
-				{
-					isWrapped &= i == exp.length()-1;
-					break;
-				}
-		}
-		if (!isWrapped)
 			exp = "("+exp+")";
 		
 //		System.out.println("before paren neg: " + exp);
@@ -304,7 +327,6 @@ public abstract class Expression implements Serializable
 	{
 		try
 		{
-			LOGGER.fine("TEST");
 			LOGGER.fine("sanitized: " + sanitizeInput(exp));
 			String ans = infixToPrefix2(sanitizeInput(exp));
 			LOGGER.fine(() -> "sanitized prefix: " + ans);
@@ -312,7 +334,7 @@ public abstract class Expression implements Serializable
 			LOGGER.fine(() -> "english prefix sanitized: " + ans2);
 			String ans3 = postSanitize(ans2);
 			LOGGER.fine(() -> "post sanitization: " + ans3);
-			return create(ans3);
+			return create(removeDoubleWrapParens(ans3));
 		}
 		catch (Exception e)
 		{
@@ -354,7 +376,7 @@ public abstract class Expression implements Serializable
 				numParentheses--;			
 		}
 		terms.add(create(exp.substring(endIndex,exp.length()-1)));
-		return new Function(op, terms);
+		return Function.constructUnsafe(op, terms);
 	}
 	
 	/**
