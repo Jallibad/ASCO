@@ -57,14 +57,10 @@ public enum NormalForm implements Transform
 	
 	private static boolean checkAll(Operator op, Expression e)
 	{
-		if (e instanceof Function)
-		{
-			Function f = (Function) e;
-			return
-				(f.operator == Operator.NEG && f.getTerm(0) instanceof Literal)
-				|| (f.operator == op && f.getTerms().stream().allMatch(t -> checkAll(op,t)));
-		}
-		else return true;
+		return
+			e instanceof Literal ||
+			e.equalWithoutLiterals("(NEG A)") ||
+			e.mapPredicate(t -> checkAll(op,t), op);
 	}
 	
 	/**
@@ -77,64 +73,23 @@ public enum NormalForm implements Transform
 	{
 		switch (this)
 		{
-			case CONJUNCTIVE: // TODO check if in CNF
-			
+			case CONJUNCTIVE:
+				return
+					e instanceof Literal ||
+					checkAll(Operator.OR, (Function) e) ||
+					e.mapPredicate(CONJUNCTIVE::inForm, Operator.AND);
 				
-				if (e instanceof Function)
-				{
-					Function f = (Function) e;
-					return
-					(
-						checkAll(Operator.OR, f)
-					) ||
-					(
-						(
-							f.operator == Operator.AND
-						) &&
-							f.getTerms().stream().allMatch(CONJUNCTIVE::inForm) 
-					);
-					
-				}
-			
-				return true;
-				
-			case DISJUNCTIVE: // TODO check if in DNF
-				
-				if (e instanceof Function)
-				{
-					Function f = (Function) e;
-					return
-					(
-						checkAll(Operator.AND, f)
-					) ||
-					(
-						(
-							f.operator == Operator.OR
-						) &&
-							f.getTerms().stream().allMatch(DISJUNCTIVE::inForm) 
-					);
-					
-				}
-		
-				return true;
+			case DISJUNCTIVE:
+				return
+					e instanceof Literal ||
+					checkAll(Operator.AND, (Function) e) ||
+					e.mapPredicate(DISJUNCTIVE::inForm, Operator.OR);
 				
 			case NEGATION:
-				if (e instanceof Function)
-				{
-					Function f = (Function) e;
-					return // TODO this is the abyss staring back
-					(
-						f.operator == Operator.NEG && (f.getTerm(0) instanceof Literal)
-					) ||
-					(
-						(
-							f.operator == Operator.AND ||
-							f.operator == Operator.OR
-						) &&
-						f.getTerms().stream().allMatch(NEGATION::inForm)
-					); 
-				}
-				return true;
+				return
+					e instanceof Literal ||
+					e.equalWithoutLiterals("(NEG A)") ||
+					e.mapPredicate(NEGATION::inForm, Operator.AND, Operator.OR); 
 		}
 		return false; // TODO implement
 	}

@@ -137,6 +137,11 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 		return ans.iterator();
 	}
 
+	/**
+	 * Concatenates this and other into one TransformSteps object
+	 * @param other
+	 * @return
+	 */
 	public TransformSteps combine(TransformSteps other)
 	{
 		TransformSteps ans = new TransformSteps();

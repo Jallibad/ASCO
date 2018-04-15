@@ -25,7 +25,7 @@ public class TransformStep implements Serializable
 	@Override
 	public String toString()
 	{
-		return before+" --- "+step+" --- "+after; // TODO Implement
+		return before+" --- "+step+" --- "+after;
 	}
 	
 	@Override

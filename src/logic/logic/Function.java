@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,6 @@ import java.util.stream.Collectors;
 public class Function extends Expression
 {
 	private static final long serialVersionUID = 7003195412543405388L;
-	@SuppressWarnings("unused")
 	private static final Logger LOGGER = Logger.getLogger(Expression.class.getName());
 	public final Operator operator;
 	/**
@@ -55,12 +55,11 @@ public class Function extends Expression
 	}
 	
 	/**
-	 * The basic constructor for the Function class.  Checks that the number
-	 * terms matches up with the expected number of arguments.
+	 * A wrapper function to construct a new Function object.  Does not check that the number of terms are correct.
 	 * @param operator the operator for the new Function
 	 * @param terms a List of the terms, a copy is made to avoid rep exposure
 	 */
-	public static Expression constructUnsafe(Operator operator, List<Expression> terms)
+	static Expression constructUnsafe(Operator operator, List<Expression> terms)
 	{
 		try
 		{
@@ -68,7 +67,7 @@ public class Function extends Expression
 		}
 		catch (MalformedExpressionException e)
 		{
-			System.out.println(e);
+			LOGGER.severe(e.getMessage());
 			throw new Error(e.getMessage());
 		}
 	}
@@ -234,8 +233,14 @@ public class Function extends Expression
 	@Override
 	public boolean simplyEquivalent(Expression o)
 	{
+		return simplyEquivalentWithSteps(o).isPresent();
+	}
+	
+	@Override
+	public Optional<TransformSteps> simplyEquivalentWithSteps(Expression o)
+	{
 		if (o.getOperator() != operator)
-			return false;
+			return Optional.empty();
 		Function other = (Function) o;
 		
 		if
@@ -244,13 +249,20 @@ public class Function extends Expression
 			&& terms.get(0).simplyEquivalent(other.terms.get(1))
 			&& terms.get(1).simplyEquivalent(other.terms.get(0))
 		)
-			return true;
+		{
+			TransformSteps ans = new TransformSteps(this);
+			ans.addStep(MiscTransform.COMMUTE);
+			return Optional.of(ans); // TODO commute
+		}
 		
 		if (operator.TRAITS.contains(OperatorTrait.ASSOCIATIVE))
 		{
 			// TODO implement
 		}
-		return equals(other);
+		if (equals(other))
+			return Optional.of(new TransformSteps(this));
+		else
+			return Optional.empty();
 	}
 
 	@Override
@@ -260,14 +272,38 @@ public class Function extends Expression
 		//System.out.println(ans);
 		TransformSteps secondHalf = NormalForm.CONJUNCTIVE.transformWithSteps(other);
 		//System.out.println(secondHalf);
-		if (ans.result().simplyEquivalent(secondHalf.result()))
-			return Optional.of(ans.combine(secondHalf.reverse()));
-		else
-			return Optional.empty();
+		return ans
+				.result()
+				.simplyEquivalentWithSteps(secondHalf.result())
+				.map
+				(
+					e -> ans
+						.combine(e)
+						.combine(secondHalf.reverse())
+				);
 	}
 	
 	public Function mapTerms(java.util.function.Function<Expression, Expression> f)
 	{
 		return (Function) constructUnsafe(operator, terms.stream().map(f).collect(Collectors.toList()));
+	}
+
+	@Override
+	public boolean equalWithoutLiterals(Expression pattern)
+	{
+		if (!(pattern instanceof Function))
+			return false;
+		Function other = (Function) pattern;
+		if (operator != other.operator)
+			return false;
+		for (int i=0; i<terms.size(); ++i)
+			if (!terms.get(i).equalWithoutLiterals(other.getTerm(i)))
+				return false;
+		return true;
+	}
+	
+	public boolean mapPredicate(Predicate<Expression> p, Operator... op)
+	{
+		return Arrays.asList(op).contains(operator) && terms.stream().allMatch(p);
 	}
 }

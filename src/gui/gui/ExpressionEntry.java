@@ -5,6 +5,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import logic.ExpParser;
 import logic.Expression;
 import logic.MalformedExpressionException;
 
@@ -54,7 +55,7 @@ public class ExpressionEntry extends VBox
 	
 	public Expression getExpression() throws MalformedExpressionException
 	{
-		return Expression.parse(textField.getText());
+		return ExpParser.parse(textField.getText());
 	}
 	
 	/**

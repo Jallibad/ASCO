@@ -14,15 +14,15 @@ public enum InferenceRule implements BiDirectionalTransform
 
 	InferenceRule(String left, String right, String name)
 	{
-		this.left = Expression.create(left);
-		this.right = Expression.create(right);
+		this.left = ExpParser.create(left);
+		this.right = ExpParser.create(right);
 		this.name = name;
 	}
 	
 	InferenceRule(String left, String right)
 	{
-		this.left = Expression.create(left);
-		this.right = Expression.create(right);
+		this.left = ExpParser.create(left);
+		this.right = ExpParser.create(right);
 		name = null;
 	}
 	

@@ -15,7 +15,7 @@ public class FunctionTests
 	{
 		Function e = new Function(Operator.AND, "A", "B");
 		assertEquals(e, new Function(Operator.AND, "A", "B"));
-		assertEquals(Expression.create("(AND A B)"), e);
+		assertEquals(ExpParser.create("(AND A B)"), e);
 		assertNotEquals(e, new Function(Operator.AND, "A", "A"));
 		assertNotEquals(e, new Function(Operator.OR, "A", "B"));
 		assertNotEquals(e, new Literal("A"));

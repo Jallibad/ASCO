@@ -1,7 +1,7 @@
 package logic;
 
 /**
- * An interface representing Transforms that can be undone.  By default the "left" side
+ * An interface representing Transforms that can be undone.  By convention the "left" side
  * of the expression is the more complex part, and the "right" side is simpler.  Transforming
  * left is transforming from left to right, and vice versa.
  * @author Jallibad

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * This class represents a single variable such as "A" or "B".
@@ -90,6 +91,15 @@ public class Literal extends Expression
 	{
 		return (other instanceof Literal) && ((Literal) other).VARIABLE_NAME.equals(VARIABLE_NAME);
 	}
+	
+	@Override
+	public Optional<TransformSteps> simplyEquivalentWithSteps(Expression other)
+	{
+		if (simplyEquivalent(other))
+			return Optional.of(new TransformSteps(this));
+		else
+			return Optional.empty();
+	}
 
 	@Override
 	public Optional<TransformSteps> proveEquivalence(Expression other)
@@ -98,5 +108,17 @@ public class Literal extends Expression
 			return Optional.of(new TransformSteps(this));
 		else
 			return Optional.empty();
+	}
+
+	@Override
+	public boolean equalWithoutLiterals(Expression pattern)
+	{
+		return pattern instanceof Literal;
+	}
+
+	@Override
+	public boolean mapPredicate(Predicate<Expression> p, Operator... op)
+	{
+		return p.test(this);
 	}
 }

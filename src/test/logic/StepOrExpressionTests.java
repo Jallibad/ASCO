@@ -11,7 +11,7 @@ public class StepOrExpressionTests
 	{
 		StepOrExpression s1 = new StepOrExpression(new TransformStep(null, null, null));
 		assertTrue(s1.mapOver(left -> true, right -> false));
-		StepOrExpression s2 = new StepOrExpression(Expression.create("A"));
+		StepOrExpression s2 = new StepOrExpression(ExpParser.create("A"));
 		assertFalse(s2.mapOver(left -> true, right -> false));
 	}
 }

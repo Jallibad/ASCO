@@ -13,14 +13,14 @@ public class TransformStepsTests
 	@Test
 	public void testIterator()
 	{
-		TransformSteps s1 = new TransformSteps(Expression.create("(NEG (NEG A))"));
+		TransformSteps s1 = new TransformSteps(ExpParser.create("(NEG (NEG A))"));
 		s1.addStep(InferenceRule.DOUBLE_NEGATION);
 		
 		Iterator<StepOrExpression> correctSteps = makeSteps
 		(
-			Expression.create("(NEG (NEG A))"),
-			new TransformStep(Expression.create("(NEG (NEG A))"), InferenceRule.DOUBLE_NEGATION, Expression.create("A")),
-			Expression.create("A")
+				ExpParser.create("(NEG (NEG A))"),
+			new TransformStep(ExpParser.create("(NEG (NEG A))"), InferenceRule.DOUBLE_NEGATION, ExpParser.create("A")),
+			ExpParser.create("A")
 		);
 		
 		for (StepOrExpression se : s1)

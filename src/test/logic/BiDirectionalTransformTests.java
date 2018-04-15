@@ -9,9 +9,9 @@ public class BiDirectionalTransformTests
 	@Test
 	public void testTransformLeftRight()
 	{
-		Expression e1 = Expression.create("P");
+		Expression e1 = ExpParser.create("P");
 		Expression e2 = InferenceRule.DOUBLE_NEGATION.transformRight(e1);
-		assertEquals(Expression.create("(NEG (NEG P))"), e2);
+		assertEquals(ExpParser.create("(NEG (NEG P))"), e2);
 		Expression e3 = InferenceRule.DOUBLE_NEGATION.transformLeft(e2);
 		assertEquals(e1, e3);
 	}
@@ -19,19 +19,19 @@ public class BiDirectionalTransformTests
 	@Test
 	public void testTransformLeftRightSteps()
 	{
-		TransformSteps steps = new TransformSteps(Expression.create("P"));
+		TransformSteps steps = new TransformSteps(ExpParser.create("P"));
 		InferenceRule.DOUBLE_NEGATION.transformRightWithSteps(steps);
-		assertEquals(Expression.create("(NEG (NEG P))"), steps.result());
+		assertEquals(ExpParser.create("(NEG (NEG P))"), steps.result());
 		InferenceRule.DOUBLE_NEGATION.transformLeftWithSteps(steps);
-		assertEquals(Expression.create("P"), steps.result());
+		assertEquals(ExpParser.create("P"), steps.result());
 	}
 	
 	@Test
 	public void testInvalidTransforms()
 	{
-		Expression e1 = Expression.create("(NEG (OR P Q))");
+		Expression e1 = ExpParser.create("(NEG (OR P Q))");
 		assertEquals(e1, InferenceRule.DE_MORGANS_OR.transformRight(e1));
-		Expression e2 = Expression.create("(AND (NEG P) (NEG Q))");
+		Expression e2 = ExpParser.create("(AND (NEG P) (NEG Q))");
 		assertEquals(e2, InferenceRule.DE_MORGANS_OR.transformLeft(e2));
 	}
 	
