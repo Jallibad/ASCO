@@ -24,7 +24,7 @@ public class LiteralTests
 	{
 		Literal a = new Literal("A");
 		Set<Literal> vars = a.getVariables();
-		assertEquals(vars.size(),1);
-		assertEquals(vars.iterator().next(),a);
+		assertEquals(1, vars.size());
+		assertEquals(a, vars.iterator().next());
 	}
 }

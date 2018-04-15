@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -46,7 +47,7 @@ public class Function extends Expression
 			));
 		}
 		this.operator = operator;
-		this.terms = new ArrayList<Expression>(terms);
+		this.terms = new ArrayList<>(terms);
 	}
 
 	/**
@@ -77,7 +78,7 @@ public class Function extends Expression
 	 */
 	public List<Expression> getTerms()
 	{
-		return new ArrayList<Expression>(terms); // Copy new list to avoid representation exposure
+		return new ArrayList<>(terms); // Copy new list to avoid representation exposure
 	}
 	
 	/**
@@ -95,16 +96,16 @@ public class Function extends Expression
 	@Override
 	public String toString()
 	{
-		String ans = operator.toString();
+		StringBuilder ans = new StringBuilder(operator.toString());
 		for (Expression e : terms)
-			ans += " "+e;
+			ans.append(" "+e);
 		return "("+ans+")";
 	}
 
 	@Override
 	public Set<Literal> getVariables()
 	{
-		Set<Literal> ans = new HashSet<Literal>();
+		Set<Literal> ans = new HashSet<>();
 		for (Expression e : terms)
 			ans.addAll(e.getVariables());
 		return ans;
@@ -129,6 +130,12 @@ public class Function extends Expression
 				return false;
 		return true;
 	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(operator, terms);
+	}
 
 	@Override
 	public boolean matches(Expression e)
@@ -152,7 +159,7 @@ public class Function extends Expression
 		Function other = (Function) e;
 		if (operator != other.operator)
 			return null;
-		Map<Literal, Expression> ans = new HashMap<Literal, Expression>();
+		Map<Literal, Expression> ans = new HashMap<>();
 		for (int i=0; i<terms.size(); ++i)
 			ans.putAll(terms.get(i).fillMatches(other.getTerm(i)));
 		return ans;
@@ -169,19 +176,19 @@ public class Function extends Expression
 				return operator.DISPLAY_TEXT+terms.get(0).prettyPrint();
 		}
 		
-		String ans = "";
+		StringBuilder ans = new StringBuilder();
 		for (int i=0; i<terms.size()+1; ++i)
 		{
 			if (i == operator.SYMBOL_POSITION)
 			{
-				ans += " "+operator.DISPLAY_TEXT;
+				ans.append(" "+operator.DISPLAY_TEXT);
 				continue;
 			}
 			Expression currTerm = terms.get(i<operator.SYMBOL_POSITION ? i : i-1); // Account for inserting the operator
 			if (currTerm instanceof Literal || currTerm.getOperator() == Operator.NEG)
-				ans += " "+currTerm.prettyPrint();
+				ans.append(" "+currTerm.prettyPrint());
 			else
-				ans += " ("+currTerm.prettyPrint()+")";
+				ans.append(" ("+currTerm.prettyPrint()+")");
 		}
 		return ans.substring(1);
 	}

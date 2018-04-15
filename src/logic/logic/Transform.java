@@ -1,5 +1,6 @@
 package logic;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -10,7 +11,7 @@ import java.util.stream.Collectors;
  * @author Jallibad
  *
  */
-public interface Transform
+public interface Transform extends Serializable
 {
 	/**
 	 * A simple transform that returns only the final result

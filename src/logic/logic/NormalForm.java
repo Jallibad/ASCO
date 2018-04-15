@@ -184,7 +184,7 @@ public enum NormalForm implements Transform
 		{
 			Function f = (Function) steps.result();
 			List<Expression> getTerms = f.getTerms();
-			List<Expression> normalFormTerms = new ArrayList<Expression>();
+			List<Expression> normalFormTerms = new ArrayList<>();
 			for (int i=0; i<getTerms.size(); ++i)
 			{
 				TransformSteps partialSteps = transformHelperWithSteps(getTerms.get(i), inferenceRules);

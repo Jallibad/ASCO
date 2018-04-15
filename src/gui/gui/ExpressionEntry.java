@@ -8,6 +8,12 @@ import javafx.scene.text.Font;
 import logic.Expression;
 import logic.MalformedExpressionException;
 
+/**
+ * A subclass of Node that represent a text entry field with buttons for symbol input
+ * and expression validation.
+ * @author Jallibad
+ *
+ */
 public class ExpressionEntry extends VBox
 {
 	private TextField textField = new TextField();
@@ -51,6 +57,10 @@ public class ExpressionEntry extends VBox
 		return Expression.parse(textField.getText());
 	}
 	
+	/**
+	 * Sets the text of the inner text field to a string representation of the expression
+	 * @param e the expression to be set to
+	 */
 	public void setExpression(Expression e)
 	{
 		textField.setText(e.prettyPrint());

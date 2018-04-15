@@ -28,7 +28,7 @@ public interface BiDirectionalTransform extends Transform
 	 * @param orig the expression to transform
 	 * @return the transformed expression
 	 */
-	default public Expression transformLeft(Expression orig)
+	public default Expression transformLeft(Expression orig)
 	{
 		return left().matches(orig) ? Transform.transform(left().fillMatches(orig), right()) : orig;
 	}
@@ -41,7 +41,7 @@ public interface BiDirectionalTransform extends Transform
 	 * @return the transformation steps.  The default implementation returns a TransformSteps object
 	 * with one step, the current one.
 	 */
-	default public TransformSteps transformLeftWithSteps(Expression orig)
+	public default TransformSteps transformLeftWithSteps(Expression orig)
 	{
 		TransformSteps ans = new TransformSteps(orig);
 		if (left().matches(orig))
@@ -54,7 +54,7 @@ public interface BiDirectionalTransform extends Transform
 	 * By convention this should result in a simpler expression
 	 * @param orig the steps to append to
 	 */
-	default public void transformLeftWithSteps(TransformSteps steps)
+	public default void transformLeftWithSteps(TransformSteps steps)
 	{
 		if (left().matches(steps.result()))
 			steps.addStep(this);
@@ -67,7 +67,7 @@ public interface BiDirectionalTransform extends Transform
 	 * @param orig the expression to transform
 	 * @return the transformed expression
 	 */
-	default public Expression transformRight(Expression orig)
+	public default Expression transformRight(Expression orig)
 	{
 		return right().matches(orig) ? Transform.transform(right().fillMatches(orig), left()) : orig;
 	}
@@ -80,7 +80,7 @@ public interface BiDirectionalTransform extends Transform
 	 * @return the transformation steps.  The default implementation returns a TransformSteps object
 	 * with one step, the current one.
 	 */
-	default public TransformSteps transformRightWithSteps(Expression orig)
+	public default TransformSteps transformRightWithSteps(Expression orig)
 	{
 		TransformSteps ans = new TransformSteps(orig);
 		if (right().matches(orig))
@@ -93,7 +93,7 @@ public interface BiDirectionalTransform extends Transform
 	 * By convention this should result in a more complex expression
 	 * @param orig the steps to append to
 	 */
-	default public void transformRightWithSteps(TransformSteps steps)
+	public default void transformRightWithSteps(TransformSteps steps)
 	{
 		if (right().matches(steps.result()))
 			steps.addStep(this);
@@ -104,7 +104,7 @@ public interface BiDirectionalTransform extends Transform
 	 * @param orig the expression to test
 	 * @return true if the expression matches the left() expression, false otherwise
 	 */
-	default public boolean inLeft(Expression orig)
+	public default boolean inLeft(Expression orig)
 	{
 		return left().matches(orig);
 	}
@@ -114,7 +114,7 @@ public interface BiDirectionalTransform extends Transform
 	 * @param orig the expression to test
 	 * @return true if the expression matches the right() expression, false otherwise
 	 */
-	default public boolean inRight(Expression orig)
+	public default boolean inRight(Expression orig)
 	{
 		return right().matches(orig);
 	}

@@ -9,8 +9,6 @@ import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Optional;
 
-import javax.imageio.ImageIO;
-
 import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Node;
@@ -23,15 +21,16 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import javax.imageio.ImageIO;
+
 import logic.Expression;
 import logic.MalformedExpressionException;
 import logic.NormalForm;
@@ -108,10 +107,7 @@ public class LogicApplication extends Application
 			}
 			catch (MalformedExpressionException exception)
 			{
-				Alert error = new Alert(AlertType.ERROR);
-				error.setTitle("Error");
-				error.setContentText("The expression is malformed"); // TODO give helpful information here
-				error.showAndWait();
+				showAlert("The expression is malformed"); // TODO give helpful information here
 				return;
 			}
 			
@@ -142,7 +138,7 @@ public class LogicApplication extends Application
 		MenuItem normalForm = new MenuItem("Transform to Normal Form");
 		normalForm.setOnAction(event ->
 		{
-			ChoiceDialog<NormalForm> dialog = new ChoiceDialog<NormalForm>(NormalForm.CONJUNCTIVE, NormalForm.values());
+			ChoiceDialog<NormalForm> dialog = new ChoiceDialog<>(NormalForm.CONJUNCTIVE, NormalForm.values());
 			dialog.setTitle("Test"); // TODO Change
 			dialog.setContentText("Choose a normal form:");
 			Optional<NormalForm> result = dialog.showAndWait();
@@ -155,10 +151,7 @@ public class LogicApplication extends Application
 				}
 				catch (MalformedExpressionException exception)
 				{
-					Alert error = new Alert(AlertType.ERROR);
-					error.setTitle("Error");
-					error.setContentText("The expression is malformed"); // TODO give helpful information here
-					error.showAndWait();
+					showAlert("The expression is malformed"); // TODO give helpful information here
 					return;
 				}
 				Button b = new Button("Show steps?");
@@ -277,17 +270,16 @@ public class LogicApplication extends Application
 			File file = fileChooser.showSaveDialog(primaryStage);
 			if (file == null)
 				return;
-			FileOutputStream fileOut = new FileOutputStream(file);
-			ObjectOutputStream out = new ObjectOutputStream(fileOut);
-			out.writeObject(toSave);
-			out.close();
+			try (FileOutputStream fileOut = new FileOutputStream(file))
+			{
+				ObjectOutputStream out = new ObjectOutputStream(fileOut);
+				out.writeObject(toSave);
+				out.close();
+			}
 		}
 		catch (IOException e)
 		{
-			Alert error = new Alert(AlertType.ERROR);
-			error.setTitle("Error");
-			error.setContentText("Could not save");
-			error.showAndWait();
+			showAlert("Could not save");
 		}
 	}
 	
@@ -301,18 +293,23 @@ public class LogicApplication extends Application
 			File toOpen = fileChooser.showOpenDialog(primaryStage);
 			if (toOpen == null)
 				return Optional.empty();
-			FileInputStream fileIn = new FileInputStream(toOpen);
-			Optional<Object> ans = Optional.of(new ObjectInputStream(fileIn).readObject());
-			fileIn.close();
-			return ans;
+			try (FileInputStream fileIn = new FileInputStream(toOpen))
+			{
+				return Optional.of(new ObjectInputStream(fileIn).readObject());
+			}
 		}
 		catch (IOException | ClassNotFoundException e)
 		{
-			Alert error = new Alert(AlertType.ERROR);
-			error.setTitle("Error");
-			error.setContentText(e.getMessage());
-			error.showAndWait();
+			showAlert(e.getMessage());
 			return Optional.empty();
 		}
+	}
+	
+	private void showAlert(String message)
+	{
+		Alert error = new Alert(AlertType.ERROR);
+		error.setTitle("Error");
+		error.setContentText(message);
+		error.showAndWait();
 	}
 }

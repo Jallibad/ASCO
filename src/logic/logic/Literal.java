@@ -62,7 +62,7 @@ public class Literal extends Expression
 	@Override
 	public Map<Literal, Expression> fillMatches(Expression e)
 	{
-		Map<Literal, Expression> ans = new HashMap<Literal, Expression>();
+		Map<Literal, Expression> ans = new HashMap<>();
 		ans.put(this, e);
 		return ans;
 	}

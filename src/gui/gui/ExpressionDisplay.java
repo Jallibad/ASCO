@@ -14,7 +14,7 @@ import logic.Expression;
 
 public class ExpressionDisplay extends BorderPane
 {
-	private final static Border BORDER;
+	private static final Border BORDER;
 	static
 	{
 		BORDER = new Border
@@ -30,15 +30,15 @@ public class ExpressionDisplay extends BorderPane
 	}
 	
 	private Expression exp;
-	private Text expressionDisplay;
+	private Text display;
 	
 	ExpressionDisplay(Expression exp)
 	{
 		setBorder(BORDER);
 		this.exp = exp;
-		expressionDisplay = new Text(exp.prettyPrint());
-		setLeft(expressionDisplay);
-		setAlignment(expressionDisplay, Pos.CENTER_LEFT);
+		display = new Text(exp.prettyPrint());
+		setLeft(display);
+		setAlignment(display, Pos.CENTER_LEFT);
 	}
 	ExpressionDisplay(Expression exp, Node rightHalf)
 	{

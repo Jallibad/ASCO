@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  * An abstract class that represents a FOL statement.
@@ -15,13 +19,19 @@ import java.util.Set;
 public abstract class Expression implements Serializable
 {
 	private static final long serialVersionUID = -1298428615072603639L;
-
+	private static final Logger LOGGER = Logger.getLogger(Expression.class.getName());
+	
 	public static void main(String[] args)
 	{
+		ConsoleHandler handler = new ConsoleHandler();
+		handler.setFormatter(new SimpleFormatter());
+		LOGGER.addHandler(handler);
+		handler.setLevel(Level.ALL);
 		try
 		{
 			Expression e1 = parse("AND  A   B");
-			System.out.println(e1);
+			//System.out.println(e1);
+			LOGGER.severe(e1.toString());
 		}
 		catch (MalformedExpressionException e)
 		{
@@ -113,40 +123,8 @@ public abstract class Expression implements Serializable
 	 */
 	private static String removeDoubleWrapParens(String exp)
 	{
-		boolean doubleWrapped = true;
-		while (doubleWrapped)
-		{
-			doubleWrapped = false;
-			boolean amWrapping = false;
-			int wrapStartPos = -1;
-			int bracketNum = -1;
-			for (int i = 0; i < exp.length()-1; ++i)
-			{
-				if (!amWrapping)
-				{
-					if (exp.charAt(i) == '(' && exp.charAt(i+1) == '(')
-					{
-						amWrapping = true;
-						wrapStartPos = i;
-						bracketNum = 0;
-					}
-					continue;
-				}
-				if (exp.charAt(i) == '(')
-					++bracketNum;
-				else if (exp.charAt(i) == ')')
-				{
-					if (exp.charAt(i+1) == ')' && --bracketNum == 0)
-					{
-						doubleWrapped = true;
-						exp = removeChar(exp,i);
-						exp = removeChar(exp,wrapStartPos);
-						break;
-					}
-				}
-			}
-		}
-		return exp;
+		// Regexes are kind of write only, but this should work
+		return exp.replaceAll("\\((\\(.+\\))\\)","$1");
 	}
 	
 	/**
@@ -335,15 +313,14 @@ public abstract class Expression implements Serializable
 	{
 		try
 		{
-			System.out.println("sanitized: " + sanitizeInput(exp));
+			LOGGER.fine("TEST");
+			LOGGER.fine(() -> "sanitized: " + sanitizeInput(exp));
 			String ans = infixToPrefix2(sanitizeInput(exp));
-			//System.out.println("sanitized prefix: " + ans);
-			//System.out.println("\""+ans+"\"");
+			LOGGER.fine(() -> "sanitized prefix: " + ans);
 			String ans2 = operatorsToEnglish(ans);
-			//System.out.println("\""+ans2+"\"");
-			System.out.println("english prefix sanitized: " + ans2);
+			LOGGER.fine(() -> "english prefix sanitized: " + ans2);
 			String ans3 = postSanitize(ans2);
-			System.out.println("post sanitization: " + ans3);
+			LOGGER.fine(() -> "post sanitization: " + ans3);
 			return create(ans3);
 		}
 		catch (Exception e)
@@ -366,7 +343,7 @@ public abstract class Expression implements Serializable
 			return new Literal(exp);
 		int endIndex = exp.indexOf(' ');
 		Operator op = Operator.valueOf(exp.substring(1, endIndex));
-		List<Expression> terms = new ArrayList<Expression>();
+		List<Expression> terms = new ArrayList<>();
 		int numParentheses = 0;
 		for (int i=++endIndex; i<exp.length(); ++i)
 		{
@@ -431,6 +408,9 @@ public abstract class Expression implements Serializable
 	 */
 	@Override
 	public abstract boolean equals(Object other);
+	
+	@Override
+	public abstract int hashCode();
 	
 	/**
 	 * Checks whether two Expressions are simply logically equivalent, including commutativity and associativity

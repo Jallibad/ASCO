@@ -24,12 +24,7 @@ public class TransformStepsTests
 		);
 		
 		for (StepOrExpression se : s1)
-		{
-			System.out.println(se);
-			StepOrExpression currStep = correctSteps.next();
-			System.out.println(currStep);
-			assertEquals(currStep, se);
-		}
+			assertEquals(correctSteps.next(), se);
 	}
 	
 	@Test
