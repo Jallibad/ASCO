@@ -30,8 +30,8 @@ public abstract class Expression implements Serializable
 		try
 		{
 			Expression e1 = parse("AND  A   B");
-			//System.out.println(e1);
-			LOGGER.severe(e1.toString());
+			System.out.println(e1);
+			//LOGGER.severe(e1.toString());
 		}
 		catch (MalformedExpressionException e)
 		{
@@ -95,24 +95,15 @@ public abstract class Expression implements Serializable
 	private static String postSanitize(String exp)
 	{
 		//remove wrapped literals
-		boolean found = true;
-		while (found)
+		String oldExp;
+		do
 		{
-			found = false;
-			for (int i = 0; i < exp.length(); ++i)
-			{
-				// TODO this only works with single character Literals
-				if (Character.isAlphabetic(exp.charAt(i)) && i > 0 && exp.charAt(i-1) == '(' && i < exp.length() - 1 && exp.charAt(i+1) == ')')
-				{
-					found = true;
-					exp = removeChar(exp,i-1);
-					exp = removeChar(exp,i);
-					--i;
-				}
-			}
+			oldExp = exp;
+			exp = exp.replaceAll("\\(([a-zA-Z]+)\\)", "$1");
 		}
-		 
-		 //remove extra spaces
+		while (!exp.equals(oldExp));
+		
+		//remove extra spaces
 		return exp.trim().replaceAll(" +", " ");
 	}
 	
@@ -155,7 +146,6 @@ public abstract class Expression implements Serializable
 		{
 			int bracketNum = 1;
 			for (int i = 1; i < exp.length(); ++i)
-			{
 				if (exp.charAt(i) == '(')
 					++bracketNum;
 				else if (exp.charAt(i) == ')' && --bracketNum == 0)
@@ -163,7 +153,6 @@ public abstract class Expression implements Serializable
 					isWrapped &= i == exp.length()-1;
 					break;
 				}
-			}
 		}
 		if (!isWrapped)
 			exp = "("+exp+")";

@@ -14,9 +14,9 @@ import java.util.List;
 public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 {
 	private static final long serialVersionUID = -5016027615991197605L;
-	private List<Transform> steps = new ArrayList<Transform>();
-	private List<Expression> intermediaries = new ArrayList<Expression>();
-	private List<Expression> fullIntermediaries = new ArrayList<Expression>();
+	private List<Transform> steps = new ArrayList<>();
+	private List<Expression> intermediaries = new ArrayList<>();
+	private List<Expression> fullIntermediaries = new ArrayList<>();
 	
 	private TransformSteps()
 	{
@@ -84,13 +84,13 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 	@Override
 	public String toString()
 	{
-		String ans = "-----\n";
+		StringBuilder ans = new StringBuilder("-----\n");
 		for (int i=0; i<steps.size(); ++i)
 		{
-			ans += fullIntermediaries.get(i)+"\n";
-			ans += steps.get(i)+"\n";
+			ans.append(fullIntermediaries.get(i)+"\n");
+			ans.append(steps.get(i)+"\n");
 		}
-		return ans+result()+"\n-----";
+		return ans.toString()+result()+"\n-----";
 	}
 	
 	/**
@@ -127,7 +127,7 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 	@Override
 	public Iterator<StepOrExpression> iterator()
 	{
-		List<StepOrExpression> ans = new ArrayList<StepOrExpression>();
+		List<StepOrExpression> ans = new ArrayList<>();
 		for (int i=0; i<steps.size(); ++i)
 		{
 			ans.add(new StepOrExpression(fullIntermediaries.get(i)));

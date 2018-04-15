@@ -54,41 +54,18 @@ public class LogicApplication extends Application
 		VBox root = new VBox();
 		Scene s = new Scene(root, 300, 300, Color.WHITESMOKE);
 		
-		setUpMenu(root);
+		setUpMenus(root);
 		
 		root.getChildren().add(expressionEntry);
 		primaryStage.setScene(s);
 		primaryStage.show();
 	}
 	
-	private void setUpMenu(Pane root) // TODO I'm not sure if Pane is the best type here
+	private void setUpMenus(Pane root) // TODO I'm not sure if Pane is the best type here
 	{
 		MenuBar menuBar = new MenuBar();
 		
-		Menu menuFile = new Menu("File");
-		MenuItem save = new MenuItem("Save");
-		save.setOnAction(event ->
-		{
-			try
-			{
-				save(expressionEntry.getExpression());
-			}
-			catch (MalformedExpressionException e)
-			{
-				Alert error = new Alert(AlertType.ERROR);
-				error.setTitle("Error");
-				error.setContentText("The current expression is invalid and cannot be saved");
-				error.showAndWait();
-			}
-		});
-		
-		MenuItem export = new MenuItem("Export");
-		export.setOnAction(event -> exportScreen(root));
-		
-		MenuItem load = new MenuItem("Load");
-		load.setOnAction(event ->
-			loadFile().ifPresent(e -> expressionEntry.setExpression((Expression) e)));
-		menuFile.getItems().addAll(save, export, load);
+		Menu menuFile = setUpFileMenu(root);
 		
 		Menu menuEdit = new Menu("Edit");
 		menuEdit.setOnShowing(event ->
@@ -181,13 +158,9 @@ public class LogicApplication extends Application
 				{
 					Optional<TransformSteps> steps = expressionEntry.getExpression().proveEquivalence(e2.getExpression());
 					if (steps.isPresent())
-					{
 						root.getChildren().addAll(new Text("The expressions are equivalent"), new StepsDisplay(steps.get()));
-					}
 					else
-					{
 						root.getChildren().add(new Text("The expressions are not equivalent"));
-					}
 				}
 				catch (MalformedExpressionException error)
 				{
@@ -311,5 +284,34 @@ public class LogicApplication extends Application
 		error.setTitle("Error");
 		error.setContentText(message);
 		error.showAndWait();
+	}
+	
+	private Menu setUpFileMenu(Pane root)
+	{
+		Menu menuFile = new Menu("File");
+		MenuItem save = new MenuItem("Save");
+		save.setOnAction(event ->
+		{
+			try
+			{
+				save(expressionEntry.getExpression());
+			}
+			catch (MalformedExpressionException e)
+			{
+				Alert error = new Alert(AlertType.ERROR);
+				error.setTitle("Error");
+				error.setContentText("The current expression is invalid and cannot be saved");
+				error.showAndWait();
+			}
+		});
+		
+		MenuItem export = new MenuItem("Export");
+		export.setOnAction(event -> exportScreen(root));
+		
+		MenuItem load = new MenuItem("Load");
+		load.setOnAction(event ->
+			loadFile().ifPresent(e -> expressionEntry.setExpression((Expression) e)));
+		menuFile.getItems().addAll(save, export, load);
+		return menuFile;
 	}
 }
