@@ -7,7 +7,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import logic.ExpParser;
 import logic.Expression;
-import logic.MalformedExpressionException;
+import logic.malformedexpression.MalformedExpressionException;
 
 /**
  * A subclass of Node that represent a text entry field with buttons for symbol input

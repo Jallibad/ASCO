@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
@@ -32,12 +33,14 @@ import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 
 import logic.Expression;
-import logic.MalformedExpressionException;
 import logic.NormalForm;
 import logic.TransformSteps;
+import logic.malformedexpression.MalformedExpressionException;
 
 public class LogicApplication extends Application
 {
+	private static final Logger LOGGER = Logger.getLogger(Expression.class.getName());
+	
 	ExpressionEntry expressionEntry = new ExpressionEntry();
 	Stage primaryStage;
 	
@@ -136,8 +139,8 @@ public class LogicApplication extends Application
 				b.setOnAction(event2 ->
 				{
 					// TODO
-					System.out.println("Showing steps");
-					System.out.println("First removing show steps button");
+					LOGGER.fine("Showing steps");
+					LOGGER.fine("First removing show steps button");
 					root.getChildren().remove(n);
 					StepsDisplay s = new StepsDisplay(t.transformWithSteps(e));
 					root.getChildren().add(s);
@@ -165,7 +168,7 @@ public class LogicApplication extends Application
 				catch (MalformedExpressionException error)
 				{
 					// TODO Auto-generated catch block
-					error.printStackTrace();
+					LOGGER.severe(error.getMessage());
 				}
 			});
 			root.getChildren().addAll(e2, b);
@@ -224,11 +227,11 @@ public class LogicApplication extends Application
 			if (file == null)
 				return;
 			ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", file);
-			System.out.println("Captured: " + file.getAbsolutePath());
+			LOGGER.info("Captured: " + file.getAbsolutePath());
 		}
 		catch (IOException e)
 		{
-			System.out.println("Error: unable to write screen capture to output file.");
+			LOGGER.severe("Error: unable to write screen capture to output file."); // TODO error handling
 		}
 	}
 	

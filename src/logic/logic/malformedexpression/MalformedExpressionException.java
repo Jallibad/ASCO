@@ -1,4 +1,4 @@
-package logic;
+package logic.malformedexpression;
 
 @SuppressWarnings("serial")
 public class MalformedExpressionException extends Exception

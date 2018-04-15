@@ -9,6 +9,8 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import logic.malformedexpression.MalformedExpressionException;
+
 public class ExpressionTests
 {
 	@Test

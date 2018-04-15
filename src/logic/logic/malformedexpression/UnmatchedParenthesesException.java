@@ -1,4 +1,4 @@
-package logic;
+package logic.malformedexpression;
 
 public class UnmatchedParenthesesException extends MalformedExpressionException
 {
@@ -9,7 +9,7 @@ public class UnmatchedParenthesesException extends MalformedExpressionException
 	
 	public UnmatchedParenthesesException(String exp, int location)
 	{
-		super(String.format("Unmatched parentheses found in {0} at index {1}", exp, location));
+		super(String.format("Unmatched parentheses found in \"%s\" at index %d", exp, location));
 		this.exp = exp;
 		this.location = location;
 	}

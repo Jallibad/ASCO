@@ -3,6 +3,12 @@ package logic;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import logic.malformedexpression.MalformedExpressionException;
+import logic.malformedexpression.NotAnOperatorException;
+import logic.malformedexpression.UnmatchedParenthesesException;
 
 public final class ExpParser
 {
@@ -17,38 +23,17 @@ public final class ExpParser
 	}
 	
 	/**
-	 * return a new string from the specified string with the desired character added
-	 * @param s the original string
-	 * @param loc the location of the character before which to add
-	 * @param c the character to write to string position loc
-	 * @return a new string equal to s with character number loc preceded by c
-	 */
-	private static String addChar(String s, int loc, char c)
-	{
-		return s.substring(0, loc) + c + s.substring(loc);
-	}
-	
-	/**
-	 * return a new string from the specified string with the desired character removed
-	 * @param s the original string
-	 * @param loc the location of the character to remove
-	 * @return a new string equal to s with character number loc removed
-	 */
-	private static String removeChar(String s, int loc)
-	{
-		return s.substring(0,loc) + s.substring(loc+1);
-	}
-	
-	/**
 	 * convert all operator characters to the operator name
 	 * @param exp the expression in which to convert all operators
 	 * @return the specified expression string with all operator characters replaced with the operator name
 	 */
-	private static String operatorsToEnglish(String exp)
+	private static void operatorsToEnglish(StringBuilder exp)
 	{
+		String ans = exp.toString();
 		for (Operator op : Operator.values())
-			exp = exp.replaceAll(op.DISPLAY_TEXT, op.name());
-		return exp;
+			ans = ans.replaceAll(op.DISPLAY_TEXT, op.name());
+		exp.setLength(0);
+		exp.append(ans);
 	}
 	
 	/**
@@ -69,19 +54,25 @@ public final class ExpParser
 	 * @param exp the expression to sanitize
 	 * @return the sanitized expression
 	 */
-	private static String postSanitize(String exp)
+	private static void postSanitize(StringBuilder exp)
 	{
 		//remove wrapped literals
-		String oldExp;
-		do
-		{
-			oldExp = exp;
-			exp = exp.replaceAll("\\(([a-zA-Z]+)\\)", "$1");
-		}
-		while (!exp.equals(oldExp));
+		StringBuffer buffer = new StringBuffer();
+		Pattern p = Pattern.compile("\\(([a-zA-Z]+)\\)");
+		Matcher m = p.matcher(exp);
+		while (m.find())
+			m.appendReplacement(buffer, "$1");
+		m.appendTail(buffer);
 		
 		//remove extra spaces
-		return exp.trim().replaceAll(" +", " ");
+		Matcher trimMatcher = Pattern.compile("^\\s|\\s+(?=\\s)|\\s$").matcher(buffer.toString());
+		buffer.setLength(0);
+		while (trimMatcher.find())
+			trimMatcher.appendReplacement(buffer, "");
+		trimMatcher.appendTail(buffer);
+		
+		exp.setLength(0);
+		exp.append(buffer);
 	}
 	
 	/**
@@ -89,31 +80,30 @@ public final class ExpParser
 	 * @param exp the expression from which to remove sets of parentheses
 	 * @return the specified expression wrapped in at most one set of parentheses
 	 */
-	private static String removeDoubleWrapParens(String exp)
+	private static void removeDoubleWrapParens(StringBuilder ans)
 	{
 		boolean doubleWrapped = true;
 		while (doubleWrapped)
 		{
 			doubleWrapped = false;
-			int wrapStartPos = exp.indexOf("((");
+			int wrapStartPos = ans.indexOf("((");
 			if (wrapStartPos != -1)
 			{
 				int bracketNum = 0;
-				for (int i = wrapStartPos+1; i < exp.length()-1; ++i)
+				for (int i = wrapStartPos+1; i < ans.length()-1; ++i)
 				{
-					if (exp.charAt(i) == '(')
+					if (ans.charAt(i) == '(')
 						++bracketNum;
-					else if (exp.substring(i, i+2).equals("))") && --bracketNum == 0)
+					else if (ans.substring(i, i+2).equals("))") && --bracketNum == 0)
 					{
 						doubleWrapped = true;
-						exp = removeChar(exp,i);
-						exp = removeChar(exp,wrapStartPos);
+						ans.deleteCharAt(i);
+						ans.deleteCharAt(wrapStartPos);
 						break;
 					}
 				}
 			}
 		}
-		return exp;
 	}
 	
 	/**
@@ -135,21 +125,21 @@ public final class ExpParser
 	 * @return
 	 * @throws UnmatchedParenthesesException
 	 */
-	private static int numMatchedParentheses(String exp) throws UnmatchedParenthesesException
+	private static int numMatchedParentheses(StringBuilder exp) throws UnmatchedParenthesesException
 	{
 		int numOpen = 0;
 		int numClosed = 0;
-		for (char i : exp.toCharArray())
+		for (char i : exp.toString().toCharArray())
 		{
 			if (i == '(')
 				numOpen++;
 			else if (i == ')')
 				numClosed++;
 			if (numClosed > numOpen)
-				throw new UnmatchedParenthesesException(exp, 0); // TODO indicate where in string the parens are
+				throw new UnmatchedParenthesesException(exp.toString(), 0); // TODO indicate where in string the parens are
 		}
 		if (numOpen != numClosed)
-			throw new UnmatchedParenthesesException(exp, exp.length());
+			throw new UnmatchedParenthesesException(exp.toString(), exp.length());
 		return numOpen;
 	}
 	
@@ -160,41 +150,40 @@ public final class ExpParser
 	 * @throws NotAnOperatorException 
 	 * @throws UnmatchedParenthesesException 
 	 */
-	private static String sanitizeInput(String exp) throws NotAnOperatorException, UnmatchedParenthesesException
+	private static void sanitizeInput(StringBuilder ans) throws NotAnOperatorException, UnmatchedParenthesesException
 	{
 		//add parentheses around the expression if not already present
-		numMatchedParentheses(exp);
-		if (exp.charAt(0) != '(')
-			exp = "("+exp+")";
+		numMatchedParentheses(ans);
+		if (ans.charAt(0) != '(')
+			ans.append(")").insert(0, '(');
 		
 //		System.out.println("before paren neg: " + exp);
 		//add parentheses around all negations
-		for (int i = 0; i < exp.length(); ++i)
+		for (int i = 0; i < ans.length(); ++i)
 		{
-			if (exp.charAt(i) == '¬' && (i == 0 || exp.charAt(i-1) != '('))
+			if (ans.charAt(i) == '¬' && (i == 0 || ans.charAt(i-1) != '('))
 			{
-				exp = addChar(exp,i,'(');
-				i+=2;
-				exp = addChar(exp,i,' ');
-				i+=1;
+				ans.insert(i, '(');
+				ans.insert(i+2,' ');
+				i+=3;
 				//move forward until we find the second operator or same-level closed paren
 				int r = i;
 				int bracketCount = 0;
-				while (++r < exp.length())
+				while (++r < ans.length())
 				{
-					if (exp.charAt(r) == '(')
+					if (ans.charAt(r) == '(')
 						++bracketCount;
-					else if (exp.charAt(r) == ')')
+					else if (ans.charAt(r) == ')')
 					{
 						if (--bracketCount == -1)
 						{
-							exp = addChar(exp, ++r, ')');
+							ans.insert(++r, ')');
 							break;
 						}
 					}
-					else if (Character.isAlphabetic(exp.charAt(r)))
+					else if (Character.isAlphabetic(ans.charAt(r)))
 					{
-						exp = addChar(exp,++r, ')');
+						ans.insert(++r, ')');
 						break;
 					}
 				}
@@ -204,28 +193,28 @@ public final class ExpParser
 //		System.out.println("after paren neg: " + exp);
 		
 		//parenthesize all position 1 operators
-		for (int i = 0; i < exp.length(); ++i)
+		for (int i = 0; i < ans.length(); ++i)
 		{
-			if (charIsOperator(exp.charAt(i)) && operatorPosition(exp.charAt(i)) == 1)
+			if (charIsOperator(ans.charAt(i)) && operatorPosition(ans.charAt(i)) == 1)
 			{
 				//move back until we find the first operator or same-level open paren
 				int r = i;
 				int bracketCount = 0;
 				while (--r >= 0)
 				{
-					if (exp.charAt(r) == ')')
+					if (ans.charAt(r) == ')')
 						++bracketCount;
-					else if (exp.charAt(r) == '(')
+					else if (ans.charAt(r) == '(')
 					{
 						if (--bracketCount == 0)
 						{
-							exp = addChar(exp, r, '(');
+							ans.insert(r, '(');
 							break;
 						}
 					}
-					else if (Character.isAlphabetic(exp.charAt(r)))
+					else if (Character.isAlphabetic(ans.charAt(r)))
 					{
-						exp = addChar(exp,r, '(');
+						ans.insert(r, '(');
 						break;
 					}
 				}
@@ -233,21 +222,21 @@ public final class ExpParser
 				//move forward until we find the second operator or same-level closed paren
 				r = i;
 				bracketCount = 0;
-				while (++r < exp.length())
+				while (++r < ans.length())
 				{
-					if (exp.charAt(r) == '(')
+					if (ans.charAt(r) == '(')
 						++bracketCount;
-					else if (exp.charAt(r) == ')')
+					else if (ans.charAt(r) == ')')
 					{
 						if (--bracketCount == 0)
 						{
-							exp = addChar(exp, ++r, ')');
+							ans.insert(++r, ')');
 							break;
 						}
 					}
-					else if (Character.isAlphabetic(exp.charAt(r)))
+					else if (Character.isAlphabetic(ans.charAt(r)))
 					{
-						exp = addChar(exp,++r, ')');
+						ans.insert(++r, ')');
 						break;
 					}
 				}
@@ -256,9 +245,7 @@ public final class ExpParser
 		}		
 		
 		//System.out.println("before wrap: " + exp);
-		exp = removeDoubleWrapParens(exp);
-		
-		return exp;
+		removeDoubleWrapParens(ans);
 	}
 	
 	/**
@@ -266,7 +253,7 @@ public final class ExpParser
 	 * @param exp the expression to convert
 	 * @return the specified expression in infix form
 	 */
-	private static String infixToPrefix2(String exp)
+	private static StringBuilder infixToPrefix2(StringBuilder exp)
 	{
 		//search for operators
 		for (int i = 0; i < exp.length(); ++i)
@@ -284,17 +271,17 @@ public final class ExpParser
 					else if (exp.charAt(r) == '(' && --bracketCount < 0)
 					{
 						//move operator to just ahead of same-level opening paren
-						exp = addChar(exp,++r, exp.charAt(i));
+						exp.insert(++r, exp.charAt(i));
 						//remove operator from old location
-						exp = removeChar(exp, ++i);
+						exp.deleteCharAt(++i);
 						//add a space before the second operator, if not already present
 						if (exp.charAt(i) != ' ')
-							exp = addChar(exp,i,' ');
+							exp.insert(i,' ');
 						//decrement here so we don't skip over the next character
 						i-=1;
 						//add a space before the first operator, if not already present
 						if (exp.charAt(++r) != ' ')
-							exp = addChar(exp,r,' ');
+							exp.insert(r,' ');
 						break;
 					}
 				}
@@ -312,14 +299,17 @@ public final class ExpParser
 	{
 		try
 		{
-			LOGGER.fine("sanitized: " + sanitizeInput(exp));
-			String ans = infixToPrefix2(sanitizeInput(exp));
+			StringBuilder ans = new StringBuilder(exp);
+			sanitizeInput(ans);
+			LOGGER.fine(() -> "sanitized: " + ans);
+			infixToPrefix2(ans);
 			LOGGER.fine(() -> "sanitized prefix: " + ans);
-			String ans2 = operatorsToEnglish(ans);
-			LOGGER.fine(() -> "english prefix sanitized: " + ans2);
-			String ans3 = postSanitize(ans2);
-			LOGGER.fine(() -> "post sanitization: " + ans3);
-			return create(removeDoubleWrapParens(ans3));
+			operatorsToEnglish(ans);
+			LOGGER.fine(() -> "english prefix sanitized: " + ans);
+			postSanitize(ans);
+			LOGGER.fine(() -> "post sanitization: " + ans);
+			removeDoubleWrapParens(ans);
+			return create(ans.toString());
 		}
 		catch (Exception e)
 		{

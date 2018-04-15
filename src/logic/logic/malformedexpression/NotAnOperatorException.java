@@ -1,4 +1,4 @@
-package logic;
+package logic.malformedexpression;
 
 public class NotAnOperatorException extends MalformedExpressionException
 {

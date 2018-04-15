@@ -10,6 +10,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import logic.malformedexpression.MalformedExpressionException;
+
 /**
  * An abstract class that represents a FOL statement.
  * Subclassed by Literal and Function 
@@ -115,5 +117,12 @@ public abstract class Expression implements Serializable
 	
 	public abstract Optional<TransformSteps> proveEquivalence(Expression other);
 	
+	/**
+	 * Maps a predicate over the expression, testing if the operator is in the given list
+	 * and if each of the terms matches the predicate.  This is intended to be used recursively. 
+	 * @param p the predicate to test against
+	 * @param op a variadic Array of allowed operators
+	 * @return
+	 */
 	public abstract boolean mapPredicate(Predicate<Expression> p, Operator... op);
 }

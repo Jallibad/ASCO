@@ -12,6 +12,8 @@ import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import logic.malformedexpression.MalformedExpressionException;
+
 /**
  * The Function class represent functions such as "(NEG A)" and "(AND A B)".
  * Functions are represented as an Operator and an ordered List of terms, with terms[0] being the first argument.
@@ -23,7 +25,7 @@ import java.util.stream.Collectors;
 public class Function extends Expression
 {
 	private static final long serialVersionUID = 7003195412543405388L;
-	private static final Logger LOGGER = Logger.getLogger(Expression.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(Function.class.getName());
 	public final Operator operator;
 	/**
 	 * An ordered List of the arguments to the Function, with term[0] being the first argument.
