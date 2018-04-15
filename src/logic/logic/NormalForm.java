@@ -6,8 +6,33 @@ import java.util.stream.Collectors;
 
 public enum NormalForm implements Transform
 {
+	/**
+	 * <p>
+	 * Enum representing a transformation of conjunctive normal form
+	 * </p>
+	 * 
+	 * Conjunctive normal form is a conjunction of one or more clauses,
+	 * where a clause is a disjunction of literals
+	 */
 	CONJUNCTIVE,
+	
+	/**
+	 * <p>
+	 * Enum representing a transformation of disjunctive normal form
+	 * </p>
+	 * Disjunctive normal form is a disjunction of one or more clauses,
+	 * where a clause is a conjunction of literals
+	 * 
+	 */
 	DISJUNCTIVE,
+	
+	/**
+	 * <p>
+	 * Enum representing a transformatoin of negation normal form
+	 * </p>
+	 * 
+	 * Negation normal form is when a negation operator is applied to the variabls in an expression
+	 */
 	NEGATION;
 
 	@Override
@@ -41,7 +66,13 @@ public enum NormalForm implements Transform
 		}
 		else return true;
 	}
-
+	
+	/**
+	 * Checks if the expression is in either conjunctive, disjunctive, or negation normal form
+	 * 
+	 * @param e the Expression, who's form is being checked
+	 * @return True if the expression is in the indicated form, otherwise False
+	 */
 	public boolean inForm(Expression e)
 	{
 		switch (this)

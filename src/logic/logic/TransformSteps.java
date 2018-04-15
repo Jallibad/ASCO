@@ -30,15 +30,25 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 		checkRep();
 	}
 	
+	/**
+	 * Transforms the current last result and then adds it to the list
+	 * 
+	 * @param step the step to be added
+	 */
 	public void addStep(Transform step)
 	{
 		steps.add(step);
-		// Transform the current last result and then add it to the list
 		fullIntermediaries.add(step.transform(result()));
 		intermediaries.add(null);
 		checkRep();
 	}
 	
+	/**
+	 * Combine
+	 * 
+	 * @param s
+	 * @param index
+	 */
 	public void combine(TransformSteps s, int index)
 	{
 		if (s.steps.size() == 0)

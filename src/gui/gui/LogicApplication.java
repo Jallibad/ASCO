@@ -188,9 +188,13 @@ public class LogicApplication extends Application
 				{
 					Optional<TransformSteps> steps = expressionEntry.getExpression().proveEquivalence(e2.getExpression());
 					if (steps.isPresent())
+					{
 						root.getChildren().addAll(new Text("The expressions are equivalent"), new StepsDisplay(steps.get()));
+					}
 					else
+					{
 						root.getChildren().add(new Text("The expressions are not equivalent"));
+					}
 				}
 				catch (MalformedExpressionException error)
 				{
