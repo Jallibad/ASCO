@@ -78,6 +78,7 @@ public abstract class Expression implements Serializable
 	 * determine whether or not the specified character is an operator
 	 * @param c the character to check
 	 * @return whether c is an operator (true) or not (false)
+	 * @throws NotAnOperatorException if the character is not an operator
 	 */
 	private static boolean charIsOperator(char c)
 	{
@@ -123,20 +124,21 @@ public abstract class Expression implements Serializable
 	 * @param c the character to check for operator position
 	 * @return the operator position of the specified character, or -1 if the character is not an operator
 	 */
-	private static int operatorPosition(char c)
+	private static int operatorPosition(char c) throws NotAnOperatorException
 	{
 		for (Operator o : Operator.values())
 			if (o.DISPLAY_TEXT.charAt(0) == c)
 				return o.SYMBOL_POSITION;
-		return -1;
+		throw new NotAnOperatorException(String.valueOf(c)); // TODO add error message
 	}
 	
 	/**
 	 * sanitize the input expression in order to prepare it for parsing
 	 * @param exp the string to sanitize
 	 * @return the specified string sanitized for expression parsing
+	 * @throws NotAnOperatorException 
 	 */
-	private static String sanitizeInput(String exp)
+	private static String sanitizeInput(String exp) throws NotAnOperatorException
 	{
 		//add parentheses around the expression if not already present
 		boolean isWrapped = true;
@@ -303,7 +305,7 @@ public abstract class Expression implements Serializable
 		try
 		{
 			LOGGER.fine("TEST");
-			LOGGER.fine(() -> "sanitized: " + sanitizeInput(exp));
+			LOGGER.fine("sanitized: " + sanitizeInput(exp));
 			String ans = infixToPrefix2(sanitizeInput(exp));
 			LOGGER.fine(() -> "sanitized prefix: " + ans);
 			String ans2 = operatorsToEnglish(ans);
