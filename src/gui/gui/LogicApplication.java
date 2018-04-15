@@ -23,10 +23,12 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -95,6 +97,47 @@ public class LogicApplication extends Application
 				item.setDisable(!expressionEntry.validExpression())));
 		
 		MenuItem simplify = new MenuItem("Simplify");
+		
+		MenuItem checkForm = new MenuItem("Check Form");
+		checkForm.setOnAction(event ->
+		{
+			Expression ex;
+			try
+			{
+				ex = expressionEntry.getExpression();
+			}
+			catch (MalformedExpressionException exception)
+			{
+				Alert error = new Alert(AlertType.ERROR);
+				error.setTitle("Error");
+				error.setContentText("The expression is malformed"); // TODO give helpful information here
+				error.showAndWait();
+				return;
+			}
+			
+			Stage formStage = new Stage();
+			VBox box = new VBox();
+			
+			Text conjunctiveText = new Text( NormalForm.CONJUNCTIVE.inForm(ex) 
+					? "Expression is in conjunctive normal form" : "Expression is not in conjunctive normal form" );
+			
+			Text disjunctiveText = new Text( NormalForm.DISJUNCTIVE.inForm(ex) 
+					? "Expression is in disjunctive normal form" : "Expression is not in disjunctive normal form" );
+			
+			Text negationText = new Text( NormalForm.CONJUNCTIVE.inForm(ex) 
+					? "Expression is in negation normal form" : "Expression is not in negation normal form" );
+			
+			box.getChildren().add(conjunctiveText);
+			box.getChildren().add(disjunctiveText);
+			box.getChildren().add(negationText);
+
+			Scene scene = new Scene(box, 300, 250);
+			formStage.setScene(scene);
+			
+			formStage.show();
+	
+		});
+		
 		
 		MenuItem normalForm = new MenuItem("Transform to Normal Form");
 		normalForm.setOnAction(event ->
@@ -192,7 +235,7 @@ public class LogicApplication extends Application
 			}
 		});
 		
-		menuEdit.getItems().addAll(simplify, normalForm, proveEquivalence, checkWork);
+		menuEdit.getItems().addAll(simplify, normalForm, proveEquivalence, checkWork, checkForm);
 		
 		menuBar.getMenus().addAll(menuFile, menuEdit);
 		root.getChildren().add(menuBar);
