@@ -30,7 +30,7 @@ public interface BiDirectionalTransform extends Transform
 	 */
 	public default Expression transformLeft(Expression orig)
 	{
-		return left().matches(orig) ? Transform.transform(left().fillMatches(orig), right()) : orig;
+		return left().fillMatches(orig).map(m -> Transform.transform(m, right())).orElse(orig);
 	}
 	
 	/**
@@ -69,7 +69,7 @@ public interface BiDirectionalTransform extends Transform
 	 */
 	public default Expression transformRight(Expression orig)
 	{
-		return right().matches(orig) ? Transform.transform(right().fillMatches(orig), left()) : orig;
+		return right().fillMatches(orig).map(m -> Transform.transform(m, left())).orElse(orig);
 	}
 	
 	/**

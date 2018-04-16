@@ -10,14 +10,17 @@ public class NormalFormTests
 	@Test
 	public void testNNFinForm()
 	{
-		Expression e1 = ExpParser.create("(AND (OR A B) C)");
-		Expression e2 = ExpParser.create("(OR (AND A (AND (OR (NEG B) C) (NEG C))) D)");
-		Expression e3 = ExpParser.create("(NEG (OR A (NEG C)))");
-		Expression e4 = ExpParser.create("(AND A (NEG (OR B C)))");
-		assertTrue(NormalForm.NEGATION.inForm(e1));
-		assertTrue(NormalForm.NEGATION.inForm(e2));
-		assertFalse(NormalForm.NEGATION.inForm(e3));
-		assertFalse(NormalForm.NEGATION.inForm(e4));
+		assertTrue(NormalForm.NEGATION.inForm(
+			ExpParser.create("(AND (OR A B) C)")));
+		
+		assertTrue(NormalForm.NEGATION.inForm(
+			ExpParser.create("(OR (AND A (AND (OR (NEG B) C) (NEG C))) D)")));
+		
+		assertFalse(NormalForm.NEGATION.inForm(
+			ExpParser.create("(NEG (OR A (NEG C)))")));
+		
+		assertFalse(NormalForm.NEGATION.inForm(
+			ExpParser.create("(AND A (NEG (OR B C)))")));
 	}
 	
 	@Test
@@ -34,14 +37,20 @@ public class NormalFormTests
 	@Test
 	public void testCNFinform()
 	{
-		Expression e1 = ExpParser.create("(AND A B)");
-		Expression e2 = ExpParser.create("(AND (OR A B) (OR B C))");
-		Expression e3 = ExpParser.create("(OR C (AND A B))");
-		Expression e4 = ExpParser.create("(NEG (OR B C))");
-		assertTrue(NormalForm.CONJUNCTIVE.inForm(e1));
-		assertTrue(NormalForm.CONJUNCTIVE.inForm(e2));
-		assertFalse(NormalForm.CONJUNCTIVE.inForm(e3));
-		assertFalse(NormalForm.CONJUNCTIVE.inForm(e4));
+		assertTrue(NormalForm.CONJUNCTIVE.inForm(
+			ExpParser.create("(AND A B)")));
+		
+		assertTrue(NormalForm.CONJUNCTIVE.inForm(
+			ExpParser.create("(AND (OR A B) (OR B C))")));
+		
+		assertTrue(NormalForm.CONJUNCTIVE.inForm(
+			ExpParser.create("(AND (AND (OR A (NEG A)) B) (AND (NEG C) (OR (NEG B) D)))")));
+		
+		assertFalse(NormalForm.CONJUNCTIVE.inForm(
+			ExpParser.create("(OR C (AND A B))")));
+		
+		assertFalse(NormalForm.CONJUNCTIVE.inForm(
+			ExpParser.create("(NEG (OR B C))")));
 	}
 	
 	@Test
@@ -56,14 +65,17 @@ public class NormalFormTests
 	@Test 
 	public void testDNFinform()
 	{
-		Expression e1 = ExpParser.create("(OR C (AND A B))");
-		Expression e2 = ExpParser.create("(AND A B)");
-		Expression e3 = ExpParser.create("(OR C (OR A B))");
-		Expression e4 = ExpParser.create("(NEG (OR A B))");
-		assertTrue(NormalForm.DISJUNCTIVE.inForm(e1));
-		assertTrue(NormalForm.DISJUNCTIVE.inForm(e2));
-		assertTrue(NormalForm.DISJUNCTIVE.inForm(e3));
-		assertFalse(NormalForm.DISJUNCTIVE.inForm(e4));
+		assertTrue(NormalForm.DISJUNCTIVE.inForm(
+			ExpParser.create("(OR C (AND A B))")));
+		
+		assertTrue(NormalForm.DISJUNCTIVE.inForm(
+			ExpParser.create("(AND A B)")));
+		
+		assertTrue(NormalForm.DISJUNCTIVE.inForm(
+			ExpParser.create("(OR C (OR A B))")));
+		
+		assertFalse(NormalForm.DISJUNCTIVE.inForm(
+			ExpParser.create("(NEG (OR A B))")));
 	}
 	
 	@Test

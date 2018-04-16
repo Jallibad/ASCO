@@ -1,5 +1,8 @@
 package gui;
 
+import java.util.Optional;
+import java.util.logging.Logger;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -17,6 +20,7 @@ import logic.malformedexpression.MalformedExpressionException;
  */
 public class ExpressionEntry extends VBox
 {
+	private static final Logger LOGGER = Logger.getLogger(ExpressionEntry.class.getName());
 	private TextField textField = new TextField();
 	private HBox buttons = new HBox();
 	
@@ -49,7 +53,20 @@ public class ExpressionEntry extends VBox
 		}
 		catch (MalformedExpressionException e)
 		{
+			LOGGER.info(e.getMessage());
 			return false;
+		}
+	}
+	
+	public Optional<Expression> getOptionalExpression()
+	{
+		try
+		{
+			return Optional.of(getExpression());
+		}
+		catch (MalformedExpressionException e)
+		{
+			return Optional.empty();
 		}
 	}
 	

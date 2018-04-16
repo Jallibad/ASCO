@@ -7,11 +7,13 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import logic.malformedexpression.InvalidArgumentsException;
+
 public class LiteralTests
 {
 
 	@Test
-	public void testEquality()
+	public void testEquality() throws InvalidArgumentsException
 	{
 		Literal a = new Literal("A");
 		Literal b = new Literal("B");
@@ -20,7 +22,7 @@ public class LiteralTests
 	}
 	
 	@Test
-	public void testGetVariables()
+	public void testGetVariables() throws InvalidArgumentsException
 	{
 		Literal a = new Literal("A");
 		Set<Literal> vars = a.getVariables();

@@ -44,12 +44,11 @@ public class StepOrExpression
 	 */
 	public <T> T mapOver(java.util.function.Function<TransformStep, T> stepMap, java.util.function.Function<Expression, T> expressionMap)
 	{
-		T ans;
 		if (step.isPresent())
-			ans = stepMap.apply(step.get());
-		else
-			ans = expressionMap.apply(exp.get());
-		return ans;
+			return stepMap.apply(step.get());
+		else if (exp.isPresent())
+			return expressionMap.apply(exp.get());
+		throw new Error("Neither step nor expression is present");
 	}
 	
 	@Override
@@ -57,8 +56,9 @@ public class StepOrExpression
 	{
 		if (step.isPresent())
 			return "TransformStep: "+step.get();
-		else
+		else if (exp.isPresent())
 			return "Expression: "+exp.get();
+		throw new Error("Neither step nor expression is present");
 	}
 	
 	@Override

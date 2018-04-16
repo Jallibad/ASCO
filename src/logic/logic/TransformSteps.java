@@ -51,7 +51,7 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 	 */
 	public void combine(TransformSteps s, int index)
 	{
-		if (s.steps.size() == 0)
+		if (s.steps.isEmpty())
 			return;
 		// Remove the possibly null last element to make room for the new original
 		// TODO this sounds wrong...

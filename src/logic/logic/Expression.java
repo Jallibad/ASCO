@@ -10,8 +10,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import logic.malformedexpression.MalformedExpressionException;
-
 /**
  * An abstract class that represents a FOL statement.
  * Subclassed by Literal and Function 
@@ -22,24 +20,18 @@ public abstract class Expression implements Serializable
 {
 	private static final long serialVersionUID = -1298428615072603639L;
 	private static final Logger LOGGER = Logger.getLogger(Expression.class.getName());
-	
-	public static void main(String[] args)
+	static
 	{
 		LOGGER.setLevel(Level.ALL);
 		ConsoleHandler handler = new ConsoleHandler();
 		handler.setFormatter(new SimpleFormatter());
 		LOGGER.addHandler(handler);
 		handler.setLevel(Level.ALL);
-		try
-		{
-			Expression e1 = ExpParser.parse("AND  A   B");
-			System.out.println(e1);
-			//LOGGER.severe(e1.toString());
-		}
-		catch (MalformedExpressionException e)
-		{
-			LOGGER.severe(e.getMessage());
-		}
+	}
+	
+	public static void main(String[] args)
+	{
+		//System.out.println("(A|B)".matches(".*[^\\p{Alpha}\\s\\(\\)].*"));
 	}
 	
 	/**
@@ -80,7 +72,7 @@ public abstract class Expression implements Serializable
 	{
 		return matches(ExpParser.create(pattern));
 	}
-	public abstract Map<Literal,Expression> fillMatches(Expression e);
+	public abstract Optional<Map<Literal,Expression>> fillMatches(Expression e);
 	
 	/**
 	 * A version of the expression with proper infix notation and symbols

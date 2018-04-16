@@ -3,15 +3,31 @@ package logic;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Test;
 
+import logic.malformedexpression.InvalidArgumentsException;
 import logic.malformedexpression.MalformedExpressionException;
 
 public class FunctionTests
 {
+	@Test(expected = MalformedExpressionException.class)
+	public void testConstructor() throws MalformedExpressionException
+	{
+		new Function(Operator.AND, new Literal("A"));
+	}
+	
+	@Test(expected = MalformedExpressionException.class)
+	public void testVariadicConstructor() throws MalformedExpressionException
+	{
+		new Function(Operator.AND, "A");
+	}
+	
 	@Test
 	public void testEquality() throws MalformedExpressionException
 	{
@@ -51,8 +67,14 @@ public class FunctionTests
 	}
 	
 	@Test
-	public void testFillMatches()
+	public void testFillMatches() throws InvalidArgumentsException
 	{
-		// TODO write test cases here
+		Map<Literal, Expression> m1 = ExpParser.create("(AND A B)").fillMatches(ExpParser.create("(AND (NEG A) (NEG B))")).get();
+		Map<Literal, Expression> m1Ans = new HashMap<>();
+		m1Ans.put(new Literal("A"), ExpParser.create("(NEG A)"));
+		m1Ans.put(new Literal("B"), ExpParser.create("(NEG B)"));
+		assertEquals(m1Ans, m1);
+		
+		assertEquals(Optional.empty(), ExpParser.create("(AND (NEG A) (NEG B))").fillMatches(ExpParser.create("(AND A B)")));
 	}
 }

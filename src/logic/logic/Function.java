@@ -12,6 +12,7 @@ import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import logic.malformedexpression.InvalidArgumentsException;
 import logic.malformedexpression.MalformedExpressionException;
 
 /**
@@ -40,11 +41,11 @@ public class Function extends Expression
 	 * @param terms a List of the terms, a copy is made to avoid rep exposure
 	 * @throws MalformedExpressionException 
 	 */
-	public Function(Operator operator, List<Expression> terms) throws MalformedExpressionException
+	public Function(Operator operator, List<Expression> terms) throws InvalidArgumentsException
 	{
 		if (terms.size() != operator.NUM_ARGUMENTS)
 		{
-			throw new MalformedExpressionException(String.format
+			throw new InvalidArgumentsException(String.format
 			(
 				"Operator \"%s\" expects %d arguments, %d were provided",
 				operator,
@@ -80,7 +81,7 @@ public class Function extends Expression
 	 * @param terms an Expression[] consisting of the terms in order.  Uses variadic arguments.
 	 * @throws MalformedExpressionException 
 	 */
-	public Function(Operator operator, Expression... terms) throws MalformedExpressionException
+	public Function(Operator operator, Expression... terms) throws InvalidArgumentsException
 	{
 		this(operator, Arrays.asList(terms));
 	}
@@ -92,9 +93,22 @@ public class Function extends Expression
 	 * @param terms a String[] consisting of the terms in order.  Uses variadic arguments.
 	 * @throws MalformedExpressionException 
 	 */
-	public Function(Operator operator, String... terms) throws MalformedExpressionException
+	public Function(Operator operator, String... terms) throws InvalidArgumentsException
 	{
-		this(operator, Arrays.stream(terms).map(Literal::new).collect(Collectors.toList()));
+		if (terms.length != operator.NUM_ARGUMENTS)
+		{
+			throw new InvalidArgumentsException(String.format
+			(
+				"Operator \"%s\" expects %d arguments, %d were provided",
+				operator,
+				operator.NUM_ARGUMENTS,
+				terms.length
+			));
+		}
+		this.operator = operator;
+		this.terms = new ArrayList<>();
+		for (String s : terms)
+			this.terms.add(new Literal(s));
 	}
 	
 	/**
@@ -178,17 +192,20 @@ public class Function extends Expression
 	}
 
 	@Override
-	public Map<Literal, Expression> fillMatches(Expression e)
+	public Optional<Map<Literal, Expression>> fillMatches(Expression e)
 	{
-		if (!(e instanceof Function))
-			return null;
+		if (operator != e.getOperator())
+			return Optional.empty();
 		Function other = (Function) e;
-		if (operator != other.operator)
-			return null;
 		Map<Literal, Expression> ans = new HashMap<>();
 		for (int i=0; i<terms.size(); ++i)
-			ans.putAll(terms.get(i).fillMatches(other.getTerm(i)));
-		return ans;
+		{
+			Optional<Map<Literal, Expression>> subterms = terms.get(i).fillMatches(other.getTerm(i));
+			subterms.ifPresent(ans::putAll);
+			if (!subterms.isPresent())
+				return Optional.empty();
+		}
+		return Optional.of(ans);
 	}
 
 	@Override
@@ -271,9 +288,7 @@ public class Function extends Expression
 	public Optional<TransformSteps> proveEquivalence(Expression other)
 	{
 		TransformSteps ans = NormalForm.CONJUNCTIVE.transformWithSteps(this);
-		//System.out.println(ans);
 		TransformSteps secondHalf = NormalForm.CONJUNCTIVE.transformWithSteps(other);
-		//System.out.println(secondHalf);
 		return ans
 				.result()
 				.simplyEquivalentWithSteps(secondHalf.result())

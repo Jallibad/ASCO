@@ -100,11 +100,10 @@ public enum NormalForm implements Transform
 	{
 		switch (this)
 		{
-			// TODO for CNF and DNF show NNF transform steps as well
 			case CONJUNCTIVE:
-				return transformHelperWithSteps(NEGATION.transform(orig), InferenceRule.OR_DISTRIBUTION);
+				return transformHelperWithSteps(NEGATION.transformWithSteps(orig), InferenceRule.OR_DISTRIBUTION);
 			case DISJUNCTIVE:
-				return transformHelperWithSteps(NEGATION.transform(orig), InferenceRule.AND_DISTRIBUTION);
+				return transformHelperWithSteps(NEGATION.transformWithSteps(orig), InferenceRule.AND_DISTRIBUTION);
 			case NEGATION:
 				return transformHelperWithSteps(orig,
 					InferenceRule.DE_MORGANS_OR,
@@ -116,6 +115,11 @@ public enum NormalForm implements Transform
 		}
 	}
 	
+	private TransformSteps transformHelperWithSteps(TransformSteps orig, InferenceRule inferenceRules)
+	{
+		return orig.combine(transformHelperWithSteps(orig.result(), inferenceRules));
+	}
+
 	private Expression transformHelper(Expression orig, InferenceRule... inferenceRules)
 	{
 		for (InferenceRule i : inferenceRules)
@@ -148,5 +152,11 @@ public enum NormalForm implements Transform
 			}
 		}
 		return steps;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return name().toLowerCase();
 	}
 }

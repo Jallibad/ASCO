@@ -33,10 +33,13 @@ public enum InferenceRule implements BiDirectionalTransform
 	 */
 	public Expression transform(Expression orig)
 	{
+//		left.fillMatches(orig)
+//			.ifPresent(m -> Transform.transform(m, right))
+//			//.orElse(right.fillMatches(orig).orElse(null));
 		if (left.matches(orig))
-			return Transform.transform(left.fillMatches(orig), right);
+			return Transform.transform(left.fillMatches(orig).get(), right);
 		else if (right.matches(orig))
-			return Transform.transform(right.fillMatches(orig), left);
+			return Transform.transform(right.fillMatches(orig).get(), left);
 		System.out.println("An inference rule couldn't be successfully applied");
 		return null; // TODO this could be a terrible idea
 	}

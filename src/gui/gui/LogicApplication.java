@@ -39,7 +39,7 @@ import logic.malformedexpression.MalformedExpressionException;
 
 public class LogicApplication extends Application
 {
-	private static final Logger LOGGER = Logger.getLogger(Expression.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(LogicApplication.class.getName());
 	
 	ExpressionEntry expressionEntry = new ExpressionEntry();
 	Stage primaryStage;
@@ -64,7 +64,7 @@ public class LogicApplication extends Application
 		primaryStage.show();
 	}
 	
-	private void setUpMenus(Pane root) // TODO I'm not sure if Pane is the best type here
+	private void setUpMenus(Pane root)
 	{
 		MenuBar menuBar = new MenuBar();
 		
@@ -79,41 +79,8 @@ public class LogicApplication extends Application
 		
 		MenuItem checkForm = new MenuItem("Check Form");
 		checkForm.setOnAction(event ->
-		{
-			Expression ex;
-			try
-			{
-				ex = expressionEntry.getExpression();
-			}
-			catch (MalformedExpressionException exception)
-			{
-				showAlert("The expression is malformed"); // TODO give helpful information here
-				return;
-			}
-			
-			Stage formStage = new Stage();
-			VBox box = new VBox();
-			
-			Text conjunctiveText = new Text( NormalForm.CONJUNCTIVE.inForm(ex) 
-					? "Expression is in conjunctive normal form" : "Expression is not in conjunctive normal form" );
-			
-			Text disjunctiveText = new Text( NormalForm.DISJUNCTIVE.inForm(ex) 
-					? "Expression is in disjunctive normal form" : "Expression is not in disjunctive normal form" );
-			
-			Text negationText = new Text( NormalForm.CONJUNCTIVE.inForm(ex) 
-					? "Expression is in negation normal form" : "Expression is not in negation normal form" );
-			
-			box.getChildren().add(conjunctiveText);
-			box.getChildren().add(disjunctiveText);
-			box.getChildren().add(negationText);
-
-			Scene scene = new Scene(box, 300, 250);
-			formStage.setScene(scene);
-			
-			formStage.show();
-	
-		});
-		
+			expressionEntry.getOptionalExpression().ifPresent(ex ->
+				CheckFormDisplay.display(ex, primaryStage)));
 		
 		MenuItem normalForm = new MenuItem("Transform to Normal Form");
 		normalForm.setOnAction(event ->
