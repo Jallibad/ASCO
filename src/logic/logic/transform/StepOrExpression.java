@@ -1,6 +1,8 @@
-package logic;
+package logic.transform;
 
 import java.util.Optional;
+
+import logic.Expression;
 
 /**
  * A container object for use with TransformSteps.  StepOrExpression is guaranteed to contain

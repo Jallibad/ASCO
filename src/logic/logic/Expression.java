@@ -10,6 +10,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+import logic.transform.TransformSteps;
+
 /**
  * An abstract class that represents a FOL statement.
  * Subclassed by Literal and Function 
@@ -27,11 +29,6 @@ public abstract class Expression implements Serializable
 		handler.setFormatter(new SimpleFormatter());
 		LOGGER.addHandler(handler);
 		handler.setLevel(Level.ALL);
-	}
-	
-	public static void main(String[] args)
-	{
-		//System.out.println("(A|B)".matches(".*[^\\p{Alpha}\\s\\(\\)].*"));
 	}
 	
 	/**
@@ -84,7 +81,7 @@ public abstract class Expression implements Serializable
 	 * Helper function that returns null if expression is a Literal, the operator if it is a Function
 	 * @return the operator
 	 */
-	abstract Operator getOperator();
+	public abstract Operator getOperator();
 	
 	public abstract int complexity();
 	

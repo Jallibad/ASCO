@@ -1,8 +1,10 @@
-package logic;
+package logic.transform;
 
 import static org.junit.Assert.*;
+
+import logic.ExpParser;
 import logic.Expression;
-import logic.InferenceRule;
+import logic.transform.InferenceRule;
 
 import org.junit.Test;
 

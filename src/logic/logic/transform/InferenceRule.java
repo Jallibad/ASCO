@@ -1,7 +1,12 @@
-package logic;
+package logic.transform;
+
+import java.util.logging.Logger;
+
+import logic.ExpParser;
+import logic.Expression;
 
 public enum InferenceRule implements BiDirectionalTransform
-{	
+{
 	DE_MORGANS_OR("(NEG (OR P Q))", "(AND (NEG P) (NEG Q))", "DeMorgan's or"),
 	DE_MORGANS_AND("(NEG (AND P Q))", "(OR (NEG P) (NEG Q))", "DeMorgan's and"),
 	OR_DISTRIBUTION("(OR P (AND Q R))", "(AND (OR P Q) (OR P R))"),
@@ -40,7 +45,7 @@ public enum InferenceRule implements BiDirectionalTransform
 			return Transform.transform(left.fillMatches(orig).get(), right);
 		else if (right.matches(orig))
 			return Transform.transform(right.fillMatches(orig).get(), left);
-		System.out.println("An inference rule couldn't be successfully applied");
+		LOGGER.warning("An inference rule couldn't be successfully applied");
 		return null; // TODO this could be a terrible idea
 	}
 	
@@ -71,4 +76,6 @@ public enum InferenceRule implements BiDirectionalTransform
 	{
 		return right;
 	}
+	
+	private static final Logger LOGGER = Logger.getLogger(Expression.class.getName());
 }

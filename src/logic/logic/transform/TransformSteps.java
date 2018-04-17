@@ -1,10 +1,14 @@
-package logic;
+package logic.transform;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import logic.Expression;
+import logic.Function;
+import logic.Operator;
 
 /**
  * A mutable class representing a collection of steps and intermediary expressions

@@ -7,7 +7,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import logic.Expression;
-import logic.NormalForm;
+import logic.transform.NormalForm;
 
 public class CheckFormDisplay extends Stage
 {

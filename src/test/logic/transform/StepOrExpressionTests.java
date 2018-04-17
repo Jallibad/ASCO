@@ -1,8 +1,12 @@
-package logic;
+package logic.transform;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import logic.ExpParser;
+import logic.transform.StepOrExpression;
+import logic.transform.TransformStep;
 
 public class StepOrExpressionTests
 {

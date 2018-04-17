@@ -14,6 +14,9 @@ import java.util.stream.Collectors;
 
 import logic.malformedexpression.InvalidArgumentsException;
 import logic.malformedexpression.MalformedExpressionException;
+import logic.transform.MiscTransform;
+import logic.transform.NormalForm;
+import logic.transform.TransformSteps;
 
 /**
  * The Function class represent functions such as "(NEG A)" and "(AND A B)".
@@ -62,7 +65,7 @@ public class Function extends Expression
 	 * @param operator the operator for the new Function
 	 * @param terms a List of the terms, a copy is made to avoid rep exposure
 	 */
-	static Expression constructUnsafe(Operator operator, List<Expression> terms)
+	public static Expression constructUnsafe(Operator operator, List<Expression> terms)
 	{
 		try
 		{
@@ -237,7 +240,7 @@ public class Function extends Expression
 	}
 
 	@Override
-	Operator getOperator()
+	public Operator getOperator()
 	{
 		return operator;
 	}
@@ -264,7 +267,7 @@ public class Function extends Expression
 		
 		if
 		(
-			operator.TRAITS.contains(OperatorTrait.COMMUTATIVE)
+			operator.hasTrait(OperatorTrait.COMMUTATIVE)
 			&& terms.get(0).simplyEquivalent(other.terms.get(1))
 			&& terms.get(1).simplyEquivalent(other.terms.get(0))
 		)
@@ -274,7 +277,7 @@ public class Function extends Expression
 			return Optional.of(ans); // TODO commute
 		}
 		
-		if (operator.TRAITS.contains(OperatorTrait.ASSOCIATIVE))
+		if (operator.hasTrait(OperatorTrait.ASSOCIATIVE))
 		{
 			// TODO implement
 		}
@@ -308,11 +311,9 @@ public class Function extends Expression
 	@Override
 	public boolean equalWithoutLiterals(Expression pattern)
 	{
-		if (!(pattern instanceof Function))
+		if (operator != pattern.getOperator())
 			return false;
 		Function other = (Function) pattern;
-		if (operator != other.operator)
-			return false;
 		for (int i=0; i<terms.size(); ++i)
 			if (!terms.get(i).equalWithoutLiterals(other.getTerm(i)))
 				return false;

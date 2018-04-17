@@ -1,7 +1,9 @@
-package logic;
+package logic.transform;
 
 import java.io.Serializable;
 import java.util.Objects;
+
+import logic.Expression;
 
 /**
  * An immutable container class representing a single transform, along with the expressions before and after

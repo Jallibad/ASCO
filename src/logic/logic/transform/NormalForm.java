@@ -1,8 +1,13 @@
-package logic;
+package logic.transform;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import logic.Expression;
+import logic.Function;
+import logic.Literal;
+import logic.Operator;
 
 public enum NormalForm implements Transform
 {

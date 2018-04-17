@@ -1,4 +1,4 @@
-package logic;
+package logic.transform;
 
 import static org.junit.Assert.assertEquals;
 
@@ -7,6 +7,13 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import org.junit.Test;
+
+import logic.ExpParser;
+import logic.Expression;
+import logic.transform.InferenceRule;
+import logic.transform.StepOrExpression;
+import logic.transform.TransformStep;
+import logic.transform.TransformSteps;
 
 public class TransformStepsTests
 {

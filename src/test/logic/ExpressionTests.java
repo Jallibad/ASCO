@@ -5,11 +5,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Test;
 
 import logic.malformedexpression.InvalidArgumentsException;
+import logic.transform.MiscTransform;
+import logic.transform.TransformSteps;
 
 public class ExpressionTests
 {
@@ -17,7 +20,12 @@ public class ExpressionTests
 	public void testEquivalence() throws InvalidArgumentsException
 	{	
 		// Test commutativity
-		assertTrue(ExpParser.create("(AND A B)").proveEquivalence(ExpParser.create("(AND B A)")).isPresent());
+		Optional<TransformSteps> s1 = ExpParser.create("(AND A B)").proveEquivalence(ExpParser.create("(AND B A)"));
+		assertTrue(s1.isPresent());
+		TransformSteps ans1 = new TransformSteps(ExpParser.create("(AND A B)"));
+		ans1.addStep(MiscTransform.COMMUTE);
+		//assertEquals(ans1, s1.get());
+		
 		assertFalse(ExpParser.create("(AND A A)").proveEquivalence(ExpParser.create("(AND B A)")).isPresent());
 		assertFalse(ExpParser.create("(AND B B)").proveEquivalence(ExpParser.create("(AND B A)")).isPresent());
 		

@@ -33,9 +33,9 @@ import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 
 import logic.Expression;
-import logic.NormalForm;
-import logic.TransformSteps;
 import logic.malformedexpression.MalformedExpressionException;
+import logic.transform.NormalForm;
+import logic.transform.TransformSteps;
 
 public class LogicApplication extends Application
 {

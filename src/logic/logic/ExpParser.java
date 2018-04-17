@@ -157,21 +157,26 @@ public final class ExpParser
 		return numOpen;
 	}
 	
-	private static void insertClosing(StringBuilder ans, int i)
+	private static void insertClosing(StringBuilder ans, int startPos)
 	{
 		int bracketCount = 0;
-		for (int r=i+1; r < ans.length(); ++r)
+		for (int i=startPos+1; i < ans.length(); ++i)
 		{
-			if (ans.charAt(r) == '(')
+			char c = ans.charAt(i);
+			if (c == '(')
 				++bracketCount;
-			else if ((ans.charAt(r) == ')' && --bracketCount == -1) || Character.isAlphabetic(ans.charAt(r)))
+			else if ((c == ')' && --bracketCount == -1) || Character.isAlphabetic(c))
 			{
-				ans.insert(r+1, ')');
-				break;
+				ans.insert(i+1, ')');
+				return;
 			}
 		}
 	}
 	
+	/**
+	 * Wraps parentheses around any negations
+	 * @param ans
+	 */
 	private static void parenthesizeNegations(StringBuilder ans)
 	{
 		for (int i = 0; i < ans.length(); ++i)
@@ -179,10 +184,8 @@ public final class ExpParser
 			{
 				ans.insert(i, '(');
 				ans.insert(i+2,' ');
-				i+=3;
-				//move forward until we find the second operator or same-level closed paren
-				insertClosing(ans, i);
-				continue; //move forward one space to make room for the new closed parenthesis
+				insertClosing(ans, i+3);
+				i+=4;
 			}
 	}
 	

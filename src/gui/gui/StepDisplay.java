@@ -2,7 +2,7 @@ package gui;
 
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
-import logic.TransformStep;
+import logic.transform.TransformStep;
 
 public class StepDisplay extends HBox 
 {

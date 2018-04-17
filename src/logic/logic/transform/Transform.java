@@ -1,7 +1,11 @@
-package logic;
+package logic.transform;
 
 import java.io.Serializable;
 import java.util.Map;
+
+import logic.Expression;
+import logic.Function;
+import logic.Literal;
 
 /**
  * An interface representing arbitrary transformations that can be applied to
@@ -25,7 +29,7 @@ public interface Transform extends Serializable
 	 */
 	public TransformSteps transformWithSteps(Expression orig);
 	
-	public static Expression transform(Map<Literal,Expression> mapping, Expression e)
+	static Expression transform(Map<Literal,Expression> mapping, Expression e)
 	{
 		if (e instanceof Literal)
 		{

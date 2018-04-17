@@ -1,4 +1,6 @@
-package logic;
+package logic.transform;
+
+import logic.Expression;
 
 /**
  * An interface representing Transforms that can be undone.  By convention the "left" side

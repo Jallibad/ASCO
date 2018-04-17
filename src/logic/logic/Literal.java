@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import logic.malformedexpression.InvalidArgumentsException;
+import logic.transform.TransformSteps;
 
 /**
  * This class represents a single variable such as "A" or "B".
@@ -85,7 +86,7 @@ public class Literal extends Expression
 	}
 
 	@Override
-	Operator getOperator()
+	public Operator getOperator()
 	{
 		return null;
 	}

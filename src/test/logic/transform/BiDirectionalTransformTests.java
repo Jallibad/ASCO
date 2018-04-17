@@ -1,8 +1,13 @@
-package logic;
+package logic.transform;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import logic.ExpParser;
+import logic.Expression;
+import logic.transform.InferenceRule;
+import logic.transform.TransformSteps;
 
 public class BiDirectionalTransformTests
 {

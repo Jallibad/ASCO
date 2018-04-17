@@ -1,4 +1,4 @@
-package logic;
+package logic.transform;
 
 @SuppressWarnings("serial")
 public class InferenceMismatchException extends Exception
