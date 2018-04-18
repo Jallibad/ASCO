@@ -289,7 +289,7 @@ public abstract class Expression implements Serializable
 	 * @param exp the expression to convert
 	 * @return the specified expression in infix form
 	 */
-	private static String infixToPrefix2(String exp)
+	private static String infixToPrefix(String exp)
 	{
 		//search for operators
 		for (int i = 0; i < exp.length(); ++i)
@@ -336,11 +336,8 @@ public abstract class Expression implements Serializable
 		try
 		{
 			System.out.println("sanitized: " + sanitizeInput(exp));
-			String ans = infixToPrefix2(sanitizeInput(exp));
-			//System.out.println("sanitized prefix: " + ans);
-			//System.out.println("\""+ans+"\"");
+			String ans = infixToPrefix(sanitizeInput(exp));
 			String ans2 = operatorsToEnglish(ans);
-			//System.out.println("\""+ans2+"\"");
 			System.out.println("english prefix sanitized: " + ans2);
 			String ans3 = postSanitize(ans2);
 			System.out.println("post sanitization: " + ans3);

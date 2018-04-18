@@ -2,6 +2,7 @@ package logic;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -40,6 +41,19 @@ public class FunctionTests
 		assertEquals(testVariables, e2.getVariables());
 		Function e3 = new Function(Operator.NEG, e2);
 		assertEquals(testVariables, e3.getVariables());
+	}
+	
+	@Test
+	public void testGetTruthTable()
+	{
+		Function fAnd = new Function(Operator.AND, "A", "B");
+		assertTrue(fAnd.getTruthAssignments().iterator().next().toString().equals("A|B|*\nT|T|T\nT|F|F\nF|T|F\nF|F|F"));
+		
+		Function fOr = new Function(Operator.OR, "A", "B");
+		assertTrue(fOr.getTruthAssignments().iterator().next().toString().equals("A|B|*\nT|T|T\nT|F|T\nF|T|T\nF|F|F"));
+
+		Function fNeg = new Function(Operator.NEG, "A");
+		assertTrue(fNeg.getTruthAssignments().iterator().next().toString().equals("A|*\nT|F\nF|T"));		
 	}
 	
 	@Test
