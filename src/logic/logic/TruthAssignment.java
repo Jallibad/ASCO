@@ -41,7 +41,7 @@ public class TruthAssignment
 	 * add operator table to specified StringBuilder
 	 */
 	private void appendOperatorTable(StringBuilder sb, Operator op) {
-		boolean[][] ot = op.TRUTH_TABLE;
+		boolean[][] ot = op.truthTable;
 		for (int i = 0; i < ot.length; ++i) {
 			for (int r = 0; r < ot[i].length; ++r) {
 				sb.append(ot[i][r] == true ? 'T' : 'F');
