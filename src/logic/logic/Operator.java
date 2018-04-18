@@ -1,6 +1,7 @@
 package logic;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -44,7 +45,13 @@ public enum Operator
 		this.displayText = displayText;
 		this.numArguments = numArguments;
 		this.symbolPosition = symbolPosition;
-		this.truthTable = truthTable;
+		this.truthTable = new ArrayList<ArrayList<Boolean>>();
+		for (int i = 0; i < truthTable.length; ++i) {
+			this.truthTable.add(new ArrayList<Boolean>());
+			for (int r = 0; r < truthTable[i].length; ++r) {
+				this.truthTable.get(i).add(truthTable[i][r]);
+			}
+		}
 		this.traits = Collections.unmodifiableSet(new HashSet<OperatorTrait>(Arrays.asList(traits)));
 	}
 	
@@ -63,6 +70,6 @@ public enum Operator
 	 * The ordinal position of the operator in the pretty-printed version.  In other '∧' in "A∧B" has a position of 1.
 	 */
 	public final int symbolPosition;
-	public final boolean[][] truthTable;
+	public final ArrayList<ArrayList<Boolean>> truthTable;
 	private final Set<OperatorTrait> traits;
 }

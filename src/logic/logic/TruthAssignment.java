@@ -2,19 +2,18 @@ package logic;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
 
 public class TruthAssignment
 {
 	Expression e;
-	boolean[][] table;
 	
 	TruthAssignment(Expression e)
 	{
 		this.e = e;
-		this.table = getTable();
 	}
 	
-	public boolean[][] getTable() 
+	public ArrayList<ArrayList<Boolean>> getTable() 
 	{
 		List<Expression> terms = ((Function)e).getTerms();
 		//base case: if expression contains no nested expressions, simply return the operator table
@@ -30,13 +29,22 @@ public class TruthAssignment
 			return e.getOperator().truthTable;
 		}
 		
+		//recursive call: construct a table for nested expressions and merge up
+		ArrayList<ArrayList<Boolean>> mergedTable = e.getOperator().truthTable;
 		for (int i = 0; i < terms.size(); ++i) {
+			//need to handle literals and expressions separately (also consider AND A,A vs AND A,B) 
 			Expression curTerm = terms.get(i);
-			if (!(curTerm instanceof Literal)) {
-//				System.out.println(curTerm);
+			if ((curTerm instanceof Literal))
+			{
+				//parse literal
+				
+			}
+			else
+			{
+				//parse expression 
 			}
 		}
-		return new boolean[0][0];
+		return mergedTable;
 	
 	}
 	
@@ -54,6 +62,7 @@ public class TruthAssignment
 		}
 		tableString.append("*\n");
 		appendTableString(tableString, getTable());
+		
 		System.out.println(tableString.toString());
 		return tableString.toString();
 	}
@@ -61,15 +70,15 @@ public class TruthAssignment
 	/*
 	 * add operator table to specified StringBuilder
 	 */
-	private void appendTableString(StringBuilder sb, boolean[][] ot) {
-		for (int i = 0; i < ot.length; ++i) {
-			for (int r = 0; r < ot[i].length; ++r) {
-				sb.append(ot[i][r] == true ? 'T' : 'F');
-				if (r != ot[i].length - 1) {
+	private void appendTableString(StringBuilder sb, ArrayList<ArrayList<Boolean>> ot) {
+		for (int i = 0; i < ot.size(); ++i) {
+			for (int r = 0; r < ot.get(i).size(); ++r) {
+				sb.append(ot.get(i).get(r) == true ? 'T' : 'F');
+				if (r != ot.get(i).size() - 1) {
 					sb.append("|");	
 				}	
 			}
-			if (i != ot.length - 1) {
+			if (i != ot.size() - 1) {
 				sb.append('\n');	
 			}
 		}
