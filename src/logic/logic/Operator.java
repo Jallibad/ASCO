@@ -16,21 +16,35 @@ public enum Operator
 	/**
 	 * Represents the unary not/negation "¬"
 	 */
-	NEG("¬", 1, 0),
+	NEG("¬", 1, 0, new boolean[][] {
+		{false, true},
+		{true, false}
+	}),
 	/**
 	 * Represents the logical and "∧"
 	 */
-	AND("∧", 2, 1, OperatorTrait.COMMUTATIVE, OperatorTrait.ASSOCIATIVE),
+	AND("∧", 2, 1, new boolean[][] {
+		{false, false, false},
+		{false, true, false},
+		{true, false, false},
+		{true, true, true}
+	}, OperatorTrait.COMMUTATIVE, OperatorTrait.ASSOCIATIVE),
 	/**
 	 * Represents the logical or "∨"
 	 */
-	OR("∨", 2, 1, OperatorTrait.COMMUTATIVE, OperatorTrait.ASSOCIATIVE);
+	OR("∨", 2, 1, new boolean[][] {
+		{false, false, false},
+		{false, true, true},
+		{true, false, true},
+		{true, true, true}
+	}, OperatorTrait.COMMUTATIVE, OperatorTrait.ASSOCIATIVE);
 	
-	Operator(String displayText, int numArguments, int symbolPosition, OperatorTrait... traits)
+	Operator(String displayText, int numArguments, int symbolPosition, boolean[][] truthTable, OperatorTrait... traits)
 	{
 		this.displayText = displayText;
 		this.numArguments = numArguments;
 		this.symbolPosition = symbolPosition;
+		this.truthTable = truthTable;
 		this.traits = Collections.unmodifiableSet(new HashSet<OperatorTrait>(Arrays.asList(traits)));
 	}
 	
@@ -49,5 +63,6 @@ public enum Operator
 	 * The ordinal position of the operator in the pretty-printed version.  In other '∧' in "A∧B" has a position of 1.
 	 */
 	public final int symbolPosition;
+	public final boolean[][] truthTable;
 	private final Set<OperatorTrait> traits;
 }
