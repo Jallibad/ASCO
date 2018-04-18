@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import logic.ExpParser;
 import logic.Expression;
+import logic.malformedexpression.MalformedExpressionException;
 import logic.transform.InferenceRule;
 import logic.transform.StepOrExpression;
 import logic.transform.TransformStep;
@@ -18,16 +19,16 @@ import logic.transform.TransformSteps;
 public class TransformStepsTests
 {
 	@Test
-	public void testIterator()
+	public void testIterator() throws MalformedExpressionException
 	{
-		TransformSteps s1 = new TransformSteps(ExpParser.parseUnsafe("(NEG (NEG A))"));
+		TransformSteps s1 = new TransformSteps(ExpParser.parse("NEG NEG A"));
 		s1.addStep(InferenceRule.DOUBLE_NEGATION);
 		
 		Iterator<StepOrExpression> correctSteps = makeSteps
 		(
-				ExpParser.parseUnsafe("(NEG (NEG A))"),
-			new TransformStep(ExpParser.parseUnsafe("(NEG (NEG A))"), InferenceRule.DOUBLE_NEGATION, ExpParser.parseUnsafe("A")),
-			ExpParser.parseUnsafe("A")
+			ExpParser.parse("NEG NEG A"),
+			new TransformStep(ExpParser.parse("NEG NEG A"), InferenceRule.DOUBLE_NEGATION, ExpParser.parse("A")),
+			ExpParser.parse("A")
 		);
 		
 		for (StepOrExpression se : s1)
@@ -35,9 +36,19 @@ public class TransformStepsTests
 	}
 	
 	@Test
-	public void testCombination()
+	public void testCombination() throws MalformedExpressionException
 	{
+		TransformSteps s1 = NormalForm.CONJUNCTIVE.transformWithSteps(ExpParser.parse("A AND (B OR (D AND NEG NEG E))"));
+		Iterator<StepOrExpression> correctSteps = makeSteps
+		(
+			ExpParser.parse("A AND (B OR (D AND NEG NEG E))"),
+			new TransformStep(ExpParser.parse("A AND (B OR (D AND NEG NEG E))"), InferenceRule.DOUBLE_NEGATION, ExpParser.parse("AND A (OR B (AND D E))")),
+			ExpParser.parse("AND A (OR B (AND D E))"),
+			new TransformStep(ExpParser.parse("AND A (OR B (AND D E))"), InferenceRule.OR_DISTRIBUTION, ExpParser.parse("(AND A (AND (OR B D) (OR B E)))"))
+		);
 		
+		for (StepOrExpression se : s1)
+			assertEquals(correctSteps.next(), se);
 	}
 	
 	private Iterator<StepOrExpression> makeSteps(Object... step)

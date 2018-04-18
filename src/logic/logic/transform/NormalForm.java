@@ -9,6 +9,11 @@ import logic.Function;
 import logic.Literal;
 import logic.Operator;
 
+/**
+ * An enum representing the supported normal form transformations.  Subclass Transform.
+ * @author Jallibad
+ *
+ */
 public enum NormalForm implements Transform
 {
 	/**
@@ -33,10 +38,10 @@ public enum NormalForm implements Transform
 	
 	/**
 	 * <p>
-	 * Enum representing a transformatoin of negation normal form
+	 * Enum representing a transformation of negation normal form
 	 * </p>
 	 * 
-	 * Negation normal form is when a negation operator is applied to the variabls in an expression
+	 * Negation normal form allows only conjunctions and disjunctions, as well as negations applied directly to literals.
 	 */
 	NEGATION;
 
@@ -46,10 +51,13 @@ public enum NormalForm implements Transform
 		switch (this)
 		{
 			case CONJUNCTIVE:
+				// Put into NNF, then drive all "∨"s inwards.
 				return transformHelper(NEGATION.transform(orig), InferenceRule.OR_DISTRIBUTION);
 			case DISJUNCTIVE:
+				// Put into NNF, then drive all "∧"s inwards.
 				return transformHelper(NEGATION.transform(orig), InferenceRule.AND_DISTRIBUTION);
 			case NEGATION:
+				// Drive negations inwards using DeMorgan's laws, eliminate any double negations
 				return transformHelper(orig,
 					InferenceRule.DE_MORGANS_OR,
 					InferenceRule.DE_MORGANS_AND,
@@ -58,14 +66,6 @@ public enum NormalForm implements Transform
 			default:
 				throw new UnsupportedOperationException("A normal form transform has been applied without an implementation");
 		}
-	}
-	
-	private static boolean checkAll(Operator op, Expression e)
-	{
-		return
-			e instanceof Literal ||
-			e.equalWithoutLiterals("(NEG A)") ||
-			e.mapPredicate(t -> checkAll(op,t), op);
 	}
 	
 	/**
@@ -80,25 +80,44 @@ public enum NormalForm implements Transform
 		{
 			case CONJUNCTIVE:
 				return
-					e instanceof Literal ||
-					checkAll(Operator.OR, (Function) e) ||
+					// Either the expression should be disjunctions of (possibly negated) literals
+					checkAll(Operator.OR, e) ||
+					// Or it should be a conjunction with each clause in CNF
 					e.mapPredicate(CONJUNCTIVE::inForm, Operator.AND);
 				
 			case DISJUNCTIVE:
 				return
-					e instanceof Literal ||
-					checkAll(Operator.AND, (Function) e) ||
+					// Same as CNF but with conjunctions and disjunctions flipped
+					checkAll(Operator.AND, e) ||
 					e.mapPredicate(DISJUNCTIVE::inForm, Operator.OR);
 				
 			case NEGATION:
 				return
+					// The expression should be either a (possibly negated) literal
 					e instanceof Literal ||
-					e.equalWithoutLiterals("(NEG A)") ||
-					e.mapPredicate(NEGATION::inForm, Operator.AND, Operator.OR); 
+					e.equalWithoutLiterals("¬A") ||
+					// Or the expression is a conjunction or disjunction of clauses in NNF
+					e.mapPredicate(NEGATION::inForm, Operator.AND, Operator.OR);
+			default:
+				throw new UnsupportedOperationException("A normal form has been checked without an implementation");
 		}
-		return false; // TODO implement
 	}
 	
+	/**
+	 * Recursively checks if every subterm is either a (possibly negated) literal,
+	 * or if the given operator expression is a function of the given operator and every clause
+	 * matches the original criteria.
+	 * @param op the allowed operator
+	 * @param e the expression to check
+	 * @return true if the expression consists of only negations and the specified operator
+	 */
+	private static boolean checkAll(Operator op, Expression e)
+	{
+		return
+			e instanceof Literal ||
+			e.equalWithoutLiterals("¬A") ||
+			e.mapPredicate(t -> checkAll(op,t), op);
+	}
 
 	@Override
 	public TransformSteps transformWithSteps(Expression orig)
@@ -162,6 +181,6 @@ public enum NormalForm implements Transform
 	@Override
 	public String toString()
 	{
-		return name().toLowerCase();
+		return name().toLowerCase()+" normal form";
 	}
 }

@@ -7,23 +7,35 @@ import logic.Expression;
 
 public enum InferenceRule implements BiDirectionalTransform
 {
-	DE_MORGANS_OR("(NEG (OR P Q))", "(AND (NEG P) (NEG Q))", "DeMorgan's or"),
-	DE_MORGANS_AND("(NEG (AND P Q))", "(OR (NEG P) (NEG Q))", "DeMorgan's and"),
-	OR_DISTRIBUTION("(OR P (AND Q R))", "(AND (OR P Q) (OR P R))"),
-	AND_DISTRIBUTION("(AND P (OR Q R))", "(OR (AND P Q) (AND P R))"),
-	DOUBLE_NEGATION("(NEG (NEG P))", "P");
+	DE_MORGANS_OR("¬(P∨Q)", "(¬P)∧(¬Q)", "DeMorgan's or"),
+	DE_MORGANS_AND("¬(P∧Q)", "(¬P)∨(¬Q)", "DeMorgan's and"),
+	OR_DISTRIBUTION("P∨(Q∧R)", "(P∨Q)∧(P∨R)"),
+	AND_DISTRIBUTION("P∧(Q∨R)", "(P∧Q)∨(P∧R)"),
+	DOUBLE_NEGATION("¬¬P", "P");
 
 	private final Expression left;
 	private final Expression right;
 	private final String name;
 
+	/**
+	 * InferenceRule constructor, takes the left and right expression, as well as a display name
+	 * @param left the left expression, by convention more complex
+	 * @param right the right expression, by convention less complex
+	 * @param name the display name
+	 */
 	InferenceRule(String left, String right, String name)
 	{
+		// We have to use parseUnsafe because the enum constructor can't throw a checked exception
 		this.left = ExpParser.parseUnsafe(left);
 		this.right = ExpParser.parseUnsafe(right);
 		this.name = name;
 	}
 	
+	/**
+	 * InferenceRule constructor, takes the left and right expression
+	 * @param left the left expression, by convention more complex
+	 * @param right the right expression, by convention less complex
+	 */
 	InferenceRule(String left, String right)
 	{
 		this.left = ExpParser.parseUnsafe(left);
@@ -31,11 +43,6 @@ public enum InferenceRule implements BiDirectionalTransform
 		name = null;
 	}
 	
-	/**
-	 * 
-	 * @param orig
-	 * @return
-	 */
 	public Expression transform(Expression orig)
 	{
 //		left.fillMatches(orig)
@@ -57,6 +64,10 @@ public enum InferenceRule implements BiDirectionalTransform
 		return ans;
 	}
 	
+	/**
+	 * Returns the name of the inference rule.  By default that is the name of the enum with underscores
+	 * replaced by spaces, and all in lowercase.  Some rules have specialized names though. 
+	 */
 	@Override
 	public String toString()
 	{

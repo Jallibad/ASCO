@@ -20,7 +20,6 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 	private static final long serialVersionUID = -5016027615991197605L;
 	private List<Transform> steps = new ArrayList<>();
 	private List<Expression> intermediaries = new ArrayList<>();
-	private List<Expression> fullIntermediaries = new ArrayList<>();
 	
 	private TransformSteps()
 	{
@@ -29,8 +28,7 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 	
 	public TransformSteps(Expression orig)
 	{
-		intermediaries.add(null);
-		fullIntermediaries.add(orig);
+		intermediaries.add(orig);
 		checkRep();
 	}
 	
@@ -42,37 +40,33 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 	public void addStep(Transform step)
 	{
 		steps.add(step);
-		fullIntermediaries.add(step.transform(result()));
-		intermediaries.add(null);
+		intermediaries.add(step.transform(result()));
 		checkRep();
 	}
 	
 	/**
 	 * Combine
 	 * 
-	 * @param s
+	 * @param toCombine
 	 * @param index
 	 */
-	public void combine(TransformSteps s, int index)
+	public void combine(TransformSteps toCombine, int index)
 	{
-		if (s.steps.isEmpty())
+		if (toCombine.steps.isEmpty())
 			return;
 		// Remove the possibly null last element to make room for the new original
 		// TODO this sounds wrong...
 		List<Expression> newTerms = ((Function) result()).getTerms();
 		Operator o = result().getOperator();
 		intermediaries.remove(intermediaries.size()-1);
-		fullIntermediaries.remove(fullIntermediaries.size()-1);
-		List<Expression> newIntermediaries = s.intermediaries;
+		List<Expression> newIntermediaries = toCombine.intermediaries;
 		for (int i=0; i<newIntermediaries.size(); ++i)
 		{
-			newTerms.set(index, s.fullIntermediaries.get(i));
-			fullIntermediaries.add(Function.constructUnsafe(o, newTerms));
-			if (newIntermediaries.get(i) == null)
-				newIntermediaries.set(i, s.fullIntermediaries.get(i));
+			newTerms.set(index, toCombine.intermediaries.get(i));
+			intermediaries.add(Function.constructUnsafe(o, newTerms));
 		}
 		intermediaries.addAll(newIntermediaries);
-		steps.addAll(s.steps);
+		steps.addAll(toCombine.steps);
 		checkRep();
 	}
 	
@@ -82,7 +76,7 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 	 */
 	public Expression result()
 	{
-		return fullIntermediaries.get(fullIntermediaries.size()-1);
+		return intermediaries.get(intermediaries.size()-1);
 	}
 	
 	@Override
@@ -91,7 +85,7 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 		StringBuilder ans = new StringBuilder("-----\n");
 		for (int i=0; i<steps.size(); ++i)
 		{
-			ans.append(fullIntermediaries.get(i)+"\n");
+			ans.append(intermediaries.get(i)+"\n");
 			ans.append(steps.get(i)+"\n");
 		}
 		return ans.toString()+result()+"\n-----";
@@ -103,7 +97,8 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 	 */
 	private void checkRep()
 	{
-		assert(intermediaries.size() == fullIntermediaries.size());
+		System.out.println(intermediaries);
+		System.out.println(steps);
 		assert(intermediaries.size() == steps.size()+1);
 	}
 	
@@ -114,15 +109,12 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 	
 	public Expression get(int i)
 	{
-		if (intermediaries.get(i) == null)
-			return fullIntermediaries.get(i);
 		return intermediaries.get(i);
 	}
 	
 	public TransformSteps reverse()
 	{
 		TransformSteps ans = new TransformSteps();
-		Collections.reverse(ans.fullIntermediaries);
 		Collections.reverse(ans.intermediaries);
 		Collections.reverse(ans.steps);
 		return ans;
@@ -134,7 +126,7 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 		List<StepOrExpression> ans = new ArrayList<>();
 		for (int i=0; i<steps.size(); ++i)
 		{
-			ans.add(new StepOrExpression(fullIntermediaries.get(i)));
+			ans.add(new StepOrExpression(intermediaries.get(i)));
 			ans.add(new StepOrExpression(getStep(i)));
 		}
 		ans.add(new StepOrExpression(result()));
@@ -149,9 +141,6 @@ public class TransformSteps implements Serializable, Iterable<StepOrExpression>
 	public TransformSteps combine(TransformSteps other)
 	{
 		TransformSteps ans = new TransformSteps();
-		ans.fullIntermediaries.addAll(fullIntermediaries);
-		ans.fullIntermediaries.remove(fullIntermediaries.size()-1);
-		ans.fullIntermediaries.addAll(other.fullIntermediaries);
 		ans.intermediaries.addAll(intermediaries);
 		ans.intermediaries.remove(intermediaries.size()-1);
 		ans.intermediaries.addAll(other.intermediaries);

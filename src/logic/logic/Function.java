@@ -32,6 +32,7 @@ public class Function extends Expression
 	private static final long serialVersionUID = 7003195412543405388L;
 	private static final Logger LOGGER = Logger.getLogger(Function.class.getName());
 	public final Operator operator;
+	
 	/**
 	 * An ordered List of the arguments to the Function, with term[0] being the first argument.
 	 * For instance with "(AND A B)" the list would contain [A, B].
@@ -43,7 +44,8 @@ public class Function extends Expression
 	 * terms matches up with the expected number of arguments.
 	 * @param operator the operator for the new Function
 	 * @param terms a List of the terms, a copy is made to avoid rep exposure
-	 * @throws MalformedExpressionException 
+	 * @throws InvalidArgumentsException if the number of terms provided doesn't match the
+	 * number of terms expected by the operator
 	 */
 	public Function(Operator operator, List<Expression> terms) throws InvalidArgumentsException
 	{

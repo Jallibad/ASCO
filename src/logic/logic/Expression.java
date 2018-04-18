@@ -110,8 +110,8 @@ public abstract class Expression implements Serializable
 	 * Maps a predicate over the expression, testing if the operator is in the given list
 	 * and if each of the terms matches the predicate.  This is intended to be used recursively. 
 	 * @param p the predicate to test against
-	 * @param op a variadic Array of allowed operators
-	 * @return
+	 * @param allowedOperators a variadic Array of allowed operators
+	 * @return true if the operator is in the list of allowed operators and for each term the predicate p is true
 	 */
-	public abstract boolean mapPredicate(Predicate<Expression> p, Operator... op);
+	public abstract boolean mapPredicate(Predicate<Expression> p, Operator... allowedOperators);
 }
