@@ -56,7 +56,7 @@ public enum NormalForm implements Transform
 					InferenceRule.DOUBLE_NEGATION
 				);
 			default:
-				throw new Error("A normal form transform has been applied without an implementation");
+				throw new UnsupportedOperationException("A normal form transform has been applied without an implementation");
 		}
 	}
 	
@@ -116,7 +116,7 @@ public enum NormalForm implements Transform
 					InferenceRule.DOUBLE_NEGATION
 				);
 			default:
-				throw new Error("A normal form transform has been applied without an implementation");
+				throw new UnsupportedOperationException("A normal form transform has been applied without an implementation");
 		}
 	}
 	

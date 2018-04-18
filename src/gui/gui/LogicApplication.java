@@ -155,11 +155,9 @@ public class LogicApplication extends Application
 			{
 				// TODO say which expression is which
 				Node toAdd;
-				try
+				try (FileInputStream fileIn = new FileInputStream(f))
 				{
-					FileInputStream fileIn = new FileInputStream(f);
 					Expression other = (Expression) new ObjectInputStream(fileIn).readObject();
-					fileIn.close();
 					
 					Optional<TransformSteps> steps = expressionEntry.getExpression().proveEquivalence(other);
 					if (steps.isPresent())
@@ -270,7 +268,12 @@ public class LogicApplication extends Application
 			{
 				Alert error = new Alert(AlertType.ERROR);
 				error.setTitle("Error");
-				error.setContentText("The current expression is invalid and cannot be saved");
+				error.setContentText(String.format
+				(
+						"The current expression is invalid and cannot be saved%n%s: %s",
+						e.getClass().getSimpleName(),
+						e.getMessage()
+				));
 				error.showAndWait();
 			}
 		});

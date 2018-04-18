@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import logic.malformedexpression.InvalidArgumentsException;
+import logic.malformedexpression.MalformedExpressionError;
 import logic.malformedexpression.MalformedExpressionException;
 import logic.malformedexpression.NotAnOperatorException;
 import logic.malformedexpression.UnmatchedParenthesesException;
@@ -24,21 +25,83 @@ public final class ExpParser
 	}
 	
 	/**
-	 * convert all operator characters to the operator name
-	 * @param exp the expression in which to convert all operators
-	 * @return the specified expression string with all operator characters replaced with the operator name
-	 * @throws NotAnOperatorException 
+	 * Wrapper function that upcasts the MalformedExpressionException from ExpParser::parse to an unchecked exception. 
+	 * @param exp the String to convert to an expression
+	 * @return An Expression object that is equivalent to the specified expression
 	 */
-	private static void operatorsToEnglish(StringBuilder exp) throws NotAnOperatorException
+	public static Expression parseUnsafe(String exp)
 	{
+		try
+		{
+			return parse(exp);
+		}
+		catch (MalformedExpressionException e)
+		{
+			throw new MalformedExpressionError(e.getMessage());
+		}
+	}
+	
+	/**
+	 * Parses text for an expression.  Infix and prefix forms are both supported, depending on the symbol position for
+	 * each operator.  
+	 * @param exp the String to convert to an Expression
+	 * @return an Expression object that is equivalent to the specified expression
+	 */
+	public static Expression parse(String exp) throws MalformedExpressionException
+	{	
+		StringBuilder ans = new StringBuilder(exp);
+		checkMatchingParentheses(ans);
+		convertOperatorsToEnglish(ans);
+		removeExtraSpaces(ans);
+		if (exp.length() == 0)
+			throw new MalformedExpressionException("The input is empty");
+		return readTerm(ans);
+	}
+	
+	/**
+	 * Checks if all of the parentheses in the given expression are matching.
+	 * @param exp the expression to check
+	 * @throws UnmatchedParenthesesException if at any point the expression closes an unopened parenthesis
+	 * or if the total number open and closed are not the same.
+	 */
+	private static void checkMatchingParentheses(StringBuilder exp) throws UnmatchedParenthesesException
+	{
+		// Start on the top level of the expression, an open parenthesis means going down a level.
+		int levelsDeep = 0;
+		
+		for (char c : exp.toString().toCharArray())
+			if (c == '(')
+				levelsDeep++;
+			// Throw an error if there are too many closing parentheses.
+			else if (c == ')' && --levelsDeep < 0)
+				throw new UnmatchedParenthesesException(exp.toString(), 0); // TODO indicate where in string the parens are
+		
+		// If not on the top level after the loop throw an error.
+		if (levelsDeep != 0)
+			throw new UnmatchedParenthesesException(exp.toString(), exp.length());
+	}
+	
+	/**
+	 * Replaces all operator symbols such as "¬" to the corresponding operator name such as "NEG".
+	 * Puts an extra space around each symbol to avoid situations such as "A∧B"->"ANEGB".
+	 * @param exp the expression in which to convert all operators
+	 * @throws NotAnOperatorException if there are any non alphanumeric characters remaining after the replace
+	 */
+	private static void convertOperatorsToEnglish(StringBuilder exp) throws NotAnOperatorException
+	{
+		// I don't know a better way to replaceAll on multiple different patterns for a StringBuilder
 		String ans = exp.toString();
 		for (Operator op : Operator.values())
-			ans = ans.replaceAll(op.DISPLAY_TEXT, " "+op.name()+" ");
+			ans = ans.replaceAll(op.displayText, " "+op.name()+" ");
+		// Check if the answer contains anything but letters, whitespace, or parentheses.
 		if (ans.matches(".*[^\\p{Alpha}\\s\\(\\)].*"))
-			throw new NotAnOperatorException("Something's not an operator"); // TODO detailed error message
+			throw new NotAnOperatorException("Something's not an operator"); // TODO add detailed error message
+		
+		// Clear the original StringBuilder and insert the new string.
+		//I don't know if there's a better way to do this with StringBuilder.
 		exp.setLength(0);
 		exp.append(ans);
-		LOGGER.fine(exp.toString());
+		LOGGER.fine(exp::toString);
 	}
 	
 	/**
@@ -47,92 +110,59 @@ public final class ExpParser
 	 */
 	private static void removeExtraSpaces(StringBuilder exp)
 	{
+		// Apparently Java 9, but not 8, has support for matching a StringBuilder directly
 		StringBuffer buffer = new StringBuffer();
+		
+		// Matches whitespace at the start or end of the string, repeated whitespace,
+		// whitespace after a '(', and whitespace before a ')'.
 		Matcher trimMatcher = Pattern.compile("^\\s+|\\s+$|\\s+(?=\\s)|(?<=\\()\\s+|\\s+(?=\\))").matcher(exp);
-		buffer.setLength(0);
 		while (trimMatcher.find())
 			trimMatcher.appendReplacement(buffer, "");
 		trimMatcher.appendTail(buffer);
 		
+		// Set the input to the result.
 		exp.setLength(0);
 		exp.append(buffer);
 	}
 	
 	/**
-	 * Counts the number of '(' or ')' in a string.
-	 * @param exp the string to count parentheses in
-	 * @return
-	 * @throws UnmatchedParenthesesException
+	 * Reads a single term from the given expression, removing the characters from the passed expression.
+	 * @param exp a StringBuilder containing an expression to parse
+	 * @return an expression representing the next term of the argument
+	 * @throws MalformedExpressionException if the next term is not syntactically valid
 	 */
-	private static int numMatchedParentheses(StringBuilder exp) throws UnmatchedParenthesesException
-	{
-		int numOpen = 0;
-		int numClosed = 0;
-		for (char i : exp.toString().toCharArray())
-		{
-			if (i == '(')
-				numOpen++;
-			else if (i == ')')
-				numClosed++;
-			if (numClosed > numOpen)
-				throw new UnmatchedParenthesesException(exp.toString(), 0); // TODO indicate where in string the parens are
-		}
-		if (numOpen != numClosed)
-			throw new UnmatchedParenthesesException(exp.toString(), exp.length());
-		return numOpen;
-	}
-	
-	/**
-	 * Parses text for an expression
-	 * @param exp the String to convert to an Expression
-	 * @return an Expression object that is equivalent to the specified expression
-	 */
-	public static Expression parse(String exp) throws MalformedExpressionException
-	{	
-		StringBuilder ans = new StringBuilder(exp);
-		numMatchedParentheses(ans);
-		operatorsToEnglish(ans);
-		removeExtraSpaces(ans);
-		return readTerm(ans);
-	}
-	
-	// TODO add error checking/handling
-	/**
-	 * Takes a String representing FOL using prefix notation (ie. "(NEG (AND A B))")
-	 * Does not do any error checking or handling
-	 * @param exp the String to convert to an Expression
-	 * @return An Expression object that is equivalent to the specified expression
-	 */
-	public static Expression create(String exp)
-	{
-		try
-		{
-			return parse(exp);
-		}
-		catch (MalformedExpressionException e)
-		{
-			throw new Error(e.getMessage());
-		}
-	}
-	
 	private static Expression readTerm(StringBuilder exp) throws MalformedExpressionException
 	{
-		char firstChar = exp.charAt(0);
-		if (firstChar == '(' && findNextParen(exp) == exp.length()-1)
+		// Unwrap any surrounding parentheses
+		if (exp.charAt(0) == '(' && findNextParen(exp, 0) == exp.length()-1)
 		{
-			int closeParen = findNextParen(exp); // Find the matching close paren
-			Expression term = readTerm(new StringBuilder(exp.substring(1, closeParen)));
-			exp.delete(0, closeParen+1);
+			// Find the matching closing parenthesis
+			int closeParen = findNextParen(exp, 0);
+			
+			// Find the number of parentheses wrapped around the term
+			int numWrapped = 0;
+			while (exp.charAt(numWrapped) == '(' && closeParen-findNextParen(exp, numWrapped) == numWrapped)
+				numWrapped++;
+			
+			// Read the following expression after unwrapping it from the possibly nested parentheses 
+			Expression term = readTerm(new StringBuilder(exp.substring(numWrapped, closeParen-numWrapped+1)));
+			
+			// Delete the entire term including the parentheses and the following space
+			exp.delete(0, closeParen+2);
+			
 			return term;
 		}
+		// Handle the special case of an unwrapped negation
 		else if (exp.length() > 4 && exp.substring(0, 4).equals("NEG "))
 		{
-			exp.delete(0, 4); // Remove "NEG "
+			exp.delete(0, 4); // Remove the preceding "NEG "
 			return new Function(Operator.NEG, readTerm(exp));
 		}
+		// Otherwise parse as a function
 		else
 		{
 			List<StringBuilder> terms = getSubTerms(exp);
+			
 			// If there's one term in the list it should be a literal
 			if (terms.size() == 1)
 				return new Literal(terms.get(0).toString());
@@ -141,9 +171,11 @@ public final class ExpParser
 			
 			// Streams and lambdas won't work here because we want want exceptions to bubble up
 			List<Expression> ansTerms = new ArrayList<>();
-			for (int i=1; i<terms.size(); ++i)
-				ansTerms.add(readTerm(terms.get(i)));
-			return new Function(Operator.valueOf(terms.get(0).toString()), ansTerms);
+			// Pop the first term and cast it to an Operator
+			Operator op = Operator.valueOf(terms.remove(0).toString());
+			for (StringBuilder term : terms)
+				ansTerms.add(readTerm(term));
+			return new Function(op, ansTerms);
 		}
 	}
 	
@@ -157,18 +189,24 @@ public final class ExpParser
 	{
 		List<StringBuilder> ans = new ArrayList<>();
 		int bracketCount = 0;
-		int lastMatch = 0;
+		int lastMatch = 0; // The index of the last term that was read
+		
+		// For each top level space in the expression
 		for (int i=0; i<exp.length(); ++i)
 			if (exp.charAt(i) == '(')
 				bracketCount++;
 			else if (exp.charAt(i) == ')')
 				bracketCount--;
+			// Add term if on the top level, first char is a space, and previous term is not a negation.
 			else if (bracketCount == 0 && exp.charAt(i) == ' ' && !exp.substring(Math.max(i-3, 0), i).equals("NEG"))
 			{
 				ans.add(new StringBuilder(exp.substring(lastMatch, i)));
 				lastMatch = i+1;
 			}
+		
+		// The last term isn't followed by a space, we have to add it now
 		ans.add(new StringBuilder(exp.substring(lastMatch, exp.length())));
+		
 		return ans;
 	}
 	
@@ -182,13 +220,13 @@ public final class ExpParser
 	{
 		int op = operatorLocation(terms);
 		Operator operator = Operator.valueOf(terms.get(op).toString());
-		if (op != 0 && operator.SYMBOL_POSITION != op)
+		if (op != 0 && operator.symbolPosition != op)
 			throw new InvalidArgumentsException(String.format
 			(
 				"Operator %s found in position %d, should be 0 or %d",
-				operator.DISPLAY_TEXT,
+				operator.displayText,
 				op,
-				operator.SYMBOL_POSITION
+				operator.symbolPosition
 			));
 		StringBuilder temp = terms.get(op);
 		terms.set(op, terms.get(0));
@@ -217,25 +255,26 @@ public final class ExpParser
 	private static boolean isOperator(String s)
 	{
 		for (Operator o : Operator.values())
-			if (s.equals(o.DISPLAY_TEXT) || s.equals(o.name()))
+			if (s.equals(o.displayText) || s.equals(o.name()))
 				return true;
 		return false;
 	}
 	
 	/**
-	 * Finds the index of the next top level closing parenthesis
-	 * @param exp the string to search through
-	 * @return the index of the parenthesis.  exp.charAt(returnValue) == ')'
-	 * @throws UnmatchedParenthesesException if there is no closing top level parenthesis
+	 * Finds the index of the next closing parenthesis on the same level as the given opening parenthesis.
+	 * Returns -1 if the given expression and index does not have a corresponding closing parenthesis.
+	 * @param exp the expression to search through
+	 * @param startPos the index to start searching from
+	 * @return either the index of the closing parenthesis or -1
 	 */
-	private static int findNextParen(StringBuilder exp) throws UnmatchedParenthesesException
+	private static int findNextParen(StringBuilder exp, int startPos)
 	{
 		int bracketNum = 0; // keep track of what level we're on
-		for (int i=0; i<exp.length(); ++i)
+		for (int i=startPos; i<exp.length(); ++i)
 			if (exp.charAt(i) == '(')
 				bracketNum++;
 			else if (exp.charAt(i) == ')' && --bracketNum == 0)
 				return i;
-		throw new UnmatchedParenthesesException(exp.toString(), 0);
+		return -1;
 	}
 }

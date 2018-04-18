@@ -1,5 +1,10 @@
 package logic.malformedexpression;
 
+/**
+ * A subclass of MalformedExpressionException, representing an invalid operator string.
+ * @author Jallibad
+ *
+ */
 public class NotAnOperatorException extends MalformedExpressionException
 {
 	public final String operator;

@@ -18,7 +18,7 @@ public class LiteralTests
 		Literal a = new Literal("A");
 		Literal b = new Literal("B");
 		assertNotEquals(a,b);
-		assertNotEquals(a, ExpParser.create("(NEG A)"));
+		assertNotEquals(a, ExpParser.parseUnsafe("(NEG A)"));
 	}
 	
 	@Test

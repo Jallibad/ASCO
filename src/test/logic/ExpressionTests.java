@@ -20,16 +20,16 @@ public class ExpressionTests
 	public void testEquivalence() throws InvalidArgumentsException
 	{	
 		// Test commutativity
-		Optional<TransformSteps> s1 = ExpParser.create("(AND A B)").proveEquivalence(ExpParser.create("(AND B A)"));
+		Optional<TransformSteps> s1 = ExpParser.parseUnsafe("(AND A B)").proveEquivalence(ExpParser.parseUnsafe("(AND B A)"));
 		assertTrue(s1.isPresent());
-		TransformSteps ans1 = new TransformSteps(ExpParser.create("(AND A B)"));
+		TransformSteps ans1 = new TransformSteps(ExpParser.parseUnsafe("(AND A B)"));
 		ans1.addStep(MiscTransform.COMMUTE);
 		//assertEquals(ans1, s1.get());
 		
-		assertFalse(ExpParser.create("(AND A A)").proveEquivalence(ExpParser.create("(AND B A)")).isPresent());
-		assertFalse(ExpParser.create("(AND B B)").proveEquivalence(ExpParser.create("(AND B A)")).isPresent());
+		assertFalse(ExpParser.parseUnsafe("(AND A A)").proveEquivalence(ExpParser.parseUnsafe("(AND B A)")).isPresent());
+		assertFalse(ExpParser.parseUnsafe("(AND B B)").proveEquivalence(ExpParser.parseUnsafe("(AND B A)")).isPresent());
 		
-		assertFalse(ExpParser.create("(AND A B)").proveEquivalence(new Literal("A")).isPresent());
+		assertFalse(ExpParser.parseUnsafe("(AND A B)").proveEquivalence(new Literal("A")).isPresent());
 		
 		assertTrue(new Literal("A").proveEquivalence(new Literal("A")).isPresent());
 		assertFalse(new Literal("A").proveEquivalence(new Literal("B")).isPresent());
@@ -40,29 +40,29 @@ public class ExpressionTests
 	{
 		Set<Literal> variables = new HashSet<Literal>();
 		variables.add(new Literal("A"));
-		assertEquals(variables, ExpParser.create("A").getVariables());
+		assertEquals(variables, ExpParser.parseUnsafe("A").getVariables());
 		variables.add(new Literal("B"));
-		assertEquals(variables, ExpParser.create("(AND A B)").getVariables());
+		assertEquals(variables, ExpParser.parseUnsafe("(AND A B)").getVariables());
 	}
 	
 	@Test
 	public void testMatches()
 	{
-		assertTrue(ExpParser.create("(AND A B)").matches("(AND A B)"));
-		assertFalse(ExpParser.create("(AND (OR A B) B)").matches("(AND (AND A B) B)"));
+		assertTrue(ExpParser.parseUnsafe("(AND A B)").matches("(AND A B)"));
+		assertFalse(ExpParser.parseUnsafe("(AND (OR A B) B)").matches("(AND (AND A B) B)"));
 	}
 	
 	@Test
 	public void testPrettyPrint()
 	{
-		assertEquals("¬A", ExpParser.create("(NEG A)").prettyPrint());
-		assertEquals("¬(A ∧ B)", ExpParser.create("(NEG (AND A B))").prettyPrint());
-		assertEquals("¬(A ∧ (B ∨ C))", ExpParser.create("(NEG (AND A (OR B C)))").prettyPrint());
+		assertEquals("¬A", ExpParser.parseUnsafe("(NEG A)").prettyPrint());
+		assertEquals("¬(A ∧ B)", ExpParser.parseUnsafe("(NEG (AND A B))").prettyPrint());
+		assertEquals("¬(A ∧ (B ∨ C))", ExpParser.parseUnsafe("(NEG (AND A (OR B C)))").prettyPrint());
 	}
 	
 	@Test
 	public void testComplexity()
 	{
-		assertEquals(4, ExpParser.create("¬(A∧B)").complexity());
+		assertEquals(4, ExpParser.parseUnsafe("¬(A∧B)").complexity());
 	}
 }

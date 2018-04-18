@@ -62,12 +62,12 @@ public abstract class Expression implements Serializable
 	 */
 	public boolean equalWithoutLiterals(String pattern)
 	{
-		return equalWithoutLiterals(ExpParser.create(pattern));
+		return equalWithoutLiterals(ExpParser.parseUnsafe(pattern));
 	}
 	
 	public boolean matches(String pattern) // TODO write JavaDoc for this I'm lazy
 	{
-		return matches(ExpParser.create(pattern));
+		return matches(ExpParser.parseUnsafe(pattern));
 	}
 	public abstract Optional<Map<Literal,Expression>> fillMatches(Expression e);
 	

@@ -31,22 +31,11 @@ public interface Transform extends Serializable
 	
 	static Expression transform(Map<Literal,Expression> mapping, Expression e)
 	{
-		if (e instanceof Literal)
-		{
-			if (mapping.containsKey(e))
-				return mapping.get(e);
-			else
-			{
-				// TODO throw error and shit
-				throw new Error();
-			}
-		}
+		if (e instanceof Literal && mapping.containsKey(e))
+			return mapping.get(e);
 		else if (e instanceof Function)
 			return ((Function) e).mapTerms(x -> transform(mapping, x));
 		else
-		{
-			// TODO throw error and shit
-			return null;
-		}
+			throw new TransformNotApplicableError();
 	}
 }

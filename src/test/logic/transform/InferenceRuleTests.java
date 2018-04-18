@@ -13,8 +13,8 @@ public class InferenceRuleTests
 	@Test
 	public void testTransform()
 	{
-		Expression e1 = ExpParser.create("(NEG (OR A B))");
-		Expression e2 = ExpParser.create("(AND (NEG A) (NEG B))");
+		Expression e1 = ExpParser.parseUnsafe("(NEG (OR A B))");
+		Expression e2 = ExpParser.parseUnsafe("(AND (NEG A) (NEG B))");
 		assertEquals(InferenceRule.DE_MORGANS_OR.transform(e1), e2);
 		assertEquals(InferenceRule.DE_MORGANS_OR.transform(e2), e1);
 		// TODO test invalid transforms

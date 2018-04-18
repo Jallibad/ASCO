@@ -19,7 +19,7 @@ import logic.transform.TransformSteps;
 public class Literal extends Expression
 {
 	private static final long serialVersionUID = 7226891007841491566L;
-	public final String VARIABLE_NAME;
+	public final String variableName;
 	
 	/**
 	 * Constructs a new Literal with the given name
@@ -28,9 +28,9 @@ public class Literal extends Expression
 	 */
 	public Literal(String variableName) throws InvalidArgumentsException
 	{
-		if (Stream.of(Operator.values()).anyMatch(o -> o.DISPLAY_TEXT.equals(variableName) || o.name().equals(variableName)))
+		if (Stream.of(Operator.values()).anyMatch(o -> o.displayText.equals(variableName) || o.name().equals(variableName)))
 			throw new InvalidArgumentsException(variableName + " is an operator"); // TODO add error details
-		VARIABLE_NAME = variableName;
+		this.variableName = variableName;
 	}
 	
 	@Override
@@ -48,21 +48,21 @@ public class Literal extends Expression
 	@Override
 	public String toString()
 	{
-		return VARIABLE_NAME;
+		return variableName;
 	}
 	
 	@Override
 	public boolean equals(Object o)
 	{
 		if (o instanceof Literal)
-			return VARIABLE_NAME.equals(((Literal) o).VARIABLE_NAME);
+			return variableName.equals(((Literal) o).variableName);
 		return false;
 	}
 	
 	@Override
 	public int hashCode()
 	{
-		return VARIABLE_NAME.hashCode();
+		return variableName.hashCode();
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public class Literal extends Expression
 	@Override
 	public String prettyPrint()
 	{
-		return VARIABLE_NAME;
+		return variableName;
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class Literal extends Expression
 	@Override
 	public boolean simplyEquivalent(Expression other)
 	{
-		return (other instanceof Literal) && ((Literal) other).VARIABLE_NAME.equals(VARIABLE_NAME);
+		return (other instanceof Literal) && ((Literal) other).variableName.equals(variableName);
 	}
 	
 	@Override
