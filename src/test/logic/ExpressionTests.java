@@ -63,6 +63,6 @@ public class ExpressionTests
 	@Test
 	public void testComplexity()
 	{
-		assertEquals(4, ExpParser.create("(NEG (AND A B))").complexity());
+		assertEquals(4, ExpParser.create("¬(A∧B)").complexity());
 	}
 }
