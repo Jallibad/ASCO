@@ -17,8 +17,8 @@ public enum Operator
 	 * Represents the unary not/negation "¬"
 	 */
 	NEG("¬", 1, 0, new boolean[][] {
-		{true, false},
-		{false, true}
+		{false, true},
+		{true, false}
 	}),
 	/**
 	 * Represents the logical and "∧"

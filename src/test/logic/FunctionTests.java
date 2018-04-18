@@ -75,9 +75,9 @@ public class FunctionTests
 		}
 		catch (InvalidArgumentsException e) { }
 		
-		assertTrue(fAnd.getTruthAssignments().iterator().next().toString().equals("A|B|*\nT|T|T\nT|F|F\nF|T|F\nF|F|F"));
-		assertTrue(fOr.getTruthAssignments().iterator().next().toString().equals("A|B|*\nT|T|T\nT|F|T\nF|T|T\nF|F|F"));
-		assertTrue(fNeg.getTruthAssignments().iterator().next().toString().equals("A|*\nT|F\nF|T"));		
+		assertTrue(fAnd.getTruthAssignments().iterator().next().toString().equals("A|B|*\nF|F|F\nF|T|F\nT|F|F\nT|T|T"));
+		assertTrue(fOr.getTruthAssignments().iterator().next().toString().equals("A|B|*\nF|F|F\nF|T|T\nT|F|T\nT|T|T"));
+		assertTrue(fNeg.getTruthAssignments().iterator().next().toString().equals("A|*\nF|T\nT|F"));		
 	}
 	
 	@Test

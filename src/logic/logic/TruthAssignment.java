@@ -29,11 +29,29 @@ public class TruthAssignment
 		}
 		tableString.append("*\n");
 		
+		appendOperatorTable(tableString, e.getOperator());
 		//recursively evaluate combinations of literals
-		
 		
 		System.out.println(tableString.toString());
 		return tableString.toString();
 		//for (int i = 0; i < e.ter)
+	}
+	
+	/*
+	 * add operator table to specified StringBuilder
+	 */
+	private void appendOperatorTable(StringBuilder sb, Operator op) {
+		boolean[][] ot = op.TRUTH_TABLE;
+		for (int i = 0; i < ot.length; ++i) {
+			for (int r = 0; r < ot[i].length; ++r) {
+				sb.append(ot[i][r] == true ? 'T' : 'F');
+				if (r != ot[i].length - 1) {
+					sb.append("|");	
+				}	
+			}
+			if (i != ot.length - 1) {
+				sb.append('\n');	
+			}
+		}
 	}
 }
