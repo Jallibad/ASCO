@@ -1,6 +1,7 @@
 package logic;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -64,6 +65,7 @@ public class FunctionTests
 	@Test
 	public void testGetTruthTable()
 	{
+		//single-operator base case
 		Function fAnd = null;
 		Function fOr = null;
 		Function fNeg = null;
@@ -75,9 +77,12 @@ public class FunctionTests
 		}
 		catch (InvalidArgumentsException e) { }
 		
-		assertTrue(fAnd.getTruthAssignments().iterator().next().toString().equals("A|B|*\nF|F|F\nF|T|F\nT|F|F\nT|T|T"));
-		assertTrue(fOr.getTruthAssignments().iterator().next().toString().equals("A|B|*\nF|F|F\nF|T|T\nT|F|T\nT|T|T"));
-		assertTrue(fNeg.getTruthAssignments().iterator().next().toString().equals("A|*\nF|T\nT|F"));		
+//		assertTrue(fAnd.getTruthAssignments().iterator().next().toString().equals("A|B|*\nF|F|F\nF|T|F\nT|F|F\nT|T|T"));
+//		assertTrue(fOr.getTruthAssignments().iterator().next().toString().equals("A|B|*\nF|F|F\nF|T|T\nT|F|T\nT|T|T"));
+//		assertTrue(fNeg.getTruthAssignments().iterator().next().toString().equals("A|*\nF|T\nT|F"));		
+		
+		//complex expressions
+		assertTrue(ExpParser.parseUnsafe("(AND (OR A B) B)").getTruthAssignments().iterator().next().toString().equals("A|B|*\nF|F|F\nF|T|T\nT|F|F\nT|T|T"));
 	}
 	
 	@Test
