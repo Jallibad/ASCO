@@ -157,7 +157,9 @@ public class Function extends Expression
 	@Override
 	public List<TruthAssignment> getTruthAssignments()
 	{
-		return null;
+		List<TruthAssignment> tas = new ArrayList<TruthAssignment>();
+		tas.add(new TruthAssignment(this));
+		return tas;
 	}
 	
 	@Override

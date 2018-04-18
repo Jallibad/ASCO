@@ -16,21 +16,35 @@ public enum Operator
 	/**
 	 * Represents the unary not/negation "¬"
 	 */
-	NEG("¬", 1, 0),
+	NEG("¬", 1, 0, new boolean[][] {
+		{true, false},
+		{false, true}
+	}),
 	/**
 	 * Represents the logical and "∧"
 	 */
-	AND("∧", 2, 1, OperatorTrait.COMMUTATIVE, OperatorTrait.ASSOCIATIVE),
+	AND("∧", 2, 1, new boolean[][] {
+		{false, false, false},
+		{false, true, false},
+		{true, false, false},
+		{true, true, true}
+	}, OperatorTrait.COMMUTATIVE, OperatorTrait.ASSOCIATIVE),
 	/**
 	 * Represents the logical or "∨"
 	 */
-	OR("∨", 2, 1, OperatorTrait.COMMUTATIVE, OperatorTrait.ASSOCIATIVE);
+	OR("∨", 2, 1, new boolean[][] {
+		{false, false, false},
+		{false, true, true},
+		{true, false, true},
+		{true, true, true}
+	}, OperatorTrait.COMMUTATIVE, OperatorTrait.ASSOCIATIVE);
 	
-	Operator(String displayText, int numArguments, int symbolPosition, OperatorTrait... traits)
+	Operator(String displayText, int numArguments, int symbolPosition, boolean[][] truthTable, OperatorTrait... traits)
 	{
 		DISPLAY_TEXT = displayText;
 		NUM_ARGUMENTS = numArguments;
 		SYMBOL_POSITION = symbolPosition;
+		TRUTH_TABLE = truthTable;
 		TRAITS = Collections.unmodifiableSet(new HashSet<OperatorTrait>(Arrays.asList(traits)));
 	}
 	
@@ -50,4 +64,5 @@ public enum Operator
 	 */
 	public final int SYMBOL_POSITION;
 	private final Set<OperatorTrait> TRAITS;
+	public final boolean[][]TRUTH_TABLE;
 }

@@ -64,13 +64,19 @@ public class FunctionTests
 	@Test
 	public void testGetTruthTable()
 	{
-		Function fAnd = new Function(Operator.AND, "A", "B");
-		assertTrue(fAnd.getTruthAssignments().iterator().next().toString().equals("A|B|*\nT|T|T\nT|F|F\nF|T|F\nF|F|F"));
+		Function fAnd = null;
+		Function fOr = null;
+		Function fNeg = null;
+		try 
+		{
+			fAnd = new Function(Operator.AND, "A", "B");
+			fOr = new Function(Operator.OR, "A", "B");
+			fNeg = new Function(Operator.NEG, "A");
+		}
+		catch (InvalidArgumentsException e) { }
 		
-		Function fOr = new Function(Operator.OR, "A", "B");
+		assertTrue(fAnd.getTruthAssignments().iterator().next().toString().equals("A|B|*\nT|T|T\nT|F|F\nF|T|F\nF|F|F"));
 		assertTrue(fOr.getTruthAssignments().iterator().next().toString().equals("A|B|*\nT|T|T\nT|F|T\nF|T|T\nF|F|F"));
-
-		Function fNeg = new Function(Operator.NEG, "A");
 		assertTrue(fNeg.getTruthAssignments().iterator().next().toString().equals("A|*\nT|F\nF|T"));		
 	}
 	
