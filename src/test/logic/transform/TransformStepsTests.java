@@ -20,14 +20,14 @@ public class TransformStepsTests
 	@Test
 	public void testIterator()
 	{
-		TransformSteps s1 = new TransformSteps(ExpParser.create("(NEG (NEG A))"));
+		TransformSteps s1 = new TransformSteps(ExpParser.parseUnsafe("(NEG (NEG A))"));
 		s1.addStep(InferenceRule.DOUBLE_NEGATION);
 		
 		Iterator<StepOrExpression> correctSteps = makeSteps
 		(
-				ExpParser.create("(NEG (NEG A))"),
-			new TransformStep(ExpParser.create("(NEG (NEG A))"), InferenceRule.DOUBLE_NEGATION, ExpParser.create("A")),
-			ExpParser.create("A")
+				ExpParser.parseUnsafe("(NEG (NEG A))"),
+			new TransformStep(ExpParser.parseUnsafe("(NEG (NEG A))"), InferenceRule.DOUBLE_NEGATION, ExpParser.parseUnsafe("A")),
+			ExpParser.parseUnsafe("A")
 		);
 		
 		for (StepOrExpression se : s1)

@@ -19,15 +19,15 @@ public enum InferenceRule implements BiDirectionalTransform
 
 	InferenceRule(String left, String right, String name)
 	{
-		this.left = ExpParser.create(left);
-		this.right = ExpParser.create(right);
+		this.left = ExpParser.parseUnsafe(left);
+		this.right = ExpParser.parseUnsafe(right);
 		this.name = name;
 	}
 	
 	InferenceRule(String left, String right)
 	{
-		this.left = ExpParser.create(left);
-		this.right = ExpParser.create(right);
+		this.left = ExpParser.parseUnsafe(left);
+		this.right = ExpParser.parseUnsafe(right);
 		name = null;
 	}
 	

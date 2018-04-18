@@ -28,26 +28,26 @@ public enum Operator
 	
 	Operator(String displayText, int numArguments, int symbolPosition, OperatorTrait... traits)
 	{
-		DISPLAY_TEXT = displayText;
-		NUM_ARGUMENTS = numArguments;
-		SYMBOL_POSITION = symbolPosition;
-		TRAITS = Collections.unmodifiableSet(new HashSet<OperatorTrait>(Arrays.asList(traits)));
+		this.displayText = displayText;
+		this.numArguments = numArguments;
+		this.symbolPosition = symbolPosition;
+		this.traits = Collections.unmodifiableSet(new HashSet<OperatorTrait>(Arrays.asList(traits)));
 	}
 	
 	public boolean hasTrait(OperatorTrait t)
 	{
-		return TRAITS.contains(t);
+		return traits.contains(t);
 	}
 	
 	/**
 	 * A Unicode representation of the symbol or text to be displayed when pretty-printing
 	 * the operator.  Currently only single characters are supported for parsing.
 	 */
-	public final String DISPLAY_TEXT;
-	public final int NUM_ARGUMENTS;
+	public final String displayText;
+	public final int numArguments;
 	/**
 	 * The ordinal position of the operator in the pretty-printed version.  In other '∧' in "A∧B" has a position of 1.
 	 */
-	public final int SYMBOL_POSITION;
-	private final Set<OperatorTrait> TRAITS;
+	public final int symbolPosition;
+	private final Set<OperatorTrait> traits;
 }

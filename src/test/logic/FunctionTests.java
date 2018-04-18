@@ -33,7 +33,7 @@ public class FunctionTests
 	{
 		Function e = new Function(Operator.AND, "A", "B");
 		assertEquals(e, new Function(Operator.AND, "A", "B"));
-		assertEquals(ExpParser.create("(AND A B)"), e);
+		assertEquals(ExpParser.parseUnsafe("(AND A B)"), e);
 		assertNotEquals(e, new Function(Operator.AND, "A", "A"));
 		assertNotEquals(e, new Function(Operator.OR, "A", "B"));
 		assertNotEquals(e, new Literal("A"));
@@ -69,12 +69,12 @@ public class FunctionTests
 	@Test
 	public void testFillMatches() throws InvalidArgumentsException
 	{
-		Map<Literal, Expression> m1 = ExpParser.create("(AND A B)").fillMatches(ExpParser.create("(AND (NEG A) (NEG B))")).get();
+		Map<Literal, Expression> m1 = ExpParser.parseUnsafe("(AND A B)").fillMatches(ExpParser.parseUnsafe("(AND (NEG A) (NEG B))")).get();
 		Map<Literal, Expression> m1Ans = new HashMap<>();
-		m1Ans.put(new Literal("A"), ExpParser.create("(NEG A)"));
-		m1Ans.put(new Literal("B"), ExpParser.create("(NEG B)"));
+		m1Ans.put(new Literal("A"), ExpParser.parseUnsafe("(NEG A)"));
+		m1Ans.put(new Literal("B"), ExpParser.parseUnsafe("(NEG B)"));
 		assertEquals(m1Ans, m1);
 		
-		assertEquals(Optional.empty(), ExpParser.create("(AND (NEG A) (NEG B))").fillMatches(ExpParser.create("(AND A B)")));
+		assertEquals(Optional.empty(), ExpParser.parseUnsafe("(AND (NEG A) (NEG B))").fillMatches(ExpParser.parseUnsafe("(AND A B)")));
 	}
 }

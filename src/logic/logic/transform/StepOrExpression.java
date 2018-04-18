@@ -60,7 +60,8 @@ public class StepOrExpression
 			return "TransformStep: "+step.get();
 		else if (exp.isPresent())
 			return "Expression: "+exp.get();
-		throw new Error("Neither step nor expression is present");
+		else
+			return "Neither step nor expression is present";
 	}
 	
 	@Override

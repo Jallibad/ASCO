@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import logic.malformedexpression.InvalidArgumentsException;
+import logic.malformedexpression.MalformedExpressionError;
 import logic.malformedexpression.MalformedExpressionException;
 import logic.transform.MiscTransform;
 import logic.transform.NormalForm;
@@ -46,13 +47,13 @@ public class Function extends Expression
 	 */
 	public Function(Operator operator, List<Expression> terms) throws InvalidArgumentsException
 	{
-		if (terms.size() != operator.NUM_ARGUMENTS)
+		if (terms.size() != operator.numArguments)
 		{
 			throw new InvalidArgumentsException(String.format
 			(
 				"Operator \"%s\" expects %d arguments, %d were provided",
 				operator,
-				operator.NUM_ARGUMENTS,
+				operator.numArguments,
 				terms.size()
 			));
 		}
@@ -74,7 +75,7 @@ public class Function extends Expression
 		catch (MalformedExpressionException e)
 		{
 			LOGGER.severe(e.getMessage());
-			throw new Error(e.getMessage());
+			throw new MalformedExpressionError(e.getMessage());
 		}
 	}
 
@@ -98,13 +99,13 @@ public class Function extends Expression
 	 */
 	public Function(Operator operator, String... terms) throws InvalidArgumentsException
 	{
-		if (terms.length != operator.NUM_ARGUMENTS)
+		if (terms.length != operator.numArguments)
 		{
 			throw new InvalidArgumentsException(String.format
 			(
 				"Operator \"%s\" expects %d arguments, %d were provided",
 				operator,
-				operator.NUM_ARGUMENTS,
+				operator.numArguments,
 				terms.length
 			));
 		}
@@ -217,20 +218,20 @@ public class Function extends Expression
 		if (operator == Operator.NEG)
 		{
 			if (terms.get(0) instanceof Function)
-				return operator.DISPLAY_TEXT+"("+terms.get(0).prettyPrint()+")";
+				return operator.displayText+"("+terms.get(0).prettyPrint()+")";
 			else
-				return operator.DISPLAY_TEXT+terms.get(0).prettyPrint();
+				return operator.displayText+terms.get(0).prettyPrint();
 		}
 		
 		StringBuilder ans = new StringBuilder();
 		for (int i=0; i<terms.size()+1; ++i)
 		{
-			if (i == operator.SYMBOL_POSITION)
+			if (i == operator.symbolPosition)
 			{
-				ans.append(" "+operator.DISPLAY_TEXT);
+				ans.append(" "+operator.displayText);
 				continue;
 			}
-			Expression currTerm = terms.get(i<operator.SYMBOL_POSITION ? i : i-1); // Account for inserting the operator
+			Expression currTerm = terms.get(i<operator.symbolPosition ? i : i-1); // Account for inserting the operator
 			if (currTerm instanceof Literal || currTerm.getOperator() == Operator.NEG)
 				ans.append(" "+currTerm.prettyPrint());
 			else

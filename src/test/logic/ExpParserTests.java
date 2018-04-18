@@ -11,7 +11,7 @@ import logic.malformedexpression.UnmatchedParenthesesException;
 public class ExpParserTests
 {
 	@Test
-	public void testParse() throws MalformedExpressionException
+	public void testConstruction() throws MalformedExpressionException
 	{
 		Expression literalA = new Literal("A");
 		Expression literalB = new Literal("B");
@@ -40,6 +40,12 @@ public class ExpParserTests
 		assertEquals(e2, ExpParser.parse("(AND ((NEG A)) B)"));
 		assertEquals(andABCD, ExpParser.parse("(A ∧ B) ∧ (C ∧ D)"));
 		assertEquals(e3, ExpParser.parse("A ∧ ¬(A ∨ B)"));
+	}
+	
+	@Test(expected = MalformedExpressionException.class)
+	public void testEmptyExpression() throws MalformedExpressionException
+	{
+		ExpParser.parse("");
 	}
 	
 	@Test(expected = InvalidArgumentsException.class)
