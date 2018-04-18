@@ -1,5 +1,7 @@
 package gui;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -21,6 +23,16 @@ import logic.malformedexpression.MalformedExpressionException;
 public class ExpressionEntry extends VBox
 {
 	private static final Logger LOGGER = Logger.getLogger(ExpressionEntry.class.getName());
+	
+	private static final String[] BAR_SYMBOLS = new String[] {"¬","∧","∨"};
+	private static final Map<String, String> KEY_REPLACEMENTS = new HashMap<>();
+	static
+	{
+		KEY_REPLACEMENTS.put("&", "∧");
+		KEY_REPLACEMENTS.put("|", "∨");
+		KEY_REPLACEMENTS.put("~", "¬");
+	}
+	
 	private TextField textField = new TextField();
 	private HBox buttons = new HBox();
 	
@@ -30,10 +42,19 @@ public class ExpressionEntry extends VBox
 		buttons.managedProperty().bind(buttons.visibleProperty()); // Remove from layout when hidden
 		buttons.setVisible(textField.focusedProperty().get()); // Set initial visibility
 		buttons.visibleProperty().bind(textField.focusedProperty()); // Attach visibility to textField focus
+		
 		textField.setFont(Font.font("Monospaced"));
+		textField.setOnKeyTyped(event ->
+			Optional.ofNullable(KEY_REPLACEMENTS.get(event.getCharacter())).ifPresent(newText ->
+			{
+				LOGGER.fine(() -> String.format("Replaced key \"%s\" with character \"%s\"", event.getCharacter(), newText));
+				textField.insertText(textField.getCaretPosition(), newText);
+				event.consume();
+			})
+		);
 		getChildren().add(textField);
 		
-		for (String symbol : new String[] {"¬","∧","∨"})
+		for (String symbol : BAR_SYMBOLS)
 		{
 			Button button = new Button(symbol);
 			button.focusTraversableProperty().set(false); // Disallow focus on the button

@@ -22,11 +22,13 @@ public class CheckFormDisplay extends Stage
 		
 		for (NormalForm normalForm : NormalForm.values())
 		{
-			box.getChildren().add(new Text(String.format(
+			Text text = new Text(String.format(
 					"Expression is%s in %s normal form",
 					normalForm.inForm(ex) ? "" : " not",
 					normalForm.toString()
-			)));
+			));
+			// TODO set background color
+			box.getChildren().add(text);
 		}
 		
 		Button closeButton = new Button("Close");

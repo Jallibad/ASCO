@@ -41,6 +41,8 @@ public class LogicApplication extends Application
 {
 	private static final Logger LOGGER = Logger.getLogger(LogicApplication.class.getName());
 	
+	private static final FileChooser.ExtensionFilter EXT_FILTER = new FileChooser.ExtensionFilter("SER files (*.ser)", "*.ser");
+	
 	ExpressionEntry expressionEntry = new ExpressionEntry();
 	Stage primaryStage;
 	
@@ -205,8 +207,7 @@ public class LogicApplication extends Application
 		try
 		{
 			FileChooser fileChooser = new FileChooser();
-			FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("SER files (*.ser)", "*.ser");
-			fileChooser.getExtensionFilters().add(extFilter);
+			fileChooser.getExtensionFilters().add(EXT_FILTER);
 			fileChooser.setTitle("Save Resource File");
 			File file = fileChooser.showSaveDialog(primaryStage);
 			if (file == null)
@@ -229,8 +230,8 @@ public class LogicApplication extends Application
 		try
 		{
 			FileChooser fileChooser = new FileChooser();
+			fileChooser.getExtensionFilters().add(EXT_FILTER);
 			fileChooser.setTitle("Open Resource File");
-			// TODO set extension filters
 			File toOpen = fileChooser.showOpenDialog(primaryStage);
 			if (toOpen == null)
 				return Optional.empty();
