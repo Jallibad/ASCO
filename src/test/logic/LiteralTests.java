@@ -7,24 +7,26 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import logic.malformedexpression.InvalidArgumentsException;
+
 public class LiteralTests
 {
 
 	@Test
-	public void testEquality()
+	public void testEquality() throws InvalidArgumentsException
 	{
 		Literal a = new Literal("A");
 		Literal b = new Literal("B");
 		assertNotEquals(a,b);
-		assertNotEquals(a,Expression.create("(NEG A)"));
+		assertNotEquals(a, ExpParser.create("(NEG A)"));
 	}
 	
 	@Test
-	public void testGetVariables()
+	public void testGetVariables() throws InvalidArgumentsException
 	{
 		Literal a = new Literal("A");
 		Set<Literal> vars = a.getVariables();
-		assertEquals(vars.size(),1);
-		assertEquals(vars.iterator().next(),a);
+		assertEquals(1, vars.size());
+		assertEquals(a, vars.iterator().next());
 	}
 }

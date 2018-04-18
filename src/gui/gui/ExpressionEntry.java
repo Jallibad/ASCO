@@ -1,15 +1,26 @@
 package gui;
 
+import java.util.Optional;
+import java.util.logging.Logger;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import logic.ExpParser;
 import logic.Expression;
-import logic.MalformedExpressionException;
+import logic.malformedexpression.MalformedExpressionException;
 
+/**
+ * A subclass of Node that represent a text entry field with buttons for symbol input
+ * and expression validation.
+ * @author Jallibad
+ *
+ */
 public class ExpressionEntry extends VBox
 {
+	private static final Logger LOGGER = Logger.getLogger(ExpressionEntry.class.getName());
 	private TextField textField = new TextField();
 	private HBox buttons = new HBox();
 	
@@ -42,15 +53,32 @@ public class ExpressionEntry extends VBox
 		}
 		catch (MalformedExpressionException e)
 		{
+			LOGGER.info(e.getMessage());
 			return false;
+		}
+	}
+	
+	public Optional<Expression> getOptionalExpression()
+	{
+		try
+		{
+			return Optional.of(getExpression());
+		}
+		catch (MalformedExpressionException e)
+		{
+			return Optional.empty();
 		}
 	}
 	
 	public Expression getExpression() throws MalformedExpressionException
 	{
-		return Expression.parse(textField.getText());
+		return ExpParser.parse(textField.getText());
 	}
 	
+	/**
+	 * Sets the text of the inner text field to a string representation of the expression
+	 * @param e the expression to be set to
+	 */
 	public void setExpression(Expression e)
 	{
 		textField.setText(e.prettyPrint());

@@ -8,8 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Optional;
-
-import javax.imageio.ImageIO;
+import java.util.logging.Logger;
 
 import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
@@ -30,13 +29,18 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import javax.imageio.ImageIO;
+
 import logic.Expression;
-import logic.MalformedExpressionException;
-import logic.NormalForm;
-import logic.TransformSteps;
+import logic.malformedexpression.MalformedExpressionException;
+import logic.transform.NormalForm;
+import logic.transform.TransformSteps;
 
 public class LogicApplication extends Application
 {
+	private static final Logger LOGGER = Logger.getLogger(LogicApplication.class.getName());
+	
 	ExpressionEntry expressionEntry = new ExpressionEntry();
 	Stage primaryStage;
 	
@@ -53,41 +57,18 @@ public class LogicApplication extends Application
 		VBox root = new VBox();
 		Scene s = new Scene(root, 300, 300, Color.WHITESMOKE);
 		
-		setUpMenu(root);
+		setUpMenus(root);
 		
 		root.getChildren().add(expressionEntry);
 		primaryStage.setScene(s);
 		primaryStage.show();
 	}
 	
-	private void setUpMenu(Pane root) // TODO I'm not sure if Pane is the best type here
+	private void setUpMenus(Pane root)
 	{
 		MenuBar menuBar = new MenuBar();
 		
-		Menu menuFile = new Menu("File");
-		MenuItem save = new MenuItem("Save");
-		save.setOnAction(event ->
-		{
-			try
-			{
-				save(expressionEntry.getExpression());
-			}
-			catch (MalformedExpressionException e)
-			{
-				Alert error = new Alert(AlertType.ERROR);
-				error.setTitle("Error");
-				error.setContentText("The current expression is invalid and cannot be saved");
-				error.showAndWait();
-			}
-		});
-		
-		MenuItem export = new MenuItem("Export");
-		export.setOnAction(event -> exportScreen(root));
-		
-		MenuItem load = new MenuItem("Load");
-		load.setOnAction(event ->
-			loadFile().ifPresent(e -> expressionEntry.setExpression((Expression) e)));
-		menuFile.getItems().addAll(save, export, load);
+		Menu menuFile = setUpFileMenu(root);
 		
 		Menu menuEdit = new Menu("Edit");
 		menuEdit.setOnShowing(event ->
@@ -96,10 +77,15 @@ public class LogicApplication extends Application
 		
 		MenuItem simplify = new MenuItem("Simplify");
 		
+		MenuItem checkForm = new MenuItem("Check Form");
+		checkForm.setOnAction(event ->
+			expressionEntry.getOptionalExpression().ifPresent(ex ->
+				CheckFormDisplay.display(ex, primaryStage)));
+		
 		MenuItem normalForm = new MenuItem("Transform to Normal Form");
 		normalForm.setOnAction(event ->
 		{
-			ChoiceDialog<NormalForm> dialog = new ChoiceDialog<NormalForm>(NormalForm.CONJUNCTIVE, NormalForm.values());
+			ChoiceDialog<NormalForm> dialog = new ChoiceDialog<>(NormalForm.CONJUNCTIVE, NormalForm.values());
 			dialog.setTitle("Test"); // TODO Change
 			dialog.setContentText("Choose a normal form:");
 			Optional<NormalForm> result = dialog.showAndWait();
@@ -112,10 +98,7 @@ public class LogicApplication extends Application
 				}
 				catch (MalformedExpressionException exception)
 				{
-					Alert error = new Alert(AlertType.ERROR);
-					error.setTitle("Error");
-					error.setContentText("The expression is malformed"); // TODO give helpful information here
-					error.showAndWait();
+					showAlert("The expression is malformed"); // TODO give helpful information here
 					return;
 				}
 				Button b = new Button("Show steps?");
@@ -123,8 +106,8 @@ public class LogicApplication extends Application
 				b.setOnAction(event2 ->
 				{
 					// TODO
-					System.out.println("Showing steps");
-					System.out.println("First removing show steps button");
+					LOGGER.fine("Showing steps");
+					LOGGER.fine("First removing show steps button");
 					root.getChildren().remove(n);
 					StepsDisplay s = new StepsDisplay(t.transformWithSteps(e));
 					root.getChildren().add(s);
@@ -152,7 +135,7 @@ public class LogicApplication extends Application
 				catch (MalformedExpressionException error)
 				{
 					// TODO Auto-generated catch block
-					error.printStackTrace();
+					LOGGER.severe(error.getMessage());
 				}
 			});
 			root.getChildren().addAll(e2, b);
@@ -192,7 +175,7 @@ public class LogicApplication extends Application
 			}
 		});
 		
-		menuEdit.getItems().addAll(simplify, normalForm, proveEquivalence, checkWork);
+		menuEdit.getItems().addAll(simplify, normalForm, proveEquivalence, checkWork, checkForm);
 		
 		menuBar.getMenus().addAll(menuFile, menuEdit);
 		root.getChildren().add(menuBar);
@@ -211,11 +194,11 @@ public class LogicApplication extends Application
 			if (file == null)
 				return;
 			ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", file);
-			System.out.println("Captured: " + file.getAbsolutePath());
+			LOGGER.info("Captured: " + file.getAbsolutePath());
 		}
 		catch (IOException e)
 		{
-			System.out.println("Error: unable to write screen capture to output file.");
+			LOGGER.severe("Error: unable to write screen capture to output file."); // TODO error handling
 		}
 	}
 	
@@ -230,17 +213,16 @@ public class LogicApplication extends Application
 			File file = fileChooser.showSaveDialog(primaryStage);
 			if (file == null)
 				return;
-			FileOutputStream fileOut = new FileOutputStream(file);
-			ObjectOutputStream out = new ObjectOutputStream(fileOut);
-			out.writeObject(toSave);
-			out.close();
+			try (FileOutputStream fileOut = new FileOutputStream(file))
+			{
+				ObjectOutputStream out = new ObjectOutputStream(fileOut);
+				out.writeObject(toSave);
+				out.close();
+			}
 		}
 		catch (IOException e)
 		{
-			Alert error = new Alert(AlertType.ERROR);
-			error.setTitle("Error");
-			error.setContentText("Could not save");
-			error.showAndWait();
+			showAlert("Could not save");
 		}
 	}
 	
@@ -254,18 +236,52 @@ public class LogicApplication extends Application
 			File toOpen = fileChooser.showOpenDialog(primaryStage);
 			if (toOpen == null)
 				return Optional.empty();
-			FileInputStream fileIn = new FileInputStream(toOpen);
-			Optional<Object> ans = Optional.of(new ObjectInputStream(fileIn).readObject());
-			fileIn.close();
-			return ans;
+			try (FileInputStream fileIn = new FileInputStream(toOpen))
+			{
+				return Optional.of(new ObjectInputStream(fileIn).readObject());
+			}
 		}
 		catch (IOException | ClassNotFoundException e)
 		{
-			Alert error = new Alert(AlertType.ERROR);
-			error.setTitle("Error");
-			error.setContentText(e.getMessage());
-			error.showAndWait();
+			showAlert(e.getMessage());
 			return Optional.empty();
 		}
+	}
+	
+	private void showAlert(String message)
+	{
+		Alert error = new Alert(AlertType.ERROR);
+		error.setTitle("Error");
+		error.setContentText(message);
+		error.showAndWait();
+	}
+	
+	private Menu setUpFileMenu(Pane root)
+	{
+		Menu menuFile = new Menu("File");
+		MenuItem save = new MenuItem("Save");
+		save.setOnAction(event ->
+		{
+			try
+			{
+				save(expressionEntry.getExpression());
+			}
+			catch (MalformedExpressionException e)
+			{
+				Alert error = new Alert(AlertType.ERROR);
+				error.setTitle("Error");
+				error.setContentText("The current expression is invalid and cannot be saved");
+				error.showAndWait();
+			}
+		});
+		
+		MenuItem export = new MenuItem("Export");
+		export.setOnAction(event -> exportScreen(root));
+		
+		MenuItem load = new MenuItem("Load");
+		load.setOnAction(event ->
+			loadFile().ifPresent(e -> expressionEntry.setExpression((Expression) e)));
+		menuFile.getItems().addAll(save, export, load);
+		return menuFile;
 	}
 }

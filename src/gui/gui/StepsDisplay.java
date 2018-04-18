@@ -1,8 +1,8 @@
 package gui;
 
 import javafx.scene.layout.VBox;
-import logic.StepOrExpression;
-import logic.TransformSteps;
+import logic.transform.StepOrExpression;
+import logic.transform.TransformSteps;
 
 public class StepsDisplay extends VBox
 {

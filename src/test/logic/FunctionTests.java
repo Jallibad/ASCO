@@ -4,33 +4,51 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Test;
 
+import logic.malformedexpression.InvalidArgumentsException;
+import logic.malformedexpression.MalformedExpressionException;
+
 public class FunctionTests
 {
+	@Test(expected = MalformedExpressionException.class)
+	public void testConstructor() throws MalformedExpressionException
+	{
+		new Function(Operator.AND, new Literal("A"));
+	}
+	
+	@Test(expected = MalformedExpressionException.class)
+	public void testVariadicConstructor() throws MalformedExpressionException
+	{
+		new Function(Operator.AND, "A");
+	}
+	
 	@Test
-	public void testEquality()
+	public void testEquality() throws MalformedExpressionException
 	{
 		Function e = new Function(Operator.AND, "A", "B");
 		assertEquals(e, new Function(Operator.AND, "A", "B"));
-		assertEquals(Expression.create("(AND A B)"), e);
+		assertEquals(ExpParser.create("(AND A B)"), e);
 		assertNotEquals(e, new Function(Operator.AND, "A", "A"));
 		assertNotEquals(e, new Function(Operator.OR, "A", "B"));
 		assertNotEquals(e, new Literal("A"));
 	}
 	
 	@Test
-	public void testToString()
+	public void testToString() throws MalformedExpressionException
 	{
 		Function e = new Function(Operator.AND, "A", "B");
 		assertEquals("(AND A B)", e.toString());
 	}
 	
 	@Test
-	public void testGetVariables()
+	public void testGetVariables() throws MalformedExpressionException
 	{
 		Function e1 = new Function(Operator.NEG, "A");
 		Set<Literal> testVariables = new HashSet<Literal>();
@@ -63,8 +81,14 @@ public class FunctionTests
 	}
 	
 	@Test
-	public void testFillMatches()
+	public void testFillMatches() throws InvalidArgumentsException
 	{
-		// TODO write test cases here
+		Map<Literal, Expression> m1 = ExpParser.create("(AND A B)").fillMatches(ExpParser.create("(AND (NEG A) (NEG B))")).get();
+		Map<Literal, Expression> m1Ans = new HashMap<>();
+		m1Ans.put(new Literal("A"), ExpParser.create("(NEG A)"));
+		m1Ans.put(new Literal("B"), ExpParser.create("(NEG B)"));
+		assertEquals(m1Ans, m1);
+		
+		assertEquals(Optional.empty(), ExpParser.create("(AND (NEG A) (NEG B))").fillMatches(ExpParser.create("(AND A B)")));
 	}
 }

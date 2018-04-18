@@ -5,9 +5,18 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import logic.malformedexpression.InvalidArgumentsException;
+import logic.malformedexpression.MalformedExpressionException;
+import logic.transform.MiscTransform;
+import logic.transform.NormalForm;
+import logic.transform.TransformSteps;
 
 /**
  * The Function class represent functions such as "(NEG A)" and "(AND A B)".
@@ -20,6 +29,7 @@ import java.util.stream.Collectors;
 public class Function extends Expression
 {
 	private static final long serialVersionUID = 7003195412543405388L;
+	private static final Logger LOGGER = Logger.getLogger(Function.class.getName());
 	public final Operator operator;
 	/**
 	 * An ordered List of the arguments to the Function, with term[0] being the first argument.
@@ -32,12 +42,13 @@ public class Function extends Expression
 	 * terms matches up with the expected number of arguments.
 	 * @param operator the operator for the new Function
 	 * @param terms a List of the terms, a copy is made to avoid rep exposure
+	 * @throws MalformedExpressionException 
 	 */
-	public Function(Operator operator, List<Expression> terms)
+	public Function(Operator operator, List<Expression> terms) throws InvalidArgumentsException
 	{
 		if (terms.size() != operator.NUM_ARGUMENTS)
 		{
-			throw new Error(String.format
+			throw new InvalidArgumentsException(String.format
 			(
 				"Operator \"%s\" expects %d arguments, %d were provided",
 				operator,
@@ -46,15 +57,34 @@ public class Function extends Expression
 			));
 		}
 		this.operator = operator;
-		this.terms = new ArrayList<Expression>(terms);
+		this.terms = new ArrayList<>(terms);
+	}
+	
+	/**
+	 * A wrapper function to construct a new Function object.  Does not check that the number of terms are correct.
+	 * @param operator the operator for the new Function
+	 * @param terms a List of the terms, a copy is made to avoid rep exposure
+	 */
+	public static Expression constructUnsafe(Operator operator, List<Expression> terms)
+	{
+		try
+		{
+			return new Function(operator, terms);
+		}
+		catch (MalformedExpressionException e)
+		{
+			LOGGER.severe(e.getMessage());
+			throw new Error(e.getMessage());
+		}
 	}
 
 	/**
 	 * A wrapper constructor to make constructing Functions inline somewhat simpler.
 	 * @param operator the Operator to be used in the Function
 	 * @param terms an Expression[] consisting of the terms in order.  Uses variadic arguments.
+	 * @throws MalformedExpressionException 
 	 */
-	public Function(Operator operator, Expression... terms)
+	public Function(Operator operator, Expression... terms) throws InvalidArgumentsException
 	{
 		this(operator, Arrays.asList(terms));
 	}
@@ -64,10 +94,24 @@ public class Function extends Expression
 	 * Each String in the second argument is parsed using Expression::create.
 	 * @param operator the Operator to be used in the Function
 	 * @param terms a String[] consisting of the terms in order.  Uses variadic arguments.
+	 * @throws MalformedExpressionException 
 	 */
-	public Function(Operator operator, String... terms)
+	public Function(Operator operator, String... terms) throws InvalidArgumentsException
 	{
-		this(operator, Arrays.stream(terms).map(Literal::new).collect(Collectors.toList()));
+		if (terms.length != operator.NUM_ARGUMENTS)
+		{
+			throw new InvalidArgumentsException(String.format
+			(
+				"Operator \"%s\" expects %d arguments, %d were provided",
+				operator,
+				operator.NUM_ARGUMENTS,
+				terms.length
+			));
+		}
+		this.operator = operator;
+		this.terms = new ArrayList<>();
+		for (String s : terms)
+			this.terms.add(new Literal(s));
 	}
 	
 	/**
@@ -77,7 +121,7 @@ public class Function extends Expression
 	 */
 	public List<Expression> getTerms()
 	{
-		return new ArrayList<Expression>(terms); // Copy new list to avoid representation exposure
+		return new ArrayList<>(terms); // Copy new list to avoid representation exposure
 	}
 	
 	/**
@@ -95,16 +139,16 @@ public class Function extends Expression
 	@Override
 	public String toString()
 	{
-		String ans = operator.toString();
+		StringBuilder ans = new StringBuilder(operator.toString());
 		for (Expression e : terms)
-			ans += " "+e;
+			ans.append(" "+e);
 		return "("+ans+")";
 	}
 
 	@Override
 	public Set<Literal> getVariables()
 	{
-		Set<Literal> ans = new HashSet<Literal>();
+		Set<Literal> ans = new HashSet<>();
 		for (Expression e : terms)
 			ans.addAll(e.getVariables());
 		return ans;
@@ -129,6 +173,12 @@ public class Function extends Expression
 				return false;
 		return true;
 	}
+	
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(operator, terms);
+	}
 
 	@Override
 	public boolean matches(Expression e)
@@ -145,17 +195,20 @@ public class Function extends Expression
 	}
 
 	@Override
-	public Map<Literal, Expression> fillMatches(Expression e)
+	public Optional<Map<Literal, Expression>> fillMatches(Expression e)
 	{
-		if (!(e instanceof Function))
-			return null;
+		if (operator != e.getOperator())
+			return Optional.empty();
 		Function other = (Function) e;
-		if (operator != other.operator)
-			return null;
-		Map<Literal, Expression> ans = new HashMap<Literal, Expression>();
+		Map<Literal, Expression> ans = new HashMap<>();
 		for (int i=0; i<terms.size(); ++i)
-			ans.putAll(terms.get(i).fillMatches(other.getTerm(i)));
-		return ans;
+		{
+			Optional<Map<Literal, Expression>> subterms = terms.get(i).fillMatches(other.getTerm(i));
+			subterms.ifPresent(ans::putAll);
+			if (!subterms.isPresent())
+				return Optional.empty();
+		}
+		return Optional.of(ans);
 	}
 
 	@Override
@@ -169,25 +222,25 @@ public class Function extends Expression
 				return operator.DISPLAY_TEXT+terms.get(0).prettyPrint();
 		}
 		
-		String ans = "";
+		StringBuilder ans = new StringBuilder();
 		for (int i=0; i<terms.size()+1; ++i)
 		{
 			if (i == operator.SYMBOL_POSITION)
 			{
-				ans += " "+operator.DISPLAY_TEXT;
+				ans.append(" "+operator.DISPLAY_TEXT);
 				continue;
 			}
 			Expression currTerm = terms.get(i<operator.SYMBOL_POSITION ? i : i-1); // Account for inserting the operator
 			if (currTerm instanceof Literal || currTerm.getOperator() == Operator.NEG)
-				ans += " "+currTerm.prettyPrint();
+				ans.append(" "+currTerm.prettyPrint());
 			else
-				ans += " ("+currTerm.prettyPrint()+")";
+				ans.append(" ("+currTerm.prettyPrint()+")");
 		}
 		return ans.substring(1);
 	}
 
 	@Override
-	Operator getOperator()
+	public Operator getOperator()
 	{
 		return operator;
 	}
@@ -202,35 +255,73 @@ public class Function extends Expression
 	@Override
 	public boolean simplyEquivalent(Expression o)
 	{
+		return simplyEquivalentWithSteps(o).isPresent();
+	}
+	
+	@Override
+	public Optional<TransformSteps> simplyEquivalentWithSteps(Expression o)
+	{
 		if (o.getOperator() != operator)
-			return false;
+			return Optional.empty();
 		Function other = (Function) o;
 		
 		if
 		(
-			operator.TRAITS.contains(OperatorTrait.COMMUTATIVE)
+			operator.hasTrait(OperatorTrait.COMMUTATIVE)
 			&& terms.get(0).simplyEquivalent(other.terms.get(1))
 			&& terms.get(1).simplyEquivalent(other.terms.get(0))
 		)
-			return true;
+		{
+			TransformSteps ans = new TransformSteps(this);
+			ans.addStep(MiscTransform.COMMUTE);
+			return Optional.of(ans); // TODO commute
+		}
 		
-		if (operator.TRAITS.contains(OperatorTrait.ASSOCIATIVE))
+		if (operator.hasTrait(OperatorTrait.ASSOCIATIVE))
 		{
 			// TODO implement
 		}
-		return equals(other);
+		if (equals(other))
+			return Optional.of(new TransformSteps(this));
+		else
+			return Optional.empty();
 	}
 
 	@Override
 	public Optional<TransformSteps> proveEquivalence(Expression other)
 	{
 		TransformSteps ans = NormalForm.CONJUNCTIVE.transformWithSteps(this);
-		//System.out.println(ans);
 		TransformSteps secondHalf = NormalForm.CONJUNCTIVE.transformWithSteps(other);
-		//System.out.println(secondHalf);
-		if (ans.result().simplyEquivalent(secondHalf.result()))
-			return Optional.of(ans.combine(secondHalf.reverse()));
-		else
-			return Optional.empty();
+		return ans
+				.result()
+				.simplyEquivalentWithSteps(secondHalf.result())
+				.map
+				(
+					e -> ans
+						.combine(e)
+						.combine(secondHalf.reverse())
+				);
+	}
+	
+	public Function mapTerms(java.util.function.Function<Expression, Expression> f)
+	{
+		return (Function) constructUnsafe(operator, terms.stream().map(f).collect(Collectors.toList()));
+	}
+
+	@Override
+	public boolean equalWithoutLiterals(Expression pattern)
+	{
+		if (operator != pattern.getOperator())
+			return false;
+		Function other = (Function) pattern;
+		for (int i=0; i<terms.size(); ++i)
+			if (!terms.get(i).equalWithoutLiterals(other.getTerm(i)))
+				return false;
+		return true;
+	}
+	
+	public boolean mapPredicate(Predicate<Expression> p, Operator... op)
+	{
+		return Arrays.asList(op).contains(operator) && terms.stream().allMatch(p);
 	}
 }

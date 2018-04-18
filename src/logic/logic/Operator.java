@@ -33,18 +33,21 @@ public enum Operator
 		SYMBOL_POSITION = symbolPosition;
 		TRAITS = Collections.unmodifiableSet(new HashSet<OperatorTrait>(Arrays.asList(traits)));
 	}
+	
+	public boolean hasTrait(OperatorTrait t)
+	{
+		return TRAITS.contains(t);
+	}
+	
 	/**
 	 * A Unicode representation of the symbol or text to be displayed when pretty-printing
 	 * the operator.  Currently only single characters are supported for parsing.
 	 */
 	public final String DISPLAY_TEXT;
 	public final int NUM_ARGUMENTS;
+	/**
+	 * The ordinal position of the operator in the pretty-printed version.  In other '∧' in "A∧B" has a position of 1.
+	 */
 	public final int SYMBOL_POSITION;
-	public final Set<OperatorTrait> TRAITS;
-}
-
-enum OperatorTrait
-{
-	COMMUTATIVE,
-	ASSOCIATIVE;
+	private final Set<OperatorTrait> TRAITS;
 }

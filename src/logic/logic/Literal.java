@@ -5,6 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
+import logic.malformedexpression.InvalidArgumentsException;
+import logic.transform.TransformSteps;
 
 /**
  * This class represents a single variable such as "A" or "B".
@@ -16,8 +21,15 @@ public class Literal extends Expression
 	private static final long serialVersionUID = 7226891007841491566L;
 	public final String VARIABLE_NAME;
 	
-	public Literal(String variableName)
+	/**
+	 * Constructs a new Literal with the given name
+	 * @param variableName the name of the Literal
+	 * @throws InvalidArgumentsException if variableName is an operator or operator symbol
+	 */
+	public Literal(String variableName) throws InvalidArgumentsException
 	{
+		if (Stream.of(Operator.values()).anyMatch(o -> o.DISPLAY_TEXT.equals(variableName) || o.name().equals(variableName)))
+			throw new InvalidArgumentsException(variableName + " is an operator"); // TODO add error details
 		VARIABLE_NAME = variableName;
 	}
 	
@@ -60,11 +72,11 @@ public class Literal extends Expression
 	}
 
 	@Override
-	public Map<Literal, Expression> fillMatches(Expression e)
+	public Optional<Map<Literal, Expression>> fillMatches(Expression e)
 	{
-		Map<Literal, Expression> ans = new HashMap<Literal, Expression>();
+		Map<Literal, Expression> ans = new HashMap<>();
 		ans.put(this, e);
-		return ans;
+		return Optional.of(ans);
 	}
 
 	@Override
@@ -74,7 +86,7 @@ public class Literal extends Expression
 	}
 
 	@Override
-	Operator getOperator()
+	public Operator getOperator()
 	{
 		return null;
 	}
@@ -90,6 +102,15 @@ public class Literal extends Expression
 	{
 		return (other instanceof Literal) && ((Literal) other).VARIABLE_NAME.equals(VARIABLE_NAME);
 	}
+	
+	@Override
+	public Optional<TransformSteps> simplyEquivalentWithSteps(Expression other)
+	{
+		if (simplyEquivalent(other))
+			return Optional.of(new TransformSteps(this));
+		else
+			return Optional.empty();
+	}
 
 	@Override
 	public Optional<TransformSteps> proveEquivalence(Expression other)
@@ -98,5 +119,17 @@ public class Literal extends Expression
 			return Optional.of(new TransformSteps(this));
 		else
 			return Optional.empty();
+	}
+
+	@Override
+	public boolean equalWithoutLiterals(Expression pattern)
+	{
+		return pattern instanceof Literal;
+	}
+
+	@Override
+	public boolean mapPredicate(Predicate<Expression> p, Operator... op)
+	{
+		return p.test(this);
 	}
 }
