@@ -57,16 +57,18 @@ public class LogicApplication extends Application
 		this.primaryStage = primaryStage;
 		primaryStage.setTitle("Logic++");
 		VBox root = new VBox();
+		VBox secondary = new VBox();
 		Scene s = new Scene(root, 300, 300, Color.WHITESMOKE);
-		
-		setUpMenus(root);
+			
+		setUpMenus(root, secondary);
 		
 		root.getChildren().add(expressionEntry);
+		root.getChildren().add(secondary);
 		primaryStage.setScene(s);
 		primaryStage.show();
 	}
 	
-	private void setUpMenus(Pane root)
+	private void setUpMenus(Pane root, Pane secondary)
 	{
 		MenuBar menuBar = new MenuBar();
 		
@@ -76,6 +78,11 @@ public class LogicApplication extends Application
 		menuEdit.setOnShowing(event ->
 			menuEdit.getItems().forEach(item -> // It might be better to only disable certain options
 				item.setDisable(!expressionEntry.validExpression())));
+		
+		MenuItem clearWork = new MenuItem("Clear Work");
+		clearWork.setOnAction(event ->
+			secondary.getChildren().clear());
+		
 		
 		MenuItem simplify = new MenuItem("Simplify");
 		
@@ -112,9 +119,9 @@ public class LogicApplication extends Application
 					LOGGER.fine("First removing show steps button");
 					root.getChildren().remove(n);
 					StepsDisplay s = new StepsDisplay(t.transformWithSteps(e));
-					root.getChildren().add(s);
+					secondary.getChildren().add(s);
 				});
-				root.getChildren().add(n);
+				secondary.getChildren().add(n);
 			});
 		});
 		
@@ -130,9 +137,9 @@ public class LogicApplication extends Application
 				{
 					Optional<TransformSteps> steps = expressionEntry.getExpression().proveEquivalence(e2.getExpression());
 					if (steps.isPresent())
-						root.getChildren().addAll(new Text("The expressions are equivalent"), new StepsDisplay(steps.get()));
+						secondary.getChildren().addAll(new Text("The expressions are equivalent"), new StepsDisplay(steps.get()));
 					else
-						root.getChildren().add(new Text("The expressions are not equivalent"));
+						secondary.getChildren().add(new Text("The expressions are not equivalent"));
 				}
 				catch (MalformedExpressionException error)
 				{
@@ -140,7 +147,7 @@ public class LogicApplication extends Application
 					LOGGER.severe(error.getMessage());
 				}
 			});
-			root.getChildren().addAll(e2, b);
+			secondary.getChildren().addAll(e2, b);
 		});
 		
 		MenuItem checkWork = new MenuItem("Check Work");
@@ -171,11 +178,11 @@ public class LogicApplication extends Application
 				{
 					toAdd = new Text(String.format("The file \"%s\" could not be read", f.toString()));
 				}
-				root.getChildren().add(toAdd);
+				secondary.getChildren().add(toAdd);
 			}
 		});
 		
-		menuEdit.getItems().addAll(simplify, normalForm, proveEquivalence, checkWork, checkForm);
+		menuEdit.getItems().addAll(clearWork, simplify, normalForm, proveEquivalence, checkWork, checkForm);
 		
 		menuBar.getMenus().addAll(menuFile, menuEdit);
 		root.getChildren().add(menuBar);
