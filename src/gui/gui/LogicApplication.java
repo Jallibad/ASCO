@@ -158,9 +158,11 @@ public class LogicApplication extends Application
 	{
 		Menu menuEdit = new Menu("Edit");
 		menuEdit.setOnShowing(event ->
+		{
+			boolean disable = !expressionEntry.validExpression();
 			menuEdit.getItems().forEach(item -> // It might be better to only disable certain options
-				item.setDisable(!expressionEntry.validExpression())));
-				
+				item.setDisable(disable));
+		});
 		
 		MenuItem clearWork = new MenuItem("Clear Work");
 		clearWork.setOnAction(event ->
@@ -316,7 +318,7 @@ public class LogicApplication extends Application
 		
 		MenuItem settings = new Menu("Settings");
 		settings.setOnAction(event ->
-			SettingDisplay.display(primaryStage));
+			SettingsDisplay.display(primaryStage));
 		
 //		MenuItem about = new Menu("About");
 //		about.setOnAction(event ->
