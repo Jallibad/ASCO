@@ -73,11 +73,94 @@ public class LogicApplication extends Application
 		MenuBar menuBar = new MenuBar();
 		
 		Menu menuFile = setUpFileMenu(root);
+		Menu menuEdit = setUpEditMenu(root, secondary);
+		Menu menuHelp = setUpHelpMenu(root);
 		
+		menuBar.getMenus().addAll(menuFile, menuEdit, menuHelp);
+		root.getChildren().add(menuBar);
+	}
+	
+	private void exportScreen(Node toExport)
+	{
+		WritableImage writableImage = toExport.snapshot(new SnapshotParameters(), null);
+		try
+		{
+			FileChooser fileChooser = new FileChooser();
+			FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.png");
+			fileChooser.getExtensionFilters().add(extFilter);
+			fileChooser.setTitle("Export Steps");
+			File file = fileChooser.showSaveDialog(primaryStage);
+			if (file == null)
+				return;
+			ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", file);
+			LOGGER.info("Captured: " + file.getAbsolutePath());
+		}
+		catch (IOException e)
+		{
+			LOGGER.severe("Error: unable to write screen capture to output file."); // TODO error handling
+		}
+	}
+	
+	private void save(Object toSave)
+	{
+		try
+		{
+			FileChooser fileChooser = new FileChooser();
+			fileChooser.getExtensionFilters().add(EXT_FILTER);
+			fileChooser.setTitle("Save Resource File");
+			File file = fileChooser.showSaveDialog(primaryStage);
+			if (file == null)
+				return;
+			try (FileOutputStream fileOut = new FileOutputStream(file))
+			{
+				ObjectOutputStream out = new ObjectOutputStream(fileOut);
+				out.writeObject(toSave);
+				out.close();
+			}
+		}
+		catch (IOException e)
+		{
+			showAlert("Could not save");
+		}
+	}
+	
+	private Optional<Object> loadFile()
+	{
+		try
+		{
+			FileChooser fileChooser = new FileChooser();
+			fileChooser.getExtensionFilters().add(EXT_FILTER);
+			fileChooser.setTitle("Open Resource File");
+			File toOpen = fileChooser.showOpenDialog(primaryStage);
+			if (toOpen == null)
+				return Optional.empty();
+			try (FileInputStream fileIn = new FileInputStream(toOpen))
+			{
+				return Optional.of(new ObjectInputStream(fileIn).readObject());
+			}
+		}
+		catch (IOException | ClassNotFoundException e)
+		{
+			showAlert(e.getMessage());
+			return Optional.empty();
+		}
+	}
+	
+	private void showAlert(String message)
+	{
+		Alert error = new Alert(AlertType.ERROR);
+		error.setTitle("Error");
+		error.setContentText(message);
+		error.showAndWait();
+	}
+	
+	private Menu setUpEditMenu(Pane root, Pane secondary)
+	{
 		Menu menuEdit = new Menu("Edit");
 		menuEdit.setOnShowing(event ->
 			menuEdit.getItems().forEach(item -> // It might be better to only disable certain options
 				item.setDisable(!expressionEntry.validExpression())));
+				
 		
 		MenuItem clearWork = new MenuItem("Clear Work");
 		clearWork.setOnAction(event ->
@@ -183,84 +266,9 @@ public class LogicApplication extends Application
 		});
 		
 		menuEdit.getItems().addAll(clearWork, simplify, normalForm, proveEquivalence, checkWork, checkForm);
-		
-		menuBar.getMenus().addAll(menuFile, menuEdit);
-		root.getChildren().add(menuBar);
+		return menuEdit;
 	}
 	
-	private void exportScreen(Node toExport)
-	{
-		WritableImage writableImage = toExport.snapshot(new SnapshotParameters(), null);
-		try
-		{
-			FileChooser fileChooser = new FileChooser();
-			FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.png");
-			fileChooser.getExtensionFilters().add(extFilter);
-			fileChooser.setTitle("Export Steps");
-			File file = fileChooser.showSaveDialog(primaryStage);
-			if (file == null)
-				return;
-			ImageIO.write(SwingFXUtils.fromFXImage(writableImage, null), "png", file);
-			LOGGER.info("Captured: " + file.getAbsolutePath());
-		}
-		catch (IOException e)
-		{
-			LOGGER.severe("Error: unable to write screen capture to output file."); // TODO error handling
-		}
-	}
-	
-	private void save(Object toSave)
-	{
-		try
-		{
-			FileChooser fileChooser = new FileChooser();
-			fileChooser.getExtensionFilters().add(EXT_FILTER);
-			fileChooser.setTitle("Save Resource File");
-			File file = fileChooser.showSaveDialog(primaryStage);
-			if (file == null)
-				return;
-			try (FileOutputStream fileOut = new FileOutputStream(file))
-			{
-				ObjectOutputStream out = new ObjectOutputStream(fileOut);
-				out.writeObject(toSave);
-				out.close();
-			}
-		}
-		catch (IOException e)
-		{
-			showAlert("Could not save");
-		}
-	}
-	
-	private Optional<Object> loadFile()
-	{
-		try
-		{
-			FileChooser fileChooser = new FileChooser();
-			fileChooser.getExtensionFilters().add(EXT_FILTER);
-			fileChooser.setTitle("Open Resource File");
-			File toOpen = fileChooser.showOpenDialog(primaryStage);
-			if (toOpen == null)
-				return Optional.empty();
-			try (FileInputStream fileIn = new FileInputStream(toOpen))
-			{
-				return Optional.of(new ObjectInputStream(fileIn).readObject());
-			}
-		}
-		catch (IOException | ClassNotFoundException e)
-		{
-			showAlert(e.getMessage());
-			return Optional.empty();
-		}
-	}
-	
-	private void showAlert(String message)
-	{
-		Alert error = new Alert(AlertType.ERROR);
-		error.setTitle("Error");
-		error.setContentText(message);
-		error.showAndWait();
-	}
 	
 	private Menu setUpFileMenu(Pane root)
 	{
@@ -292,7 +300,26 @@ public class LogicApplication extends Application
 		MenuItem load = new MenuItem("Load");
 		load.setOnAction(event ->
 			loadFile().ifPresent(e -> expressionEntry.setExpression((Expression) e)));
+		
+		
 		menuFile.getItems().addAll(save, export, load);
 		return menuFile;
+	}
+	
+	private Menu setUpHelpMenu(Pane root)
+	{
+		Menu menuHelp = new Menu("Help");
+		
+		MenuItem settings = new Menu("Settings");
+		settings.setOnAction(event ->
+			SettingDisplay.display(primaryStage));
+		
+//		MenuItem about = new Menu("About");
+//		about.setOnAction(event ->
+//			AboutDisplay.display(primaryStage));
+		
+		menuHelp.getItems().add(settings);
+		return menuHelp;
+		
 	}
 }
