@@ -1,20 +1,15 @@
 package gui;
 
-import javafx.scene.control.Button;
-import java.awt.Dimension;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Border;
+import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.scene.layout.Region;
 
 public class AboutDisplay extends Stage
 {
@@ -32,6 +27,7 @@ public class AboutDisplay extends Stage
 		final StackPane root = new StackPane();
 		
 		
+		@SuppressWarnings("unused")
 		HBox fileRoot = new HBox();
 		VBox displayStuff = new VBox();
 		HBox menu = new HBox();

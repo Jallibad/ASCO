@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -130,5 +131,11 @@ public class Literal extends Expression
 	public boolean evaluate(Map<Literal, Boolean> settings)
 	{
 		return settings.get(this);
+	}
+
+	@Override
+	public Expression mapTerms(Function<Expression, Expression> toMap)
+	{
+		return this;
 	}
 }

@@ -318,7 +318,7 @@ public class LogicApplication extends Application
 		
 		MenuItem settings = new Menu("Settings");
 		settings.setOnAction(event ->
-			SettingDisplay.display(primaryStage));
+			SettingsDisplay.display(primaryStage));
 		
 		MenuItem about = new Menu("About");
 		about.setOnAction(event ->

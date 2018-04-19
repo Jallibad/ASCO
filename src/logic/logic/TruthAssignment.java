@@ -1,4 +1,5 @@
 package logic;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,19 +16,25 @@ public class TruthAssignment
 	{
 		columns = new ArrayList<>(exp.getVariables());
 		Map<Literal, Boolean> settings = new HashMap<>();
-		long variableSettings = (1L << columns.size())-1;
-		while (variableSettings >= 0)
+		for
+		(
+			// Start at 2^n-1
+			BigInteger variableSettings = BigInteger.ONE.shiftLeft(columns.size()).subtract(BigInteger.ONE);
+			// While >= 0	
+			variableSettings.signum() != -1;
+			// Decrement by one each time
+			variableSettings = variableSettings.subtract(BigInteger.ONE)
+		) 
 		{
 			List<Boolean> currSettings = new ArrayList<>();
 			for (int i=0; i<columns.size(); ++i)
 			{
-				boolean currSetting = (variableSettings & (1 << i)) == 0;
+				boolean currSetting = variableSettings.testBit(i);
 				currSettings.add(currSetting);
 				settings.put(columns.get(i), currSetting);
 			}
 			currSettings.add(exp.evaluate(settings));
 			table.add(currSettings);
-			--variableSettings;
 		}
 	}
 	
@@ -49,6 +56,7 @@ public class TruthAssignment
 			}
 			catch (InvalidArgumentsException e)
 			{
+				// If we've run out of characters to make new literals from
 				throw new Error();
 			}
 	}

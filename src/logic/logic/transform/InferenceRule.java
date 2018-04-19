@@ -7,6 +7,7 @@ import logic.Expression;
 
 public enum InferenceRule implements BiDirectionalTransform
 {
+	// TODO all of these except for DOUBLE_NEGATION are backwards
 	DE_MORGANS_OR("¬(P∨Q)", "(¬P)∧(¬Q)", "DeMorgan's or"),
 	DE_MORGANS_AND("¬(P∧Q)", "(¬P)∨(¬Q)", "DeMorgan's and"),
 	OR_DISTRIBUTION("P∨(Q∧R)", "(P∨Q)∧(P∨R)"),
@@ -53,7 +54,7 @@ public enum InferenceRule implements BiDirectionalTransform
 		else if (right.matches(orig))
 			return Transform.transform(right.fillMatches(orig).get(), left);
 		LOGGER.warning("An inference rule couldn't be successfully applied");
-		return null; // TODO this could be a terrible idea
+		return orig; // TODO this could be a terrible idea
 	}
 	
 	@Override

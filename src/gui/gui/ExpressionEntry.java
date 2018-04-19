@@ -25,7 +25,7 @@ public class ExpressionEntry extends VBox
 	private static final Logger LOGGER = Logger.getLogger(ExpressionEntry.class.getName());
 	
 	private static final String[] BAR_SYMBOLS = new String[] {"¬","∧","∨"};
-	private static final Map<String, String> KEY_REPLACEMENTS = new HashMap<>();
+	static final Map<String, String> KEY_REPLACEMENTS = new HashMap<>();
 	static
 	{
 		KEY_REPLACEMENTS.put("&", "∧");

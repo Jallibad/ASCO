@@ -113,5 +113,7 @@ public abstract class Expression implements Serializable
 	 */
 	public abstract boolean mapPredicate(Predicate<Expression> p, Operator... allowedOperators);
 	
+	public abstract Expression mapTerms(java.util.function.Function<Expression, Expression> toMap);
+	
 	public abstract boolean evaluate(Map<Literal, Boolean> settings);
 }

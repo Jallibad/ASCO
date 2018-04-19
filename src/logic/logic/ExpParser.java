@@ -69,12 +69,12 @@ public final class ExpParser
 		// Start on the top level of the expression, an open parenthesis means going down a level.
 		int levelsDeep = 0;
 		
-		for (char c : exp.toString().toCharArray())
-			if (c == '(')
+		for (int i=0; i<exp.length(); ++i)
+			if (exp.charAt(i) == '(')
 				levelsDeep++;
 			// Throw an error if there are too many closing parentheses.
-			else if (c == ')' && --levelsDeep < 0)
-				throw new UnmatchedParenthesesException(exp.toString(), 0); // TODO indicate where in string the parens are
+			else if (exp.charAt(i) == ')' && --levelsDeep < 0)
+				throw new UnmatchedParenthesesException(exp.toString(), i);
 		
 		// If not on the top level after the loop throw an error.
 		if (levelsDeep != 0)
@@ -94,8 +94,14 @@ public final class ExpParser
 		for (Operator op : Operator.values())
 			ans = ans.replaceAll(op.displayText, " "+op.name()+" ");
 		// Check if the answer contains anything but letters, whitespace, or parentheses.
-		if (ans.matches(".*[^\\p{Alpha}\\s\\(\\)].*"))
-			throw new NotAnOperatorException("Something's not an operator"); // TODO add detailed error message
+		for (int i=0; i<ans.length(); ++i)
+			if (ans.charAt(i) != '(' && ans.charAt(i) != ')' && ans.charAt(i) != ' ' && !Character.isAlphabetic(ans.charAt(i)))
+				throw new NotAnOperatorException(String.format
+				(
+						"The character '%c' at index %d is not a valid operator",
+						ans.charAt(i),
+						i
+				));
 		
 		// Clear the original StringBuilder and insert the new string.
 		//I don't know if there's a better way to do this with StringBuilder.

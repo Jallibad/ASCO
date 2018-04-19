@@ -300,6 +300,7 @@ public class Function extends Expression
 				);
 	}
 	
+	@Override
 	public Function mapTerms(java.util.function.Function<Expression, Expression> f)
 	{
 		return (Function) constructUnsafe(operator, terms.stream().map(f).collect(Collectors.toList()));
