@@ -68,6 +68,6 @@ public enum Operator
 	 */
 	public final int symbolPosition;
 	
-	private final boolean[][] truthTable;
+	public final boolean[][] truthTable;
 	private final Set<OperatorTrait> traits;
 }

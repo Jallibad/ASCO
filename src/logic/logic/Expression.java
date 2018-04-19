@@ -35,7 +35,6 @@ public abstract class Expression implements Serializable
 	 * @return the specified Set
 	 */
 	public abstract Set<Literal> getVariables();
-	public abstract TruthAssignment getTruthAssignments();
 	
 	// TODO rewrite this JavaDoc to be more correct
 	/**
@@ -113,4 +112,6 @@ public abstract class Expression implements Serializable
 	 * @return true if the operator is in the list of allowed operators and for each term the predicate p is true
 	 */
 	public abstract boolean mapPredicate(Predicate<Expression> p, Operator... allowedOperators);
+	
+	public abstract boolean evaluate(Map<Literal, Boolean> settings);
 }

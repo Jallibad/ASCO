@@ -37,12 +37,6 @@ public class Literal extends Expression
 	{
 		return Collections.singleton(this);
 	}
-
-	@Override
-	public TruthAssignment getTruthAssignments()
-	{
-		return new TruthAssignment(this);
-	}
 	
 	@Override
 	public String toString()
@@ -130,5 +124,11 @@ public class Literal extends Expression
 	public boolean mapPredicate(Predicate<Expression> p, Operator... op)
 	{
 		return p.test(this);
+	}
+
+	@Override
+	public boolean evaluate(Map<Literal, Boolean> settings)
+	{
+		return settings.get(this);
 	}
 }

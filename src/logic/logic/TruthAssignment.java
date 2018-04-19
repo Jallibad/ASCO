@@ -1,30 +1,34 @@
 package logic;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import logic.malformedexpression.InvalidArgumentsException;
-import logic.malformedexpression.MalformedExpressionException;
 
 public class TruthAssignment
-{
-	public static void main(String[] args) throws MalformedExpressionException
-	{
-		TruthAssignment a = ExpParser.parse("A").getTruthAssignments();
-		System.out.println(a);
-		TruthAssignment b = Operator.AND.getTruthTable();
-		System.out.println(b);
-		//b.merge(a, 0);
-	}
+{	
+	public List<Literal> columns = new ArrayList<>();
+	public List<List<Boolean>> table = new ArrayList<>();
 	
-	List<Expression> columns = new ArrayList<>();
-	List<List<Boolean>> table = new ArrayList<>();
-	
-	TruthAssignment(Literal a)
+	public TruthAssignment(Expression exp)
 	{
-		table.add(getTFList());
-		table.add(getTFList());
-		columns.add(a);
-		columns.add(a);
+		columns = new ArrayList<>(exp.getVariables());
+		Map<Literal, Boolean> settings = new HashMap<>();
+		long variableSettings = (1L << columns.size())-1;
+		while (variableSettings >= 0)
+		{
+			List<Boolean> currSettings = new ArrayList<>();
+			for (int i=0; i<columns.size(); ++i)
+			{
+				boolean currSetting = (variableSettings & (1 << i)) == 0;
+				currSettings.add(currSetting);
+				settings.put(columns.get(i), currSetting);
+			}
+			currSettings.add(exp.evaluate(settings));
+			table.add(currSettings);
+			--variableSettings;
+		}
 	}
 	
 	public TruthAssignment(boolean[][] truthTable)
@@ -37,7 +41,7 @@ public class TruthAssignment
 			table.add(partial);
 		}
 		
-		char currLiteral='A';
+		char currLiteral = 'A';
 		for (int i=0; i<truthTable[0].length-1; ++i, ++currLiteral)
 			try
 			{
@@ -48,25 +52,6 @@ public class TruthAssignment
 				throw new Error();
 			}
 	}
-
-	private static List<Boolean> getTFList()
-	{
-		List<Boolean> ans = new ArrayList<>();
-		ans.add(true);
-		ans.add(false);
-		return ans;
-	}
-
-	public void merge(TruthAssignment sub)
-	{
-		// multiply this and sub
-		//for ()
-		
-		// filter for contradictions
-		
-		// remove result rows
-		//for (int )
-	}
 	
 	public String toString()
 	{
@@ -76,9 +61,9 @@ public class TruthAssignment
 			ans.append(e.toString()+"|");
 		ans.append("\n");
 		
-		for (int y=0; y<table.get(0).size(); ++y)
+		for (int x=0; x<table.size(); ++x)
 		{
-			for (int x=0; x<table.size(); ++x)
+			for (int y=0; y<table.get(x).size(); ++y)
 				ans.append((table.get(x).get(y) ? 'T' : 'F')+"|");
 			ans.append('\n');
 		}

@@ -247,9 +247,13 @@ public class LogicApplication extends Application
 			{
 				// TODO say which expression is which
 				Node toAdd;
-				try (FileInputStream fileIn = new FileInputStream(f))
+				try
+				(
+					FileInputStream fileIn = new FileInputStream(f);
+					ObjectInputStream inStream = new ObjectInputStream(fileIn);
+				)
 				{
-					Expression other = (Expression) new ObjectInputStream(fileIn).readObject();
+					Expression other = (Expression) inStream.readObject();
 					
 					Optional<TransformSteps> steps = expressionEntry.getExpression().proveEquivalence(other);
 					if (steps.isPresent())
