@@ -1,9 +1,7 @@
 package logic;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,29 +58,6 @@ public class FunctionTests
 		assertEquals(testVariables, e2.getVariables());
 		Function e3 = new Function(Operator.NEG, e2);
 		assertEquals(testVariables, e3.getVariables());
-	}
-	
-	@Test
-	public void testGetTruthTable()
-	{
-		//single-operator base case
-		Function fAnd = null;
-		Function fOr = null;
-		Function fNeg = null;
-		try 
-		{
-			fAnd = new Function(Operator.AND, "A", "B");
-			fOr = new Function(Operator.OR, "A", "B");
-			fNeg = new Function(Operator.NEG, "A");
-		}
-		catch (InvalidArgumentsException e) { }
-		assertTrue(fAnd.getTruthAssignments().iterator().next().toString().equals("A|B|*\nF|F|F\nF|T|F\nT|F|F\nT|T|T"));
-		assertTrue(fOr.getTruthAssignments().iterator().next().toString().equals("A|B|*\nF|F|F\nF|T|T\nT|F|T\nT|T|T"));
-		assertTrue(fNeg.getTruthAssignments().iterator().next().toString().equals("A|*\nF|T\nT|F"));		
-		
-		System.out.println("passed single-operator truth table tests\nbeginning complex expression truth table tests");
-		//complex expressions
-		assertTrue(ExpParser.parseUnsafe("(AND (OR A B) B)").getTruthAssignments().iterator().next().toString().equals("A|B|*\nF|F|F\nF|T|T\nT|F|F\nT|T|T"));
 	}
 	
 	@Test

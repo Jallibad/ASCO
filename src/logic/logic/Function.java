@@ -158,11 +158,14 @@ public class Function extends Expression
 	}
 
 	@Override
-	public List<TruthAssignment> getTruthAssignments()
+	public TruthAssignment getTruthAssignments()
 	{
-		List<TruthAssignment> tas = new ArrayList<>();
-		tas.add(new TruthAssignment(this));
-		return tas;
+		TruthAssignment ans = operator.getTruthTable();
+		
+		//for (int i=0; i<terms.size(); ++i)
+		//	ans.merge(terms.get(i).getTruthAssignments(), i);
+		
+		return ans;
 	}
 	
 	@Override

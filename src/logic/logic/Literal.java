@@ -1,7 +1,6 @@
 package logic;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -40,9 +39,9 @@ public class Literal extends Expression
 	}
 
 	@Override
-	public List<TruthAssignment> getTruthAssignments()
+	public TruthAssignment getTruthAssignments()
 	{
-		return null; // TODO Implement
+		return new TruthAssignment(this);
 	}
 	
 	@Override
