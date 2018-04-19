@@ -18,18 +18,22 @@ public class CheckFormDisplay extends Stage
 	
 	private CheckFormDisplay(Expression ex, Stage owner)
 	{
+		setTitle(String.format("Info on \"%s\"", ex.prettyPrint()));
 		VBox box = new VBox();
 		
 		for (NormalForm normalForm : NormalForm.values())
 		{
 			Text text = new Text(String.format(
-					"Expression is%s in %s normal form",
+					"\"%s\" is%s in %s normal form",
+					ex.prettyPrint(),
 					normalForm.inForm(ex) ? "" : " not",
 					normalForm.toString()
 			));
 			// TODO set background color
 			box.getChildren().add(text);
 		}
+		
+		box.getChildren().add(new TruthAssignmentDisplay(ex));
 		
 		Button closeButton = new Button("Close");
 		closeButton.setOnAction(event -> close());

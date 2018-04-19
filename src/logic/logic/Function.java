@@ -156,17 +156,6 @@ public class Function extends Expression
 			ans.addAll(e.getVariables());
 		return ans;
 	}
-
-	@Override
-	public TruthAssignment getTruthAssignments()
-	{
-		TruthAssignment ans = operator.getTruthTable();
-		
-		//for (int i=0; i<terms.size(); ++i)
-		//	ans.merge(terms.get(i).getTruthAssignments(), i);
-		
-		return ans;
-	}
 	
 	@Override
 	public boolean equals(Object o)
@@ -331,5 +320,21 @@ public class Function extends Expression
 	public boolean mapPredicate(Predicate<Expression> p, Operator... op)
 	{
 		return Arrays.asList(op).contains(operator) && terms.stream().allMatch(p);
+	}
+
+	@Override
+	public boolean evaluate(Map<Literal, Boolean> settings)
+	{
+		boolean[][] truthTable = operator.truthTable;
+		List<Boolean> evalTerms = terms.stream().map(t -> t.evaluate(settings)).collect(Collectors.toList());
+		for (int i=0; i<truthTable.length; ++i)
+		{
+			boolean isValid = true;
+			for (int x=0; x<truthTable[i].length-1; ++x)
+				isValid &= evalTerms.get(x) == truthTable[i][x];
+			if (isValid)
+				return truthTable[i][truthTable[i].length-1];
+		}
+		return false;
 	}
 }
