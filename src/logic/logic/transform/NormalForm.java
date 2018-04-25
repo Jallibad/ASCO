@@ -52,10 +52,16 @@ public enum NormalForm implements Transform
 		{
 			case CONJUNCTIVE:
 				// Put into NNF, then drive all "∨"s inwards.
-				return transformHelper(NEGATION.transform(orig), InferenceRule.OR_DISTRIBUTION);
+				return transformHelper(NEGATION.transform(orig),
+					InferenceRule.OR_DISTRIBUTION,
+					InferenceRule.OR_DISTRIBUTION_FLIPPED
+				);
 			case DISJUNCTIVE:
 				// Put into NNF, then drive all "∧"s inwards.
-				return transformHelper(NEGATION.transform(orig), InferenceRule.AND_DISTRIBUTION);
+				return transformHelper(NEGATION.transform(orig),
+					InferenceRule.AND_DISTRIBUTION,
+					InferenceRule.AND_DISTRIBUTION_FLIPPED
+				);
 			case NEGATION:
 				// Drive negations inwards using DeMorgan's laws, eliminate any double negations
 				return transformHelper(orig,

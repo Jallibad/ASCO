@@ -22,6 +22,7 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -56,6 +57,8 @@ public class LogicApplication extends Application
 	{
 		this.primaryStage = primaryStage;
 		primaryStage.setTitle("Logic++");
+		primaryStage.getIcons().add(new Image("Icon.png"));
+		
 		VBox root = new VBox();
 		VBox secondary = new VBox();
 		Scene s = new Scene(root, 300, 300, Color.WHITESMOKE);

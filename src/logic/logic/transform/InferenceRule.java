@@ -11,7 +11,9 @@ public enum InferenceRule implements BiDirectionalTransform
 	DE_MORGANS_OR("¬(P∨Q)", "(¬P)∧(¬Q)", "DeMorgan's or"),
 	DE_MORGANS_AND("¬(P∧Q)", "(¬P)∨(¬Q)", "DeMorgan's and"),
 	OR_DISTRIBUTION("P∨(Q∧R)", "(P∨Q)∧(P∨R)"),
+	OR_DISTRIBUTION_FLIPPED("(Q∧R)∨P", "(P∨Q)∧(P∨R)"),
 	AND_DISTRIBUTION("P∧(Q∨R)", "(P∧Q)∨(P∧R)"),
+	AND_DISTRIBUTION_FLIPPED("(Q∨R)∧P", "(P∧Q)∨(P∧R)"),
 	DOUBLE_NEGATION("¬¬P", "P");
 
 	private final Expression left;

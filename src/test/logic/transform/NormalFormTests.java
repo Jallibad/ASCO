@@ -33,10 +33,10 @@ public class NormalFormTests
 	{
 		Expression e1 = ExpParser.parse("(¬A)∧(B∨C)");
 		Expression e2 = ExpParser.parse("A∧(B∨(D∧E))");
-		//Expression e3 = Expression.create("(OR (AND A B) (AND C D))");
+		Expression e3 = ExpParser.parse("(A∧B)∨C");
 		assertEquals(e1, NormalForm.CONJUNCTIVE.transform(e1));
 		assertEquals(ExpParser.parse("A∧((B∨D)∧(B∨E))"), NormalForm.CONJUNCTIVE.transform(e2));
-		//assertEquals(Expression.create(""), NormalForm.CONJUNCTIVE.transform(e3));
+		assertEquals(ExpParser.parse("(C∨A)∧(C∨B)"), NormalForm.CONJUNCTIVE.transform(e3));
 	}
 	
 	@Test
