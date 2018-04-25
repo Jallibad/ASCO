@@ -38,6 +38,7 @@ public class SettingsDisplay extends Stage
 		Scene scene = new Scene(box, 600, 400);
 		setScene(scene);
 		
+		
 		box.getChildren().addAll
 		(
 			new Text("This is the settings page"),

@@ -324,7 +324,7 @@ public class LogicApplication extends Application
 		about.setOnAction(event ->
 			AboutDisplay.display(primaryStage));
 		
-		menuHelp.getItems().addAll(settings, about);
+		menuHelp.getItems().addAll(settings);
 		
 		return menuHelp;
 		

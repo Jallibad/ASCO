@@ -15,7 +15,9 @@ public class KeyBindingDisplay extends HBox
 	public static VBox display()
 	{
 		VBox ans = new VBox();
-		VBox entries = new VBox();
+		VBox entries = new VBox(10);
+		
+		
 		entries.getChildren().addAll(
 				ExpressionEntry.KEY_REPLACEMENTS
 				.keySet()

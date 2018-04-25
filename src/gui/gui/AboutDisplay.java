@@ -14,6 +14,8 @@ import javafx.stage.Stage;
 public class AboutDisplay extends Stage
 {
 	
+			
+	
 	public static void display(Stage owner)
 	{
 		new AboutDisplay(owner);
@@ -30,7 +32,7 @@ public class AboutDisplay extends Stage
 		@SuppressWarnings("unused")
 		HBox fileRoot = new HBox();
 		VBox displayStuff = new VBox();
-		HBox menu = new HBox();
+		HBox menu = new HBox(5);
 		
 		menu.setPadding(new Insets(15, 12, 15, 12));
 		

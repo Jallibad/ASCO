@@ -11,6 +11,7 @@ import logic.transform.NormalForm;
 
 public class CheckFormDisplay extends Stage
 {
+	
 	public static void display(Expression ex, Stage owner)
 	{
 		new CheckFormDisplay(ex, owner);
@@ -19,19 +20,26 @@ public class CheckFormDisplay extends Stage
 	private CheckFormDisplay(Expression ex, Stage owner)
 	{
 		setTitle(String.format("Info on \"%s\"", ex.prettyPrint()));
-		VBox box = new VBox();
+		VBox box = new VBox(10);
 		
+		
+		Text form = new Text("Forms:");
+		form.setStyle("-fx-font-weight: bold");
+		box.getChildren().add(form);
 		for (NormalForm normalForm : NormalForm.values())
 		{
 			Text text = new Text(String.format(
-					"\"%s\" is%s in %s normal form",
-					ex.prettyPrint(),
-					normalForm.inForm(ex) ? "" : " not",
-					normalForm.toString()
+					"%s: %s",
+					normalForm.toString(),
+					normalForm.inForm(ex) ? "✔" : " ❌"
 			));
 			// TODO set background color
 			box.getChildren().add(text);
 		}
+		
+		Text taText = new Text("Truth Assignments:");
+		taText.setStyle("-fx-font-weight: bold");
+		box.getChildren().add(taText);
 		
 		box.getChildren().add(new TruthAssignmentDisplay(ex));
 		
