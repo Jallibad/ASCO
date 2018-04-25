@@ -74,7 +74,7 @@ public class LogicApplication extends Application
 		
 		Menu menuFile = setUpFileMenu(root);
 		Menu menuEdit = setUpEditMenu(root, secondary);
-		Menu menuHelp = setUpHelpMenu(root);
+		Menu menuHelp = setUpHelpMenu();
 		
 		menuBar.getMenus().addAll(menuFile, menuEdit, menuHelp);
 		root.getChildren().add(menuBar);
@@ -312,15 +312,15 @@ public class LogicApplication extends Application
 		return menuFile;
 	}
 	
-	private Menu setUpHelpMenu(Pane root)
+	private Menu setUpHelpMenu()
 	{
 		Menu menuHelp = new Menu("Help");
 		
-		MenuItem settings = new Menu("Settings");
+		MenuItem settings = new MenuItem("Settings");
 		settings.setOnAction(event ->
 			SettingsDisplay.display(primaryStage));
 		
-		MenuItem about = new Menu("About");
+		MenuItem about = new MenuItem("About");
 		about.setOnAction(event ->
 			AboutDisplay.display(primaryStage));
 		
