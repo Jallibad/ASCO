@@ -39,7 +39,6 @@ import logic.Literal;
 import logic.malformedexpression.MalformedExpressionException;
 import logic.transform.NormalForm;
 import logic.transform.Transform;
-import logic.transform.TransformSteps;
 
 public class LogicApplication extends Application
 {
