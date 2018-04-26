@@ -33,9 +33,14 @@ import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
 
+import logic.ExpParser;
 import logic.Expression;
+import logic.Function;
+import logic.malformedexpression.InvalidArgumentsException;
+import logic.malformedexpression.MalformedExpressionError;
 import logic.malformedexpression.MalformedExpressionException;
 import logic.transform.NormalForm;
+import logic.transform.Transform;
 import logic.transform.TransformSteps;
 
 public class LogicApplication extends Application
@@ -162,7 +167,24 @@ public class LogicApplication extends Application
 	 * @param e the expression to simplified
 	 * @return a new expression containing the simplified version of the input expression
 	 */
-	private Expression simplify(Expression e) {
+	private Expression simplify (Expression e) {
+		//base case: can't simplify non-expression
+		if (!(e instanceof Function)) 
+		{
+			return e;
+		}
+		
+		try {
+			Expression left = ExpParser.parse("(A AND (NOT A)) AND NOT (NOT (B))");
+			Expression right = ExpParser.parse("B");
+			if (left.matches(e)) 
+			{
+				return Transform.transform(left.fillMatches(e).get(), right);	
+			}	
+		}
+		catch (Exception exp) {
+			throw new MalformedExpressionError(exp.getMessage());
+		}
 		return e;
 	}
 	
