@@ -157,6 +157,15 @@ public class LogicApplication extends Application
 		error.showAndWait();
 	}
 	
+	/**
+	 * simplify the specified expression
+	 * @param e the expression to simplified
+	 * @return a new expression containing the simplified version of the input expression
+	 */
+	private Expression simplify(Expression e) {
+		return e;
+	}
+	
 	private Menu setUpEditMenu(Pane root, Pane secondary)
 	{
 		Menu menuEdit = new Menu("Edit");
@@ -173,6 +182,21 @@ public class LogicApplication extends Application
 		
 		
 		MenuItem simplify = new MenuItem("Simplify");
+		simplify.setOnAction(t ->
+		{
+			Expression e;
+			try
+			{
+				e = expressionEntry.getExpression();
+			}
+			catch (MalformedExpressionException exception)
+			{
+				showAlert("The expression is malformed"); // TODO give helpful information here
+				return;
+			}
+			ExpressionDisplay n = new ExpressionDisplay(simplify(e));
+			secondary.getChildren().add(n);
+		});
 		
 		MenuItem checkForm = new MenuItem("Check Form");
 		checkForm.setOnAction(event ->
