@@ -1,6 +1,7 @@
 eclipse.preferences.version=1
 encoding//src/gui/gui/CheckFormDisplay.java=UTF-8
 encoding//src/gui/gui/ExpressionEntry.java=UTF-8
+encoding//src/gui/gui/LogicApplication.java=UTF-8
 encoding//src/logic/logic/ExpParser.java=UTF-8
 encoding//src/logic/logic/Expression.java=UTF-8
 encoding//src/logic/logic/Operator.java=UTF-8

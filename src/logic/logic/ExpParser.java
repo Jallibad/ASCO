@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import logic.malformedexpression.InvalidArgumentsException;
 import logic.malformedexpression.MalformedExpressionError;
@@ -139,12 +141,12 @@ public final class ExpParser
 	 */
 	private static Expression readTerm(StringBuilder exp) throws MalformedExpressionException
 	{
+		// Find the matching closing parenthesis
+		int closeParen = findNextParen(exp, 0);
+		
 		// Unwrap any surrounding parentheses
-		if (exp.charAt(0) == '(' && findNextParen(exp, 0) == exp.length()-1)
-		{
-			// Find the matching closing parenthesis
-			int closeParen = findNextParen(exp, 0);
-			
+		if (exp.charAt(0) == '(' && closeParen == exp.length()-1)
+		{	
 			// Find the number of parentheses wrapped around the term
 			int numWrapped = 0;
 			while (exp.charAt(numWrapped) == '(' && closeParen-findNextParen(exp, numWrapped) == numWrapped)
@@ -247,10 +249,10 @@ public final class ExpParser
 	 */
 	private static int operatorLocation(List<StringBuilder> terms) throws InvalidArgumentsException
 	{
-		for (int i=0; i<terms.size(); ++i)
-			if (isOperator(terms.get(i).toString()))
-				return i;
-		throw new InvalidArgumentsException(terms.toString());
+		return IntStream.range(0, terms.size())
+			.filter(i -> isOperator(terms.get(i).toString()))
+			.findFirst()
+			.orElseThrow(() -> new InvalidArgumentsException(terms.toString()));
 	}
 	
 	/**
@@ -260,10 +262,8 @@ public final class ExpParser
 	 */
 	private static boolean isOperator(String s)
 	{
-		for (Operator o : Operator.values())
-			if (s.equals(o.displayText) || s.equals(o.name()))
-				return true;
-		return false;
+		return Stream.of(Operator.values())
+			.anyMatch(o -> s.equals(o.displayText) || s.equals(o.name()));
 	}
 	
 	/**

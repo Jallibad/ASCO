@@ -36,7 +36,6 @@ import javax.imageio.ImageIO;
 import logic.ExpParser;
 import logic.Expression;
 import logic.Function;
-import logic.malformedexpression.InvalidArgumentsException;
 import logic.malformedexpression.MalformedExpressionError;
 import logic.malformedexpression.MalformedExpressionException;
 import logic.transform.NormalForm;
@@ -175,7 +174,7 @@ public class LogicApplication extends Application
 		}
 		
 		try {
-			Expression left = ExpParser.parse("(A AND (NOT A)) AND NOT (NOT (B))");
+			Expression left = ExpParser.parse("(A∧(¬A))∧(¬(¬B))");
 			Expression right = ExpParser.parse("B");
 			if (left.matches(e)) 
 			{
@@ -304,13 +303,9 @@ public class LogicApplication extends Application
 					ObjectInputStream inStream = new ObjectInputStream(fileIn);
 				)
 				{
-					Expression other = (Expression) inStream.readObject();
-					
-					Optional<TransformSteps> steps = expressionEntry.getExpression().proveEquivalence(other);
-					if (steps.isPresent())
-						toAdd = new StepsDisplay(steps.get());
-					else
-						toAdd = new Text("The expressions are not equivalent");
+					toAdd = expressionEntry.getExpression().proveEquivalence((Expression) inStream.readObject())
+							.map(s -> (Node) new StepsDisplay(s))
+							.orElse(new Text("The expressions are not equivalent"));
 				}
 				catch (IOException | ClassNotFoundException | MalformedExpressionException e)
 				{
