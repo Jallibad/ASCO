@@ -257,11 +257,7 @@ public class LogicApplication extends Application
 				root.getChildren().removeAll(e2, b);
 				try
 				{
-					Optional<TransformSteps> steps = expressionEntry.getExpression().proveEquivalence(e2.getExpression());
-					if (steps.isPresent())
-						secondary.getChildren().addAll(new Text("The expressions are equivalent"), new StepsDisplay(steps.get()));
-					else
-						secondary.getChildren().add(new Text("The expressions are not equivalent"));
+					secondary.getChildren().add(new Text("The expressions are " + (expressionEntry.getExpression().simplyEquivalent(e2.getExpression()) ? "" : "not ") + "equivalent"));
 				}
 				catch (MalformedExpressionException error)
 				{
