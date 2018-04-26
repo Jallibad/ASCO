@@ -35,8 +35,7 @@ import javax.imageio.ImageIO;
 
 import logic.ExpParser;
 import logic.Expression;
-import logic.Function;
-import logic.malformedexpression.MalformedExpressionError;
+import logic.Literal;
 import logic.malformedexpression.MalformedExpressionException;
 import logic.transform.NormalForm;
 import logic.transform.Transform;
@@ -168,23 +167,13 @@ public class LogicApplication extends Application
 	 */
 	private Expression simplify (Expression e) {
 		//base case: can't simplify non-expression
-		if (!(e instanceof Function)) 
-		{
+		if (e instanceof Literal) 
 			return e;
-		}
-		
-		try {
-			Expression left = ExpParser.parse("(A∧(¬A))∧(¬(¬B))");
-			Expression right = ExpParser.parse("B");
-			if (left.matches(e)) 
-			{
-				return Transform.transform(left.fillMatches(e).get(), right);	
-			}	
-		}
-		catch (Exception exp) {
-			throw new MalformedExpressionError(exp.getMessage());
-		}
-		return e;
+		return ExpParser
+			.parseUnsafe("(A∧(¬A))∧(¬(¬B))")
+			.fillMatches(e)
+			.map(left -> Transform.transform(left, Literal.createUnsafe("B")))
+			.orElse(e);
 	}
 	
 	private Menu setUpEditMenu(Pane root, Pane secondary)

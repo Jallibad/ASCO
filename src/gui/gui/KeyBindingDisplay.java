@@ -1,7 +1,9 @@
 package gui;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -12,6 +14,8 @@ public class KeyBindingDisplay extends HBox
 {
 	private TextField replace;
 	
+	private static Map<String, String> map = ExpressionEntry.KEY_REPLACEMENTS;
+	
 	public static VBox display()
 	{
 		VBox ans = new VBox();
@@ -19,7 +23,7 @@ public class KeyBindingDisplay extends HBox
 		
 		
 		entries.getChildren().addAll(
-				ExpressionEntry.KEY_REPLACEMENTS
+				map
 				.keySet()
 				.stream()
 				.map(KeyBindingDisplay::new)
@@ -34,19 +38,42 @@ public class KeyBindingDisplay extends HBox
 	
 	public KeyBindingDisplay(String key)
 	{
-		replace = new TextField(ExpressionEntry.KEY_REPLACEMENTS.get(key));
-		replace.textProperty().addListener((observable, oldVal, newVal) -> ExpressionEntry.KEY_REPLACEMENTS.put(key, newVal));
+		replace = new TextField(map.get(key));
+		replace.textProperty().addListener((observable, oldVal, newVal) ->
+			map.put(key, newVal));
 		Button remove = new Button("remove entry");
-		remove.setOnAction(event ->
-		{
-			ExpressionEntry.KEY_REPLACEMENTS.remove(key);
-			((VBox) this.getParent()).getChildren().remove(this);
-		});
-		getChildren().addAll(new Text(key), this.replace, remove);
+		remove.setOnAction(this::remove);
+		getChildren().addAll(new Text(key), replace, remove);
 	}
 	
 	public KeyBindingDisplay()
 	{
-		// TODO implement
+		TextField keyEntry = new TextField();
+		getChildren().add(keyEntry);
+		keyEntry.focusedProperty().addListener((observable, oldVal, newVal) ->
+		{
+			if (!newVal)
+			{
+				String text = keyEntry.getText();
+				if (text.isEmpty())
+					remove(null);
+				map.put(keyEntry.getText(), "");
+				// Replace the TextField with a Text
+				getChildren().replaceAll(n -> n == keyEntry ? new Text(keyEntry.getText()) : n);
+			}
+		});
+		
+		replace = new TextField();
+		replace.textProperty().addListener((observable, oldVal, newVal) ->
+			map.put(((Text) getChildren().get(0)).getText(), newVal));
+		Button remove = new Button("remove entry");
+		remove.setOnAction(this::remove);
+		getChildren().addAll(replace, remove);
+	}
+	
+	private void remove(ActionEvent event)
+	{
+		map.remove(((Text) getChildren().get(0)).getText());
+		((VBox) this.getParent()).getChildren().remove(this);
 	}
 }

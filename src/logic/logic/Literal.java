@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import logic.malformedexpression.InvalidArgumentsException;
+import logic.malformedexpression.MalformedExpressionError;
 import logic.transform.TransformSteps;
 
 /**
@@ -31,6 +32,18 @@ public class Literal extends Expression
 		if (Stream.of(Operator.values()).anyMatch(o -> o.displayText.equals(variableName) || o.name().equals(variableName)))
 			throw new InvalidArgumentsException(variableName + " is an operator"); // TODO add error details
 		this.variableName = variableName;
+	}
+	
+	public static Literal createUnsafe(String variableName)
+	{
+		try
+		{
+			return new Literal(variableName);
+		}
+		catch (InvalidArgumentsException e)
+		{
+			throw new MalformedExpressionError(e.getMessage());
+		}
 	}
 	
 	@Override
