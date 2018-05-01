@@ -59,7 +59,7 @@ public class LogicApplication extends Application
 	{
 		this.primaryStage = primaryStage;
 		primaryStage.setTitle("Logic++");
-		primaryStage.getIcons().add(new Image("Icon.png"));
+		primaryStage.getIcons().add(new Image(LogicApplication.class.getResourceAsStream("/Icon.png")));
 		
 		VBox root = new VBox();
 		VBox secondary = new VBox();
